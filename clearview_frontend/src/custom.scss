@@ -1,0 +1,43 @@
+@import 'bootstrap/scss/functions';
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+
+// ==========================================================================
+// Clear View Brand Palette
+// ==========================================================================
+
+// Primary Brand Colors (Deep Teal / Emerald Green)
+$primary-brand:        #00875a; // The core green used for buttons and main branding
+$primary-brand-hover:  #006c48; // Darker shade for button hover states
+$primary-brand-light:  #e6f3ed; // Light green accent tints
+
+// Secondary / Dark Slate Accents
+$dark-slate:           #1e2d42; // Used for primary headings like "Sign in to Clear View"
+$dark-slate-bg:        #2d3e55; // Dark background color seen in split screens/outer boundaries
+
+// Neutral Grays (Text & UI Borders)
+$text-main:            #333333; // Default body and form label text
+$text-muted:           #666666; // Secondary text (e.g., footers, placeholder text)
+$border-input:         #cccccc; // Form field border color
+$bg-light:             #ffffff; // Pure white card backgrounds
+
+// Feedback Colors
+$link-color:           #00875a; // Links ("Forgot Password?", "Create an Account")
+
+// Fontstyle custom
+
+$font-family-sans-serif: 'Playfair Display', Georgia, serif;
+
+
+// ==========================================================================
+// Bootstrap Theme Map Overrides (Optional)
+// ==========================================================================
+// If you are overriding Bootstrap's default theme colors, map them here:
+
+$theme-colors: (
+  "primary":    $primary-brand,
+  "secondary":  $dark-slate,
+  "light":      $bg-light,
+  "dark":       $dark-slate-bg
+);
+
+@import 'bootstrap/scss/bootstrap';

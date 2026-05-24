@@ -15,6 +15,7 @@ routes.get("/", async (req: Request, res: Response) => {
 
 routes.post("/login", async (req: Request, res: Response) => {
   try {
+
     const { password, email } = req.body;
 
     if (!password && !email) {
@@ -35,26 +36,27 @@ routes.post("/login", async (req: Request, res: Response) => {
     const isMatch = await bcrypt.compare(password, user.password_hash);
 
     if (!isMatch) {
-      return res.status(401).json({ message: "Invalid email or password" });
+      return res.status(401).json({ message: "Invalid password" });
     }
-    res.status(200).json({
+    return res.status(200).json({
       Message: "User logged in",
       user: {
         id: user.id,
         useremail: user.email,
       },
     });
+
   } catch (error) {
     console.error(error);
-    res.status(501).json({ Message: "Internal server error" });
+    return res.status(501).json({ Message: "Internal server error" });
   }
 });
 
-routes.post("/Register", async (req: Request, res: Response) => {
+routes.post("/register", async (req: Request, res: Response) => {
   try {
-    const { name, email, password } = req.body;
+    const { username, email, password } = req.body;
 
-    if (!name || !email || !password) {
+    if (!username || !email || !password) {
       res.status(400).json({ Message: "All fields need to be filled" });
     }
 
@@ -74,7 +76,7 @@ routes.post("/Register", async (req: Request, res: Response) => {
 
     const [registerdetails]: any = await pool.query(
       "INSERT INTO users (username,password_hash,email) VALUES (?,?,?)",
-      [name, password_hashed, email],
+      [username, password_hashed, email],
     );
     res.status(201).json({
       Message: "User registered succesfully",
