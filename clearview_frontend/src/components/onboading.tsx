@@ -14,6 +14,7 @@ function Register() {
 
   const [error, setError] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [checkemail, setCheckemail] = useState(false);
 
   const navigate = useNavigate();
 
@@ -49,10 +50,15 @@ function Register() {
         body: JSON.stringify(verified),
       });
 
+      if (!response.ok) {
+        setCheckemail(true);
+        return;
+      }
       const responsedata = await response.json();
       console.log(responsedata.Message);
 
       setSuccess(true);
+      setCheckemail(false);
       setTimeout(() => {
         navigate("/dashboard");
       }, 2000);
@@ -126,6 +132,9 @@ function Register() {
             ) : null}
             {success ? (
               <p className="text-center text-success">Succesfully registered</p>
+            ) : null}
+            {checkemail ? (
+              <p className="text-center text-danger">Email Already Exists</p>
             ) : null}
             <div className="mb-3 d-flex ">
               <button type="submit" className="btn btn-primary w-100">

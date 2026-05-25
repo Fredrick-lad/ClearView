@@ -58,7 +58,7 @@ routes.post("/register", async (req: Request, res: Response) => {
     const { username, email, password } = req.body;
 
     if (!username || !email || !password) {
-      res.status(400).json({ Message: "All fields need to be filled" });
+      return res.status(400).json({ Message: "All fields need to be filled" });
     }
 
     const saltrounds = 10;
@@ -70,12 +70,10 @@ routes.post("/register", async (req: Request, res: Response) => {
       [email],
     );
     if (checkemail.length > 0) {
-      console.log("This email already exists")
       res
         .status(401)
         .json({ Message: "An account with this email already exists" });
-      return
-
+        return;
     }
 
     const [registerdetails]: any = await pool.query(
