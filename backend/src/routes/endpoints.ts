@@ -16,7 +16,7 @@ routes.get("/", async (req: Request, res: Response) => {
 routes.post("/login", async (req: Request, res: Response) => {
   try {
 
-    const { password, email } = req.body;
+    const { email, password} = req.body;
 
     if (!password && !email) {
       return res.status(400).json({ message: "Email and password required" });
@@ -37,6 +37,7 @@ routes.post("/login", async (req: Request, res: Response) => {
 
     if (!isMatch) {
       return res.status(401).json({ message: "Invalid password" });
+      // return console.log("Wrong password")
     }
     return res.status(200).json({
       Message: "User logged in",
@@ -47,9 +48,9 @@ routes.post("/login", async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error(error);
+    console.error("Log in error: ",error);
     return res.status(501).json({ Message: "Internal server error" });
-  }
+}
 });
 
 routes.post("/register", async (req: Request, res: Response) => {
@@ -62,21 +63,24 @@ routes.post("/register", async (req: Request, res: Response) => {
 
     const saltrounds = 10;
     const salt = await bcrypt.genSalt(saltrounds);
-    const password_hashed = await bcrypt.hash(password, salt);
+    const password_hash = await bcrypt.hash(password, salt);
 
     const [checkemail]: any = await pool.query(
       "SELECT email FROM users WHERE email=?",
       [email],
     );
     if (checkemail.length > 0) {
-      return res
+      console.log("This email already exists")
+      res
         .status(401)
         .json({ Message: "An account with this email already exists" });
+      return
+
     }
 
     const [registerdetails]: any = await pool.query(
       "INSERT INTO users (username,password_hash,email) VALUES (?,?,?)",
-      [username, password_hashed, email],
+      [username, password_hash, email],
     );
     res.status(201).json({
       Message: "User registered succesfully",
@@ -90,3 +94,7 @@ routes.post("/register", async (req: Request, res: Response) => {
   }
 });
 export default routes;
+function alert(arg0: string) {
+  throw new Error("Function not implemented.");
+}
+

@@ -38,7 +38,6 @@ function Register() {
         return;
       }
       setError(false);
-      setSuccess(true);
 
       const { confirmpassword, ...verified } = formData;
 
@@ -51,12 +50,12 @@ function Register() {
       });
 
       const responsedata = await response.json();
+      console.log(responsedata.Message);
 
-      if (!response) {
-        throw new Error(responsedata.Message || "Registration failed");
-      }
-
-      navigate("/dashboard");
+      setSuccess(true);
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 2000);
     } catch (error) {
       console.error(error);
     }
@@ -178,40 +177,45 @@ function Login() {
     }
   };
 
-  async function handleLogin(e: any) {
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const response = await fetch("http://localhost:4000/login", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(loginFormData),
-    });
-    const loginresponse: any = response.json();
-    if (!response) {
-      setError(loginresponse.Message);
-    }
-    /* if (response.status === 200) {
-      console.log("We have gotten here");
-      const timer = setTimeout(() => {
+    try {
+      const response = await fetch("http://localhost:4000/login", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginFormData),
+      });
+      const loginresponse: any = await response.json();
+
+      if (!response.ok) {
+        setError(loginresponse.message || "Login failed");
         setLoading(false);
-        clearTimeout(timer);
-        navigate("/dashboard");
-      }, 5000);
-    } */
+        return;
+      }
 
-    console.log(response.body);
-
-    setMessage(loginresponse.Message);
+      if (response.status === 200) {
+        console.log("Login successful");
+        setMessage(loginresponse.Message || "Login successful");
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 2000);
+      }
+    } catch (err) {
+      setError("An error occurred during login");
+      setLoading(false);
+      console.error(err);
+    }
   }
 
   return (
     <>
       {loading ? (
-        <div className="bg-dark opacity-50 vh-100 vw-100">
-          <h4 className="text-primary">Loading.......</h4>
+        <div className="position-absolute top-0 bg-dark opacity-10 vh-100 vw-100 d-flex justify-content-center  align-items-center vh-100">
+          <h4 className="text-primary text-center">Loading.......</h4>
         </div>
       ) : (
         <div className="d-flex justify-content-center  align-items-center vh-100 bg-{#FAFAFA}">
@@ -239,6 +243,7 @@ function Login() {
                 <input
                   type="password"
                   className="form-control"
+                  name="password"
                   onChange={handleChange}
                   placeholder="**********"
                 />
@@ -248,7 +253,7 @@ function Login() {
                   Sign In
                 </button>
               </div>
-
+              <p className="text-danger text-center">{error}</p>
               <Link
                 className=" mt-3 text-primary text-center d-block w-100 text-decoration-none"
                 to="/forgotpassword"
@@ -264,7 +269,6 @@ function Login() {
                   Create an Account
                 </Link>
               </p>
-              <p>{error}</p>
               <p>{message}</p>
             </form>
           </div>
