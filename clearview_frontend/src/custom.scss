@@ -1,43 +1,58 @@
 @import 'bootstrap/scss/functions';
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
 // ==========================================================================
-// Clear View Brand Palette
+// Clear View Brand Palette Configuration
 // ==========================================================================
 
-// Primary Brand Colors (Deep Teal / Emerald Green)
-$primary-brand:        #00875a; // The core green used for buttons and main branding
-$primary-brand-hover:  #006c48; // Darker shade for button hover states
-$primary-brand-light:  #e6f3ed; // Light green accent tints
+// Primary Brand Colors (Grounded Financial Wellness)
+$brand:               #0F6E56; // Deep Forest Green
+$brand-active:        #1D9E75; // Vibrant Emerald (Great for active states/hovers)
+$brand-light:         #E1F5EE; // Mint Tint (Subtle alerts/badges)
 
-// Secondary / Dark Slate Accents
-$dark-slate:           #1e2d42; // Used for primary headings like "Sign in to Clear View"
-$dark-slate-bg:        #2d3e55; // Dark background color seen in split screens/outer boundaries
+// UI Neutral Base
+$ui-bg:               #F9F8F4; // Warm Cream (Gives a clean, notebook-style background)
+$ui-surface:          #FFFFFF; // Pure White (For form cards and active containers)
+$ui-text:             #18181A; // Deep Charcoal (High contrast primary readability)
+$ui-text-dim:         #8A8A94; // Muted Slate (Secondary text, helpers, footers)
+$ui-border:           #E0E0E0; // Light layout borders
+$muted-slate:         #4A4A50; // Darker slate for stronger structural lines
 
-// Neutral Grays (Text & UI Borders)
-$text-main:            #333333; // Default body and form label text
-$text-muted:           #666666; // Secondary text (e.g., footers, placeholder text)
-$border-input:         #cccccc; // Form field border color
-$bg-light:             #ffffff; // Pure white card backgrounds
+// Typography Setup
+// Playfair Display works beautifully for grand headers, but a clean Sans-Serif 
+// like Plus Jakarta Sans keeps your data rows, numbers, and inputs sharp.
+$font-family-serif:      'Playfair Display', Georgia, serif;
+$font-family-sans-serif: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+$font-family-base:       $font-family-sans-serif; // Defaults layout to clean text
 
-// Feedback Colors
-$link-color:           #00875a; // Links ("Forgot Password?", "Create an Account")
-
-// Fontstyle custom
-
-$font-family-sans-serif: 'Playfair Display', Georgia, serif;
-
+// Heading Customization
+$headings-font-family:   $font-family-serif; // Keeps the editorial vibe for big greetings
 
 // ==========================================================================
-// Bootstrap Theme Map Overrides (Optional)
+// Bootstrap Theme Map Overrides
 // ==========================================================================
-// If you are overriding Bootstrap's default theme colors, map them here:
+// Overriding Bootstrap defaults to look completely native
+$primary:       $brand;
+$secondary:     $ui-text-dim;
+$body-bg:       $ui-bg;
+$body-color:    $ui-text;
+$border-color:  $ui-border;
 
-$theme-colors: (
-  "primary":    $primary-brand,
-  "secondary":  $dark-slate,
-  "light":      $bg-light,
-  "dark":       $dark-slate-bg
+// Custom utility mappings so you can use classes like text-brand-active directly
+$custom-colors: (
+  "brand":        $brand,
+  "brand-active": $brand-active,
+  "brand-light":  $brand-light,
+  "ui-bg":        $ui-bg,
+  "ui-surface":   $ui-surface,
+  "ui-text":      $ui-text,
+  "ui-text-dim":  $ui-text-dim,
+  "ui-border":    $ui-border
 );
+
+@import 'bootstrap/scss/variables';
+
+// Merge our custom map into Bootstrap's existing theme map
+$theme-colors: map-merge($theme-colors, $custom-colors);
 
 @import 'bootstrap/scss/bootstrap';

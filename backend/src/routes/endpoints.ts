@@ -2,12 +2,15 @@ import { Router, Request, Response } from "express";
 import pool from "../database.js";
 import bcrypt from "bcrypt";
 const routes = Router();
+import generateToken from "../util/tokengenerator.js";
+import { JwtPayload } from "../interfaces/registerPayload.js";
 
 routes.get("/", async (req: Request, res: Response) => {
   try {
     const [data] = await pool.query("SELECT * FROM users");
     res.json(data);
-    res.status(201);
+    
+    return res.status(201);
   } catch (error) {
     console.error(error);
   }
@@ -39,11 +42,18 @@ routes.post("/login", async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Invalid password" });
       // return console.log("Wrong password")
     }
+    const payload={
+      username: user.username,
+      email: user.email
+    }
+    const token = generateToken(payload);
+
     return res.status(200).json({
       Message: "User logged in",
       user: {
         id: user.id,
         useremail: user.email,
+        token,
       },
     });
 
@@ -80,10 +90,17 @@ routes.post("/register", async (req: Request, res: Response) => {
       "INSERT INTO users (username,password_hash,email) VALUES (?,?,?)",
       [username, password_hash, email],
     );
-    res.status(201).json({
+    const payload={
+      username: registerdetails.username,
+      email: registerdetails.email
+    }
+    const token = generateToken(payload);
+    return res.status(201).json({
       Message: "User registered succesfully",
       userId: registerdetails.id,
+      token,
     });
+    
   } catch (error) {
     console.error("REgistration error: ", error);
     res.status(500).json({
@@ -92,6 +109,7 @@ routes.post("/register", async (req: Request, res: Response) => {
   }
 });
 export default routes;
+
 function alert(arg0: string) {
   throw new Error("Function not implemented.");
 }
