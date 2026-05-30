@@ -105,7 +105,7 @@ export default function ClearViewLanding() {
               <Link to="/login" style={styles.btnPrimary}>
                 Log in
               </Link>
-              <Link to="/register" style={styles.btnSecondary}>
+              <Link to="/onboarding" style={styles.btnSecondary}>
                 Register
               </Link>
             </div>

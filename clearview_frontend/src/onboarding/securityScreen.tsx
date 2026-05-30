@@ -31,10 +31,7 @@ function SecurityScreen({
     confirmpassword: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState({
-    empty: "All fields must be filled",
-    mismatch: "Passwords do not match",
-  });
+  const [error, setError] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -51,7 +48,7 @@ function SecurityScreen({
     try {
       e.preventDefault();
       if (!password.password || !password.confirmpassword) {
-        setError(error);
+        setError(true);
         console.log("fill fields");
         return;
       }
@@ -145,7 +142,12 @@ function SecurityScreen({
             </p>
           </div>
         </form>
-        {error ? <p className="text-danger mb-0"></p> : null}
+        {error ? (
+          <p className="text-danger mb-0">
+            {" "}
+            Ensure the passwords match or arenot left blank
+          </p>
+        ) : null}
         <div className="d-flex gap-2 w-100">
           <button
             type="button"

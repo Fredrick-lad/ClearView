@@ -4,11 +4,10 @@ import { Icon } from "../components/ui/iconMap";
 import GetStartedScreen from "../onboarding/getStartedScreen";
 import IncomeSourcesScreen from "../onboarding/incomeSourcesScreen";
 import CreateProfileScreen from "../onboarding/createProfileScreen";
-import CreateEnvelopesScreen from "../onboarding/createEnvelopesScreen";
 import CondtionsScreen from "../onboarding/condtionsScreen";
 import SecurityScreen from "../onboarding/securityScreen";
 import type { RegisterProps } from "../types";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 function OnboardingScreen() {
   const [screen, setScreen] = useState<onboardingScreenKey>("getStarted");
@@ -19,24 +18,41 @@ function OnboardingScreen() {
     password: "",
   });
 
-  const [incomedata, setincomedata] = useState<string[]>([]);
+  const navigate = useNavigate();
+  const [incomedata, setincomedata] = useState<
+    { source: string; amount: number }[]
+  >([]);
   const updateFormdata = (newdata: RegisterProps) => {
     setFormdata((prev: RegisterProps) => ({
       ...prev,
       ...newdata,
     }));
   };
-  async function register() {
-    const response = await fetch("http://localhost:4000/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formdata),
-    });
 
-    if (response) {
-      <Navigate to="/dashboard" />;
+  async function register() {
+    if (!formdata.username || !formdata.email || !formdata.password) {
+      alert("Please fill in all profile fields.");
+      return;
+    }
+    const payload = {
+      ...formdata,
+      incomedata,
+    };
+    console.log(payload);
+    try {
+      const response = await fetch("http://localhost:4000/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -49,8 +65,7 @@ function OnboardingScreen() {
     { screenNumber: 1, id: "createProfile", label: "Create Profile" },
     { screenNumber: 2, id: "securityScreen", label: "Secure Your Account" },
     { screenNumber: 3, id: "incomeSources", label: "Income Sources" },
-    { screenNumber: 4, id: "createEnvelopes", label: "Create Envelopes" },
-    { screenNumber: 5, id: "conditions", label: "Terms and Conditons" },
+    { screenNumber: 4, id: "conditions", label: "Terms and Conditons" },
   ];
 
   const handleNext = () => {
@@ -69,13 +84,10 @@ function OnboardingScreen() {
     // Allscreens.map((screen)=>{
     const nextscreen = screenNumber - 1;
 
-    if (nextscreen < Allscreens.length) {
+    if (nextscreen >= 0) {
       setScreenNumber(nextscreen);
       setScreen(Allscreens[nextscreen].id);
     }
-  };
-  const setdata = (e: any) => {
-    setincomedata(e);
   };
 
   return (
@@ -115,11 +127,12 @@ function OnboardingScreen() {
             <IncomeSourcesScreen
               onBack={handleBack}
               onContinue={handleNext}
-              incomedata={setdata}
+              incomedata={setincomedata}
             />
           )}
-          {screen === "createEnvelopes" && <CreateEnvelopesScreen />}
-          {screen === "conditions" && <CondtionsScreen />}
+          {screen === "conditions" && (
+            <CondtionsScreen onContinue={register} onBack={handleBack} />
+          )}
         </div>
         <div>
           <button

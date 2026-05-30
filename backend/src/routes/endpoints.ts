@@ -4,6 +4,7 @@ import bcrypt from "bcrypt";
 const routes = Router();
 import generateToken from "../util/tokengenerator.js";
 import { JwtPayload } from "../interfaces/registerPayload.js";
+import { constants } from "node:buffer";
 
 routes.get("/", async (req: Request, res: Response) => {
   try {
@@ -43,8 +44,8 @@ routes.post("/login", async (req: Request, res: Response) => {
       // return console.log("Wrong password")
     }
     const payload={
-      username: user.username,
-      email: user.email
+      userid: user.userId,
+      email: email
     }
     const token = generateToken(payload);
 
@@ -65,10 +66,10 @@ routes.post("/login", async (req: Request, res: Response) => {
 
 routes.post("/register", async (req: Request, res: Response) => {
   try {
-    const { username, email, password } = req.body;
+    const { username, email, password , incomedata } = req.body;
 
-    if (!username || !email || !password) {
-      return res.status(400).json({ Message: "All fields need to be filled" });
+    if (!username || !email || !password || !Array.isArray(incomedata)) {
+      return res.status(400).json({ Message: "SOME FIELDS ARE MISSING" });
     }
 
     const saltrounds = 10;
@@ -87,12 +88,19 @@ routes.post("/register", async (req: Request, res: Response) => {
     }
 
     const [registerdetails]: any = await pool.query(
-      "INSERT INTO users (username,password_hash,email) VALUES (?,?,?)",
-      [username, password_hash, email],
+      "INSERT INTO users (username,email,password_hash) VALUES (?,?,?)",
+      [username,email ,password_hash ],
     );
+    for(const detail of incomedata){
+      await pool.query(
+      "INSERT INTO Income (source, total_amount, email) VALUES (?,?,?)",[detail.source, detail.amount,email]
+    )
+
+    }
+    
     const payload={
-      username: registerdetails.username,
-      email: registerdetails.email
+      username: username,
+      email: email
     }
     const token = generateToken(payload);
     return res.status(201).json({
@@ -108,9 +116,7 @@ routes.post("/register", async (req: Request, res: Response) => {
     });
   }
 });
+
 export default routes;
 
-function alert(arg0: string) {
-  throw new Error("Function not implemented.");
-}
 

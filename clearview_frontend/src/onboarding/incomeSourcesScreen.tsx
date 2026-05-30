@@ -5,7 +5,7 @@ import { useState } from "react";
 interface proceeding {
   onContinue: () => void;
   onBack: () => void;
-  incomedata: (data: string[]) => void;
+  incomedata: (data: { source: string; amount: number }[]) => void;
 }
 
 export default function IncomeSourcesScreen({
@@ -15,9 +15,10 @@ export default function IncomeSourcesScreen({
 }: proceeding) {
   const [source, setSource] = useState<string>("");
   const [amount, setAmount] = useState<number | undefined>(undefined);
-  const [incomeDetails, setIncomeDetails] = useState<string[]>([]);
+  const [incomeDetails, setIncomeDetails] = useState<
+    { source: string; amount: number }[]
+  >([]);
 
-  const [modal, setModal] = useState(false);
   const [error, setError] = useState(false);
 
   const suggestions = [
@@ -31,7 +32,10 @@ export default function IncomeSourcesScreen({
       setError(true);
       return;
     }
-    const combined = `${source} : ${amount}`;
+    const combined = {
+      source: source,
+      amount: Number(amount),
+    };
     setIncomeDetails([...incomeDetails, combined]);
     setSource("");
     setAmount(0);
@@ -51,13 +55,6 @@ export default function IncomeSourcesScreen({
   };
   const handleSourceChange = (e: any) => {
     setSource(e.target.value);
-  };
-  const handleDetailChange = (e: any) => {
-    const value = e.target.value;
-
-    const newdata = value.split("\n").filter((line: any) => line.trim() !== "");
-
-    setIncomeDetails(newdata);
   };
   const clearSources = () => {
     setIncomeDetails([]);
@@ -144,114 +141,89 @@ export default function IncomeSourcesScreen({
         <div>
           {incomeDetails.map((detail) => (
             <div className="bg-brand-light text-ui-text d-flex align-items-center border border-brand-active rounded w-50 p-1 mb-1">
-              {detail}
+              {detail.source}
+              {detail.amount}
             </div>
           ))}
         </div>
-        <div className="d-flex justify-content-end">
-          <button
-            onClick={() => setModal(true)}
-            className="bg-brand-light text-brand border botder-brand-active p-1 rounded "
-          >
-            Edit sources
-          </button>
-        </div>
-        <div>
-          {modal ? (
-            <div className="form-floating d-flex flex-column">
-              <button
-                onClick={() => setModal(false)}
-                className="text-brand border botder-brand-active p-1 rounded d-flex justify-content-end"
-              >
-                <X />
-              </button>
-              <textarea
-                name="details"
-                id="details"
-                value={incomeDetails}
-                rows={10}
-                className="form-control"
-                onChange={handleDetailChange}
-              ></textarea>
-              <button
-                onClick={clearSources}
-                className="bg-brand-light text-brand border botder-brand-active p-1 rounded "
-              >
-                Clear Sources
-              </button>
-            </div>
-          ) : null}
-        </div>
-        <div className="d-flex gap-2 flex-wrap">
-          {suggestions.map((onesugg) => (
-            <div key={onesugg.id} className="">
-              <button
-                onClick={chooseSource}
-                className="bg-brand-light text-brand d-flex align-items-center border border-brand-active rounded"
-              >
-                <Plus size={14} className="text-brand" />
-                {onesugg.source}
-              </button>
-            </div>
-          ))}
-        </div>
-        <div>
-          {error ? (
-            <div className="mt-2 d-flex align-items-center gap-2">
-              <CircleAlert className="text-danger" />
-              <p className="text-danger mb-0">
-                Please enter atleast one income source to continue
-              </p>
-            </div>
-          ) : null}
-        </div>
+      </div>
+      <div>
+        <button
+          onClick={clearSources}
+          className="bg-brand-light text-brand border botder-brand-active p-1 rounded "
+        >
+          Clear Sources
+        </button>
+      </div>
+      <div className="d-flex gap-2 flex-wrap">
+        {suggestions.map((onesugg) => (
+          <div key={onesugg.id} className="">
+            <button
+              onClick={chooseSource}
+              className="bg-brand-light text-brand d-flex align-items-center border border-brand-active rounded"
+            >
+              <Plus size={14} className="text-brand" />
+              {onesugg.source}
+            </button>
+          </div>
+        ))}
+      </div>
+      <div>
+        {error ? (
+          <div className="mt-2 d-flex align-items-center gap-2">
+            <CircleAlert className="text-danger" />
+            <p className="text-danger mb-0">
+              Please enter atleast one income source to continue
+            </p>
+          </div>
+        ) : null}
+      </div>
 
-        <div className="d-flex gap-2 w-100">
-          <button
-            onClick={onBack}
-            className="border-brand-active border rounded p-2  text-primary d-flex gap-2 align-items-center"
-          >
-            <ArrowLeft size={16} />
-            Back
-          </button>
-          <button
-            onClick={onNext}
-            className="border border-brand-active rounded bg-brand text-white p-2 flex-grow-1 d-flex gap-2 align-items-center justify-content-center"
-          >
-            Continue
-            <ArrowRight size={16} />
-          </button>
-        </div>
-        <div className="d-flex gap-1 align-items-center justify-content-center">
-          <span
-            className="rounded-pill bg-brand-active"
-            style={{ width: "24px", height: "5px" }}
-          ></span>
-          <span
-            className="rounded-pill bg-brand-active"
-            style={{ width: "6px", height: "5px" }}
-          ></span>
-          <span
-            className="rounded-pill bg-brand-active"
-            style={{ width: "6px", height: "5px" }}
-          ></span>
-          <span
-            className="rounded-pill bg-brand-active"
-            style={{ width: "6px", height: "5px" }}
-          ></span>
-          <span
-            className="rounded-pill bg-ui-border"
-            style={{ width: "6px", height: "5px" }}
-          ></span>
-          <span
-            className="rounded-pill bg-ui-border"
-            style={{ width: "6px", height: "5px" }}
-          ></span>
-          <span
-            className="rounded-pill bg-ui-border"
-            style={{ width: "6px", height: "5px" }}
-          ></span>
-        </div>
+      <div className="d-flex gap-2 w-100">
+        <button
+          onClick={onBack}
+          className="border-brand-active border rounded p-2  text-primary d-flex gap-2 align-items-center"
+        >
+          <ArrowLeft size={16} />
+          Back
+        </button>
+        <button
+          onClick={onNext}
+          className="border border-brand-active rounded bg-brand text-white p-2 flex-grow-1 d-flex gap-2 align-items-center justify-content-center"
+        >
+          Continue
+          <ArrowRight size={16} />
+        </button>
+      </div>
+      <div className="d-flex gap-1 align-items-center justify-content-center">
+        <span
+          className="rounded-pill bg-brand-active"
+          style={{ width: "24px", height: "5px" }}
+        ></span>
+        <span
+          className="rounded-pill bg-brand-active"
+          style={{ width: "6px", height: "5px" }}
+        ></span>
+        <span
+          className="rounded-pill bg-brand-active"
+          style={{ width: "6px", height: "5px" }}
+        ></span>
+        <span
+          className="rounded-pill bg-brand-active"
+          style={{ width: "6px", height: "5px" }}
+        ></span>
+        <span
+          className="rounded-pill bg-ui-border"
+          style={{ width: "6px", height: "5px" }}
+        ></span>
+        <span
+          className="rounded-pill bg-ui-border"
+          style={{ width: "6px", height: "5px" }}
+        ></span>
+        <span
+          className="rounded-pill bg-ui-border"
+          style={{ width: "6px", height: "5px" }}
+        ></span>
       </div>
     </>
   );
