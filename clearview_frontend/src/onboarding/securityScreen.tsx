@@ -31,7 +31,10 @@ function SecurityScreen({
     confirmpassword: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState({
+    empty: "All fields must be filled",
+    mismatch: "Passwords do not match",
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -48,7 +51,7 @@ function SecurityScreen({
     try {
       e.preventDefault();
       if (!password.password || !password.confirmpassword) {
-        setError(true);
+        setError(error);
         console.log("fill fields");
         return;
       }
@@ -137,11 +140,12 @@ function SecurityScreen({
           <div className="mt-2 d-flex align-items-center gap-2">
             <CircleAlert className="text-brand-active" />
             <p className="text-ui-text-dim mb-0">
-              This will help secure your account from unauthorised access please
-              create a strong password
+              This will help secure your account from unauthorised access.
+              Create a strong password
             </p>
           </div>
         </form>
+        {error ? <p className="text-danger mb-0"></p> : null}
         <div className="d-flex gap-2 w-100">
           <button
             type="button"

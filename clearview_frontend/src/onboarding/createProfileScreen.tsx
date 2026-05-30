@@ -1,6 +1,7 @@
 import { User, CircleAlert, Mail, ArrowLeft, ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Onboarding } from "../types";
+import { Navigate } from "react-router-dom";
 
 function CreateProfileScreen({
   initialdata,
@@ -14,9 +15,11 @@ function CreateProfileScreen({
     }
   }, [initialdata]);
   const [data, setdata] = useState({ username: "", email: "" });
+  const [error, setError] = useState(false);
 
   // Tis methd is for uodating the data entered by the users on the inut field
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setError(false);
     const { name, value } = e.target;
 
     setdata((prev: any) => {
@@ -28,6 +31,10 @@ function CreateProfileScreen({
   };
 
   const onNext = (e: any) => {
+    if (!data.username || !data.email) {
+      setError(true);
+      return;
+    }
     e.preventDefault();
     updateformdata(data);
     onContinue();
@@ -58,7 +65,7 @@ function CreateProfileScreen({
           </div>
         </div>
         <div className="text-muted small fw-bold text-uppercase mb-1">
-          Step 1 of 5
+          Step 1 of 4
         </div>
         <form className="mb-3">
           <div className="mb-3">
@@ -108,6 +115,14 @@ function CreateProfileScreen({
             </p>
           </div>
         </form>
+
+        <div className="mt-2">
+          {error ? (
+            <p className="text-danger">
+              All fields are needed to create a profile
+            </p>
+          ) : null}
+        </div>
 
         <div className="d-flex gap-2 w-100">
           <button

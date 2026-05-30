@@ -8,6 +8,7 @@ import CreateEnvelopesScreen from "../onboarding/createEnvelopesScreen";
 import CondtionsScreen from "../onboarding/condtionsScreen";
 import SecurityScreen from "../onboarding/securityScreen";
 import type { RegisterProps } from "../types";
+import { Navigate } from "react-router-dom";
 
 function OnboardingScreen() {
   const [screen, setScreen] = useState<onboardingScreenKey>("getStarted");
@@ -18,12 +19,26 @@ function OnboardingScreen() {
     password: "",
   });
 
+  const [incomedata, setincomedata] = useState<string[]>([]);
   const updateFormdata = (newdata: RegisterProps) => {
     setFormdata((prev: RegisterProps) => ({
       ...prev,
       ...newdata,
     }));
   };
+  async function register() {
+    const response = await fetch("http://localhost:4000/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formdata),
+    });
+
+    if (response) {
+      <Navigate to="/dashboard" />;
+    }
+  }
 
   const Allscreens: Array<{
     screenNumber: number;
@@ -58,6 +73,9 @@ function OnboardingScreen() {
       setScreenNumber(nextscreen);
       setScreen(Allscreens[nextscreen].id);
     }
+  };
+  const setdata = (e: any) => {
+    setincomedata(e);
   };
 
   return (
@@ -94,7 +112,11 @@ function OnboardingScreen() {
             />
           )}
           {screen === "incomeSources" && (
-            <IncomeSourcesScreen onBack={handleBack} onContinue={handleNext} />
+            <IncomeSourcesScreen
+              onBack={handleBack}
+              onContinue={handleNext}
+              incomedata={setdata}
+            />
           )}
           {screen === "createEnvelopes" && <CreateEnvelopesScreen />}
           {screen === "conditions" && <CondtionsScreen />}

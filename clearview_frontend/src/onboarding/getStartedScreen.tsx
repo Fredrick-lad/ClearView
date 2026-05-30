@@ -1,5 +1,6 @@
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Register } from "../onboarding/onboading";
+import { Link, Navigate } from "react-router-dom";
 
 interface proceeding {
   onContinue: () => void;
@@ -61,12 +62,11 @@ export default function GetStartedScreen({ onContinue, onBack }: proceeding) {
           </span>
         </div>
         <div className="d-flex gap-2 w-100 mb-3">
-          <button
-            className="border-brand-active border rounded p-2  text-primary d-flex gap-2 align-items-center"
-            onClick={onBack}
-          >
+          <button className="border-brand-active border rounded p-2  text-primary d-flex gap-2 align-items-center">
             <ArrowLeft size={16} />
-            Back
+            <Link className="text-decoration-none" to="/">
+              Back
+            </Link>
           </button>
           <button
             className="border border-brand-active rounded bg-brand text-white p-2 flex-grow-1 d-flex gap-2 align-items-center justify-content-center"
