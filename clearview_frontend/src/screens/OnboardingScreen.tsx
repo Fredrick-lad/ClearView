@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import type { onboardingScreenKey } from "../types";
-import { Icon } from "../components/ui/iconMap";
 import GetStartedScreen from "../onboarding/getStartedScreen";
 import IncomeSourcesScreen from "../onboarding/incomeSourcesScreen";
 import CreateProfileScreen from "../onboarding/createProfileScreen";
 import CondtionsScreen from "../onboarding/condtionsScreen";
 import SecurityScreen from "../onboarding/securityScreen";
 import type { RegisterProps } from "../types";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/context/userContext";
 
 function OnboardingScreen() {
+  const { registerUser, isLoading, checkEmail, emailError } = useAuth();
   const [screen, setScreen] = useState<onboardingScreenKey>("getStarted");
   const [screenNumber, setScreenNumber] = useState(0);
   const [formdata, setFormdata] = useState({
@@ -29,32 +30,12 @@ function OnboardingScreen() {
     }));
   };
 
-  async function register() {
-    if (!formdata.username || !formdata.email || !formdata.password) {
-      alert("Please fill in all profile fields.");
-      return;
+  const register = async () => {
+    const response = await registerUser(formdata, incomedata);
+    if (response) {
+      navigate("/dashboard");
     }
-    const payload = {
-      ...formdata,
-      incomedata,
-    };
-    console.log(payload);
-    try {
-      const response = await fetch("http://localhost:4000/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (response.ok) {
-        navigate("/dashboard");
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  };
 
   const Allscreens: Array<{
     screenNumber: number;
@@ -76,8 +57,6 @@ function OnboardingScreen() {
       setScreenNumber(nextscreen);
       setScreen(Allscreens[nextscreen].id);
     }
-
-    console.log(formdata);
   };
 
   const handleBack = () => {
@@ -92,17 +71,7 @@ function OnboardingScreen() {
 
   return (
     <>
-      <div className="d-flex flex-row justify-content-between align-items-center vw-100 vh-100">
-        <div>
-          <button
-            className="bg-light border border-primary-light rounded-circle p-3"
-            style={{ border: "none" }}
-            type="button"
-            onClick={handleBack}
-          >
-            <Icon name="moveLeft" className="text-primary" />
-          </button>
-        </div>
+      <div className="d-flex flex-row justify-content-center align-items-center vw-100 vh-100">
         <div>
           {screen === "getStarted" && (
             <GetStartedScreen onBack={handleBack} onContinue={handleNext} />
@@ -133,16 +102,6 @@ function OnboardingScreen() {
           {screen === "conditions" && (
             <CondtionsScreen onContinue={register} onBack={handleBack} />
           )}
-        </div>
-        <div>
-          <button
-            className="bg-light border border-primary-light rounded-circle p-3"
-            style={{ border: "none" }}
-            type="button"
-            onClick={handleNext}
-          >
-            <Icon name="moveRight" className="text-primary" />
-          </button>
         </div>
       </div>
     </>

@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { Bell, Settings, User } from "lucide-react";
+import { useAuth } from "../../hooks/context/userContext";
 
 interface TopbarProps {
-  title: string;
-  sub: string;
   onNewEnvelope: () => void;
 }
 
-export default function Topbar({ title, sub, onNewEnvelope }: TopbarProps) {
+export default function Topbar({ onNewEnvelope }: TopbarProps) {
+  const { userData } = useAuth();
+
+  // const [focus, setFocus] = useState(false);
   return (
     <header
       style={{
@@ -16,21 +18,45 @@ export default function Topbar({ title, sub, onNewEnvelope }: TopbarProps) {
         alignItems: "center",
       }}
     >
-      <div>
-        <div className="text-primary" style={{ fontSize: 18, fontWeight: 800 }}>
-          {title}
-        </div>
-        <div style={{ fontSize: 12, color: "#6b7280" }}>{sub}</div>
+      <div className="d-flex flex-column">
+        <h2 className="" style={{ margin: 0 }}>
+          Hello {userData?.firstName || userData?.username}!
+        </h2>
+        <p className="small" style={{ margin: 0 }}>
+          Here is your financial overview of June 2026{" "}
+        </p>
       </div>
-
-      <div>
+      {/* <div>
         <button
-          className="bg-primary text-white border-primary"
+          className="bg-brand text-white border-primary p-2 rounded d-flex align-items-center"
           onClick={onNewEnvelope}
-          style={{ padding: "8px 12px", borderRadius: 8, cursor: "pointer" }}
+          style={{ border: "none", cursor: "pointer" }}
         >
-          + New Envelope
+          <Plus size="16px" className="text-white" />
+          New Envelope
         </button>
+      </div> */}
+
+      <div className="d-flex gap-4 align-items-center">
+        <div>
+          <button
+            onClick={onNewEnvelope}
+            type="button"
+            className="bg-brand-active text-white p-2 rounded"
+            style={{ border: "none" }}
+          >
+            New Envelope
+          </button>
+        </div>
+        <div>
+          <Bell />
+        </div>
+        <div className="">
+          <Settings />
+        </div>
+        <div className="">
+          <User />
+        </div>
       </div>
     </header>
   );

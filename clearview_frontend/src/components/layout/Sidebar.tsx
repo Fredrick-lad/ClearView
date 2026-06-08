@@ -1,20 +1,37 @@
 import type { ScreenKey, ModalKind } from "../../types";
 import { useState, type ReactNode } from "react";
 import { Icon } from "../ui/iconMap";
-import { User } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowRightCircle,
+  ChevronRight,
+  Headset,
+  LogOut,
+  Settings,
+  User,
+} from "lucide-react";
 
 interface SidebarProps {
+  title: string;
+
   screen: ScreenKey;
   setScreen: (s: ScreenKey) => void;
   setModal: (m: ModalKind) => void;
 }
 
-export default function Sidebar({ screen, setScreen, setModal }: SidebarProps) {
+export default function Sidebar({
+  title,
+  screen,
+  setScreen,
+  setModal,
+}: SidebarProps) {
   // const [user, setUser]= useState(username = "" , email="")
   const details = {
     username: "fred",
     email: "fred@gmail.com",
   };
+
+  const [fullSidebar, setFullSidebar] = useState(true);
 
   const items: Array<{ icon: ReactNode; id: ScreenKey; label: string }> = [
     {
@@ -44,18 +61,45 @@ export default function Sidebar({ screen, setScreen, setModal }: SidebarProps) {
     },
   ];
 
+  const support: Array<{ icon: ReactNode; id: ScreenKey; label: String }> = [
+    {
+      icon: <Settings className="text-brand" />,
+      id: "settings",
+      label: "Settings",
+    },
+    {
+      icon: <Headset className="text-brand" />,
+      id: "helpCenter",
+      label: "Help Center",
+    },
+    {
+      icon: <LogOut className="text-brand" />,
+      id: "logout",
+      label: "Logout",
+    },
+  ];
+
   return (
     <aside
       style={{
         width: 220,
-        paddingTop: 10,
         borderRight: "1px solid #e5e7eb",
         // height: "100vh",
         // position: "relative",
       }}
-      className="d-flex justify-content-between flex-column"
+      className="d-flex justify-content-between flex-column h-100 p-2 z-2"
     >
       <nav>
+        <div className="d-flex align-items-center ">
+          <div style={{ padding: "16px" }}>
+            <div
+              className="text-primary"
+              style={{ fontSize: 18, fontWeight: 800 }}
+            >
+              {title}
+            </div>
+          </div>
+        </div>
         {items.map((it) => (
           <div key={it.id} style={{ marginBottom: 8 }}>
             <button
@@ -65,8 +109,10 @@ export default function Sidebar({ screen, setScreen, setModal }: SidebarProps) {
                 textAlign: "left",
                 padding: "8px 10px",
                 border: "none",
-                background: screen === it.id ? "#eef2ff" : "transparent",
+                background: screen === it.id ? "#E1F5EE" : "transparent",
                 cursor: "pointer",
+                borderLeft: screen === it.id ? "3px solid #1D9E75" : "none",
+                paddingLeft: screen === it.id ? "8px" : "none",
               }}
             >
               <div className="d-flex gap-2">
@@ -78,19 +124,31 @@ export default function Sidebar({ screen, setScreen, setModal }: SidebarProps) {
         ))}
       </nav>
       {/* <hr style={{ margin: 0 }} /> */}
-      <button style={{ border: "none", backgroundColor: "#eef2ff" }}>
-        <div className="d-flex gap-2 align-items-center flex-row p-2 mt-1 ">
-          <div className="border rounded-circle border-primary p-2">
-            <User />
+      <div>
+        {support.map((supp) => (
+          <div key={supp.id} style={{ marginBottom: 8 }}>
+            <button
+              onClick={() => setScreen(supp.id)}
+              style={{
+                width: "100%",
+                textAlign: "left",
+                padding: "8px 10px",
+                border: "none",
+                background: screen === supp.id ? "#E1F5EE" : "transparent",
+                cursor: "pointer",
+
+                borderLeft: screen === supp.id ? "3px solid #1D9E75" : "none",
+                paddingLeft: screen === supp.id ? "8px" : "none",
+              }}
+            >
+              <div className="d-flex gap-2">
+                {supp.icon}
+                {supp.label}
+              </div>
+            </button>
           </div>
-          <div className="d-flex align-items-center ">
-            <p style={{ marginBottom: 0 }} className="text-start">
-              {details.username} <br />{" "}
-              <span className="text-muted">{details.email}</span>
-            </p>
-          </div>
-        </div>
-      </button>
+        ))}
+      </div>
     </aside>
   );
 }

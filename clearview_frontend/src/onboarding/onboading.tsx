@@ -1,200 +1,200 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import LoadingScreen from "../hooks/loadingscreen";
+import LoadingScreen from "../components/loadingscreen";
+import { useAuth } from "../hooks/context/userContext";
 
 import { Link } from "react-router-dom";
 
 // Log in and Register components
-function Register() {
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-    confirmpassword: "",
-  });
+// function Register() {
+//   const [formData, setFormData] = useState({
+//     username: "",
+//     email: "",
+//     password: "",
+//     confirmpassword: "",
+//   });
 
-  const [error, setError] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [checkemail, setCheckemail] = useState(false);
-  const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState(false);
+//   const [success, setSuccess] = useState(false);
+//   const [checkemail, setCheckemail] = useState(false);
+//   const [loading, setLoading] = useState(false);
 
-  const navigate = useNavigate();
+//   const navigate = useNavigate();
 
-  const handleChange = (event: any) => {
-    const { name, value } = event.target;
-    setFormData((prevdata: any) => {
-      return {
-        ...prevdata,
-        [name]: value,
-      };
-    });
-    if (error) {
-      setError(false);
-    }
-  };
-  async function handleRegister(e: any) {
-    try {
-      e.preventDefault();
-      setLoading(true);
-      if (formData.password !== formData.confirmpassword) {
-        setError(true);
-        setSuccess(false);
-        return;
-      }
-      setError(false);
+//   const handleChange = (event: any) => {
+//     const { name, value } = event.target;
+//     setFormData((prevdata: any) => {
+//       return {
+//         ...prevdata,
+//         [name]: value,
+//       };
+//     });
+//     if (error) {
+//       setError(false);
+//     }
+//   };
+//   async function handleRegister(e: any) {
+//     try {
+//       e.preventDefault();
+//       setLoading(true);
+//       if (formData.password !== formData.confirmpassword) {
+//         setError(true);
+//         setSuccess(false);
+//         return;
+//       }
+//       setError(false);
 
-      const { confirmpassword, ...verified } = formData;
+//       const { confirmpassword, ...verified } = formData;
 
-      const response = await fetch("http://localhost:4000/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(verified),
-      });
+//       const response = await fetch("http://localhost:4000/register", {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify(verified),
+//       });
 
-      if (!response.ok) {
-        setCheckemail(true);
-        setLoading(false);
-        return;
-      }
-      const responsedata = await response.json();
-      localStorage.setItem("jwt_token", responsedata.token);
-      console.log(responsedata.Message);
+//       if (!response.ok) {
+//         setCheckemail(true);
+//         setLoading(false);
+//         return;
+//       }
+//       const responsedata = await response.json();
+//       localStorage.setItem("jwt_token", responsedata.token);
+//       console.log(responsedata.Message);
 
-      setSuccess(true);
-      setCheckemail(false);
+//       setSuccess(true);
+//       setCheckemail(false);
 
-      setTimeout(() => {
-        setLoading(false);
-        navigate("/dashboard");
-      }, 2000);
-    } catch (error) {
-      console.error(error);
-    }
-  }
+//       setTimeout(() => {
+//         setLoading(false);
+//         navigate("/dashboard");
+//       }, 2000);
+//     } catch (error) {
+//       console.error(error);
+//     }
+//   }
 
-  return (
-    <>
-      {loading ? (
-        <LoadingScreen />
-      ) : (
-        <>
-          <style>
-            {`
-            @keyframes floatUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }`}
-          </style>
-          <div className="d-flex justify-content-center align-items-center vh-100 position-relative">
-            <div className="" style={style.cardAnimation}>
-              <form
-                className="container mt-4 needs-validation"
-                onSubmit={handleRegister}
-              >
-                <div className="w-100 d-flex justify-content-left mb-3">
-                  <Link className="text-decoration-none" to="landingpage">
-                    &lt; Back
-                  </Link>
-                </div>
-                <h4>Create your free account today</h4>
-                <p>Start managing your finances effortlessly today</p>
-                <div className="mb-3">
-                  <label htmlFor="username" className="form-label">
-                    Username
-                  </label>
-                  <input
-                    type="text"
-                    name="username"
-                    className="form-control"
-                    value={formData.username}
-                    placeholder="John Doe"
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="username" className="form-label">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    className="form-control"
-                    value={formData.email}
-                    placeholder="johndoe@gmial.com"
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="mb-3 ">
-                  <label htmlFor="password" className="form-label">
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    name="password"
-                    className="form-control"
-                    onChange={handleChange}
-                    placeholder="**********"
-                  />
-                </div>
-                <div className="mb-3 ">
-                  <label htmlFor="confirmpassword" className="form-label">
-                    Confirm Password
-                  </label>
-                  <input
-                    type="password"
-                    name="confirmpassword"
-                    className="form-control"
-                    onChange={handleChange}
-                    placeholder="**********"
-                  />
-                </div>
-                {error ? (
-                  <p className="text-left text-danger">Passwords don't match</p>
-                ) : null}
-                {success ? (
-                  <p className="text-center text-success">
-                    Succesfully registered
-                  </p>
-                ) : null}
-                {checkemail ? (
-                  <p className="text-center text-danger">
-                    Email Already Exists
-                  </p>
-                ) : null}
-                <div className="mb-3 d-flex ">
-                  <button type="submit" className="btn btn-primary w-100">
-                    Submit
-                  </button>
-                </div>
-                <p className="mt-3 text-center d-block w-100">
-                  Already have an account{" "}
-                  <Link
-                    className="text-primary text-decoration-none"
-                    to="/login"
-                  >
-                    Log in
-                  </Link>
-                </p>
-              </form>
-            </div>
-          </div>
-        </>
-      )}
-    </>
-  );
-}
+//   return (
+//     <>
+//       {loading ? (
+//         <LoadingScreen />
+//       ) : (
+//         <>
+//           <style>
+//             {`
+//             @keyframes floatUp {
+//           from { opacity: 0; transform: translateY(20px); }
+//           to { opacity: 1; transform: translateY(0); }
+//         }`}
+//           </style>
+//           <div className="d-flex justify-content-center align-items-center vh-100 position-relative">
+//             <div className="" style={style.cardAnimation}>
+//               <form
+//                 className="container mt-4 needs-validation"
+//                 onSubmit={handleRegister}
+//               >
+//                 <div className="w-100 d-flex justify-content-left mb-3">
+//                   <Link className="text-decoration-none" to="landingpage">
+//                     &lt; Back
+//                   </Link>
+//                 </div>
+//                 <h4>Create your free account today</h4>
+//                 <p>Start managing your finances effortlessly today</p>
+//                 <div className="mb-3">
+//                   <label htmlFor="username" className="form-label">
+//                     Username
+//                   </label>
+//                   <input
+//                     type="text"
+//                     name="username"
+//                     className="form-control"
+//                     value={formData.username}
+//                     placeholder="John Doe"
+//                     onChange={handleChange}
+//                   />
+//                 </div>
+//                 <div className="mb-3">
+//                   <label htmlFor="username" className="form-label">
+//                     Email
+//                   </label>
+//                   <input
+//                     type="email"
+//                     name="email"
+//                     className="form-control"
+//                     value={formData.email}
+//                     placeholder="johndoe@gmial.com"
+//                     onChange={handleChange}
+//                   />
+//                 </div>
+//                 <div className="mb-3 ">
+//                   <label htmlFor="password" className="form-label">
+//                     Password
+//                   </label>
+//                   <input
+//                     type="password"
+//                     name="password"
+//                     className="form-control"
+//                     onChange={handleChange}
+//                     placeholder="**********"
+//                   />
+//                 </div>
+//                 <div className="mb-3 ">
+//                   <label htmlFor="confirmpassword" className="form-label">
+//                     Confirm Password
+//                   </label>
+//                   <input
+//                     type="password"
+//                     name="confirmpassword"
+//                     className="form-control"
+//                     onChange={handleChange}
+//                     placeholder="**********"
+//                   />
+//                 </div>
+//                 {error ? (
+//                   <p className="text-left text-danger">Passwords don't match</p>
+//                 ) : null}
+//                 {success ? (
+//                   <p className="text-center text-success">
+//                     Succesfully registered
+//                   </p>
+//                 ) : null}
+//                 {checkemail ? (
+//                   <p className="text-center text-danger">
+//                     Email Already Exists
+//                   </p>
+//                 ) : null}
+//                 <div className="mb-3 d-flex ">
+//                   <button type="submit" className="btn btn-primary w-100">
+//                     Submit
+//                   </button>
+//                 </div>
+//                 <p className="mt-3 text-center d-block w-100">
+//                   Already have an account{" "}
+//                   <Link
+//                     className="text-primary text-decoration-none"
+//                     to="/login"
+//                   >
+//                     Log in
+//                   </Link>
+//                 </p>
+//               </form>
+//             </div>
+//           </div>
+//         </>
+//       )}
+//     </>
+//   );
+// }
 function Login() {
   const [loginFormData, setLoginFormData] = useState({
     email: "",
     password: "",
   });
-  const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
+  const { loginUser, error, isLoading, setError } = useAuth();
   // function loader() {
   //   return (
   //     <>
@@ -206,6 +206,7 @@ function Login() {
   // }
 
   const handleChange = (e: any) => {
+    setError("");
     const { name, value } = e.target;
     setLoginFormData((prevData) => {
       return {
@@ -214,42 +215,23 @@ function Login() {
       };
     });
     if (error) {
-      setError("");
     }
   };
 
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
+  const handleLogin = async (e: any) => {
     try {
-      const response = await fetch("http://localhost:4000/login", {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(loginFormData),
-      });
-      const loginresponse: any = await response.json();
-      if (!response.ok) {
-        setError(loginresponse.message || "Login failed");
-        setLoading(false);
-        return;
-      }
+      e.preventDefault();
+      const response = await loginUser(loginFormData);
 
-      const token = loginresponse.user?.token;
-      localStorage.setItem("jwt_token", token);
-
-      setMessage(loginresponse.Message || "Login successful");
-      setTimeout(() => {
+      if (response) {
         navigate("/dashboard");
-      }, 2000);
+      }
     } catch (err) {
-      setError("An error occurred during login");
+      error;
       setLoading(false);
       console.error(err);
     }
-  }
+  };
 
   return (
     <>
@@ -315,7 +297,7 @@ function Login() {
                   New to ClearView?{" "}
                   <Link
                     className="text-primary text-decoration-none"
-                    to="/register"
+                    to="/onboarding"
                   >
                     Create an Account
                   </Link>
@@ -344,4 +326,4 @@ const style: Record<string, React.CSSProperties> = {
   },
 };
 
-export { Login, Register, Forgotpassword };
+export { Login, Forgotpassword };

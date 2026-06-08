@@ -2,6 +2,7 @@ import { User, CircleAlert, Mail, ArrowLeft, ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Onboarding } from "../types";
 import { Navigate } from "react-router-dom";
+import { useAuth } from "../hooks/context/userContext";
 
 function CreateProfileScreen({
   initialdata,
@@ -16,10 +17,12 @@ function CreateProfileScreen({
   }, [initialdata]);
   const [data, setdata] = useState({ username: "", email: "" });
   const [error, setError] = useState(false);
+  const { emailError, checkEmail, setEmailError } = useAuth();
 
   // Tis methd is for uodating the data entered by the users on the inut field
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setError(false);
+    setEmailError("");
     const { name, value } = e.target;
 
     setdata((prev: any) => {
@@ -30,7 +33,12 @@ function CreateProfileScreen({
     });
   };
 
-  const onNext = (e: any) => {
+  const onNext = async (e: any) => {
+    const isEmailValid = await checkEmail(data.email);
+
+    if (!isEmailValid) {
+      return;
+    }
     if (!data.username || !data.email) {
       setError(true);
       return;
@@ -42,6 +50,19 @@ function CreateProfileScreen({
 
   return (
     <>
+      <style>
+        {`
+        @keyframes slideInFromRight {
+       from {
+       transform: translateX(20px);
+       opacity: 0;
+       }
+      to {
+      transform: translateX(0);
+      opacity: 1;
+        }
+      }`}
+      </style>
       <div
         className="card d-flex flex-column justify-content-between p-4 p-md-5 border-ui-border"
         style={{
@@ -49,6 +70,10 @@ function CreateProfileScreen({
           height: "600px",
           backgroundColor: "var(--bs-ui-bg)",
           borderRadius: "1.25rem",
+          animationName: "slideInFromRight",
+          animationDuration: "0.6s",
+          animationTimingFunction: "ease-in",
+          animationFillMode: "forwards",
         }}
       >
         <div className="d-flex gap-3 mb-3 align-items-center ">
@@ -83,7 +108,7 @@ function CreateProfileScreen({
                 value={data.username}
                 onChange={handleChange}
                 className="form-control border-start-0 "
-                placeholder="Enter your full name"
+                placeholder="Enter your full name First and last"
                 style={{ outline: "none", boxShadow: "none" }}
               />
             </div>
@@ -102,6 +127,7 @@ function CreateProfileScreen({
                 id="email"
                 value={data.email}
                 onChange={handleChange}
+                onBlur={(e) => checkEmail(e.target.value)}
                 className=" form-control border-start-0"
                 placeholder="Enter your email"
                 style={{ outline: "none", boxShadow: "none" }}
@@ -116,7 +142,10 @@ function CreateProfileScreen({
           </div>
         </form>
 
-        <div className="mt-2">
+        <div className="mt-2 d-flex justify-content-center">
+          {emailError ? (
+            <span className="text-danger text-center">{emailError}</span>
+          ) : null}
           {error ? (
             <p className="text-danger">
               All fields are needed to create a profile

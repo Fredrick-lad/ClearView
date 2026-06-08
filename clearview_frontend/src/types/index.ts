@@ -5,7 +5,12 @@ export type ScreenKey =
   | "Envelopes"
   | "Expenses"
   | "Income"
-  | "Reports";
+  | "Reports"
+  | "settings"
+  | "helpCenter"
+  | "logout"
+  | "Profile"
+
 
 export type onboardingScreenKey = 
   | "getStarted"
@@ -56,6 +61,11 @@ export type RegisterProps= {
   password: string;
 }
 
+export type LoginProps= {
+  email : string;
+  password: string;
+}
+
 export interface BadgeProps {
   pct: number;
 }
@@ -65,7 +75,10 @@ export interface ModalProps {
   onClose: () => void;
   children: ReactNode;
 }
-type initialdata={
+export type initialdata={
+  id?:number,
+  firstName?: string,
+  lastName?: string,
   username: string,
   email: string
 }

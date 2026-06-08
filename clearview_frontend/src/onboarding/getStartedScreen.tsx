@@ -1,5 +1,4 @@
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { Register } from "../onboarding/onboading";
 import { Link, Navigate } from "react-router-dom";
 
 interface proceeding {
@@ -10,6 +9,20 @@ interface proceeding {
 export default function GetStartedScreen({ onContinue, onBack }: proceeding) {
   return (
     <>
+      <style>
+        {`
+        @keyframes slideInFromRight {
+  from {
+    transform: translateX(18px);
+    opacity: 0;
+    transition: opacity 0.65s cubic-bezier(0.25, 1, 0.5, 1), transform 0.65s cubic-bezier(0.25, 1, 0.5, 1); 
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}`}
+      </style>
       <div
         className="card d-flex flex-column justify-content-between p-4 p-md-5 border-ui-border"
         style={{
@@ -17,6 +30,10 @@ export default function GetStartedScreen({ onContinue, onBack }: proceeding) {
           height: "600px",
           backgroundColor: "var(--bs-ui-bg)",
           borderRadius: "1.25rem",
+          animationName: "slideInFromRight",
+          animationDuration: "0.6s",
+          animationTimingFunction: "ease-in",
+          animationFillMode: "forwards",
         }}
       >
         {/* Top Section */}
@@ -64,7 +81,7 @@ export default function GetStartedScreen({ onContinue, onBack }: proceeding) {
         <div className="d-flex gap-2 w-100 mb-3">
           <button className="border-brand-active border rounded p-2  text-primary d-flex gap-2 align-items-center">
             <ArrowLeft size={16} />
-            <Link className="text-decoration-none" to="/">
+            <Link className="text-decoration-none" to=".." relative="path">
               Back
             </Link>
           </button>
@@ -111,3 +128,14 @@ export default function GetStartedScreen({ onContinue, onBack }: proceeding) {
     </>
   );
 }
+
+const style: Record<string, React.CSSProperties> = {
+  cardAnimation: {
+    background: "#FFFFFF",
+    border: "0.5px solid rgba(24,24,26,0.18)",
+    borderRadius: "20px",
+    padding: "1.75rem",
+    boxShadow: "0 2px 40px rgba(24,24,26,0.06), 0 1px 4px rgba(24,24,26,0.04)",
+    animation: "floatUp 0.8s ease both",
+  },
+};

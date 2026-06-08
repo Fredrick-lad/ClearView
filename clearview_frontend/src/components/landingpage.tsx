@@ -80,7 +80,7 @@ export default function ClearViewLanding() {
             </a>
           </li>
         </ul>
-        <Link to="onboarding" style={styles.navCta}>
+        <Link to="/onboarding" style={styles.navCta}>
           Get started
         </Link>
       </nav>
@@ -90,8 +90,8 @@ export default function ClearViewLanding() {
         <div className="responsive-hero" style={styles.hero}>
           <div style={styles.heroContent}>
             <div style={styles.heroBadge}>
-              <span style={styles.pulseDot}></span>Kabarak University · BBIT
-              Final Year Project
+              <span style={styles.pulseDot}></span>A Project meant to help spend
+              wisely{" "}
             </div>
             <h1 style={styles.heroTitle}>
               Budget <em>before</em> you overspend, not after.
@@ -246,10 +246,6 @@ export default function ClearViewLanding() {
       {/* STATS STRIP */}
       <div style={styles.statsStrip}>
         <div style={styles.statsInner}>
-          <div className="fade-in" style={styles.stat}>
-            <div style={styles.statNumber}>5</div>
-            <div style={styles.statLabel}>Core system modules</div>
-          </div>
           <div className="fade-in" style={styles.stat}>
             <div style={styles.statNumber}>30+</div>
             <div style={styles.statLabel}>Students surveyed</div>
