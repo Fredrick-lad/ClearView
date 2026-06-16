@@ -67,11 +67,11 @@ export default function Sidebar({
       id: "settings",
       label: "Settings",
     },
-    {
-      icon: <Headset className="text-brand" />,
-      id: "helpCenter",
-      label: "Help Center",
-    },
+    // {
+    //   icon: <Headset className="text-brand" />,
+    //   id: "helpCenter",
+    //   label: "Help Center",
+    // },
     {
       icon: <LogOut className="text-brand" />,
       id: "logout",
@@ -93,8 +93,8 @@ export default function Sidebar({
         <div className="d-flex align-items-center ">
           <div style={{ padding: "16px" }}>
             <div
-              className="text-primary"
-              style={{ fontSize: 18, fontWeight: 800 }}
+              className="text-primary  "
+              style={{ fontSize: 25, fontWeight: 800 }}
             >
               {title}
             </div>

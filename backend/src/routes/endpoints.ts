@@ -75,9 +75,9 @@ routes.post("/login", async (req: Request, res: Response) => {
 
 routes.post("/register", async (req: Request, res: Response) => {
   try {
-    const { firstname, lastname, email, password , incomedata } = req.body;
+    const { firstname, lastname, email, password } = req.body;
 
-    if (!firstname || !email || !password || !Array.isArray(incomedata)) {
+    if (!firstname || !email || !password ) {
       return res.status(400).json({ Message: "Ensure all fields are filled correctly especially username both first and lastname" });
     }
 
@@ -89,12 +89,8 @@ routes.post("/register", async (req: Request, res: Response) => {
       "INSERT INTO Users (firstName,lastName,email,password_hash) VALUES (?,?,?,?)",
       [firstname,lastname,email ,password_hash ],
     );
-    for(const detail of incomedata){
-      await pool.query(
-      "INSERT INTO Income (source, total_amount) VALUES (?,?)",[detail.source, detail.amount]
-    )
+    
 
-    }
     
     const payload={
       userId:registerdetails.id,

@@ -10,6 +10,7 @@ export type ScreenKey =
   | "helpCenter"
   | "logout"
   | "Profile"
+  | "Notifications"
 
 
 export type onboardingScreenKey = 
@@ -30,7 +31,7 @@ export type Icons =
   | "moveLeft"
   | "moveRight"
 
-export type ModalKind = "env" | "exp" | "inc" | null;
+export type ModalKind = "env" | "exp" | "inc" |"del"|"edit" | null;
 
 export type Envelope = {
   id: number;

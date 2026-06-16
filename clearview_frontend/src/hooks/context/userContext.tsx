@@ -7,6 +7,7 @@ import type {
   IncomeRecord,
 } from "../../types";
 import LoadingScreen from "../../components/loadingscreen";
+import { useNavigate } from "react-router-dom";
 
 // The context bluePrint
 
@@ -18,10 +19,7 @@ interface UserContextType {
   checkEmail: (e: any) => Promise<boolean>;
   emailError: string;
   setEmailError: React.Dispatch<React.SetStateAction<string>>;
-  registerUser: (
-    formdata: RegisterProps,
-    incomedata: any[],
-  ) => Promise<boolean>;
+  registerUser: (formdata: RegisterProps) => Promise<boolean>;
   loginUser: (loginFormData: LoginProps) => Promise<boolean>;
 
   registerEnvelope: any;
@@ -46,6 +44,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [envelopeData, setEnvelopeData] = useState<any>(null);
 
   const [error, setError] = useState("");
+
+  const [isSignedin, setIsSignedin] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkUser = async () => {
@@ -72,7 +74,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     checkUser();
-  }, []);
+  }, [isSignedin]);
   useEffect(() => {
     console.log("incomeSource updated:", incomeSource);
   }, [incomeSource]);
@@ -107,6 +109,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       });
       if (response.ok) {
         const { user, results } = await response.json();
+        setIsSignedin(true);
         setUserData(user);
         console.log(user.id);
         setIsLoading(false);
@@ -162,7 +165,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const registerUser = async (formdata: RegisterProps, incomedata: any[]) => {
+  const registerUser = async (formdata: RegisterProps) => {
     setIsLoading(true);
     const nameparts = formdata.username.trim().split(/\s+/);
     const firstname = nameparts[0];
@@ -177,7 +180,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       lastname,
       email: formdata.email,
       password: formdata.password,
-      incomedata,
     };
     setIsLoading(true);
     try {
@@ -192,6 +194,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         const { user, results } = await response.json();
         setUserData(user);
         setIsLoading(false);
+        console.log(userData?.id);
+        navigate("/onboardingStep1");
         return true;
       } else {
         alert("Registration failed");

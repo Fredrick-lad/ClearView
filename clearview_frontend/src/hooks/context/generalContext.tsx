@@ -1,11 +1,6 @@
 import React, { useState } from "react";
 import { createContext, useContext } from "react";
 import { type ModalKind, type ScreenKey } from "../../types";
-import EnvelopeModal from "../../modals/EnvelopeModal";
-import DashboardScreen from "../../screens/DashboardScreen";
-import EnvelopesScreen from "../../screens/EnvelopesScreen";
-import ExpensesScreen from "../../screens/ExpensesScreen";
-import IncomeScreen from "../../screens/IncomeScreen";
 
 interface envelopeContextType {
   screen: ScreenKey;

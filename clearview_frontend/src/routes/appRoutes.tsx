@@ -1,14 +1,15 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
 import NotFound from "../components/NotFound";
-import { Login, Forgotpassword } from "../onboarding/onboading";
+import { Login, Register, Forgotpassword } from "../onboarding/onboading";
 import LandingPage from "../components/landingpage";
-import OnboardingScreen from "../screens/OnboardingScreen";
 import MainScreen from "../screens/MainScreen";
 import ProtectedRoute from "../components/protectedRoute";
 import { UserProvider } from "../hooks/context/userContext";
 import EnvelopeContext from "../hooks/context/generalContext";
-import { User } from "lucide-react";
+import OnboardingWelcome from "../onboarding/Step1";
+import OnboardingStep2 from "../onboarding/Step2";
+import OnboardingStep3 from "../onboarding/Step3";
 
 const routes = createBrowserRouter([
   {
@@ -45,16 +46,42 @@ const routes = createBrowserRouter([
         element: <Forgotpassword />,
       },
       {
-        path: "/onboarding",
+        path: "/register",
         element: (
           <UserProvider>
-            <OnboardingScreen />
+            <Register />
           </UserProvider>
         ),
       },
       {
         path: "*",
         element: <LandingPage />,
+      },
+      {
+        path: "/onboardingStep1",
+        element: (
+          <UserProvider>
+            <OnboardingWelcome />
+          </UserProvider>
+        ),
+      },
+      {
+        path: "/onboardingStep2",
+        element: (
+          <UserProvider>
+            <OnboardingStep2 />
+          </UserProvider>
+        ),
+      },
+      {
+        path: "/onboardingStep3",
+        element: (
+          <UserProvider>
+            <EnvelopeContext>
+              <OnboardingStep3 />
+            </EnvelopeContext>
+          </UserProvider>
+        ),
       },
     ],
   },

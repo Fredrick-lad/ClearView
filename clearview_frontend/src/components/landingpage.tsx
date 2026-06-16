@@ -80,7 +80,7 @@ export default function ClearViewLanding() {
             </a>
           </li>
         </ul>
-        <Link to="/onboarding" style={styles.navCta}>
+        <Link to="/register" style={styles.navCta}>
           Get started
         </Link>
       </nav>
@@ -105,7 +105,7 @@ export default function ClearViewLanding() {
               <Link to="/login" style={styles.btnPrimary}>
                 Log in
               </Link>
-              <Link to="/onboarding" style={styles.btnSecondary}>
+              <Link to="/register" style={styles.btnSecondary}>
                 Register
               </Link>
             </div>

@@ -1,6 +1,4 @@
-import { useState } from "react";
 import Sidebar from "../components/layout/Sidebar";
-import Topbar from "../components/layout/Topbar";
 import type { ScreenKey, ModalKind } from "../types";
 import DashboardScreen from "./DashboardScreen";
 import EnvelopesScreen from "./EnvelopesScreen";
@@ -8,11 +6,19 @@ import ExpensesScreen from "./ExpensesScreen";
 import IncomeScreen from "./IncomeScreen";
 import ReportsScreen from "./ReportsScreen";
 import { GetData } from "../hooks/context/generalContext";
-import EnvelopeModal from "../modals/EnvelopeModal";
 import MobileNav from "../components/layout/MobileNav";
-
+import SettingsContent from "./Settings";
+import UserProfileContent from "./UserProfile";
+import CreateEnvelopeModal from "../modals/EnvelopeModal";
+import AddExpenseModal from "../modals/AddExpenseModal";
+import AddIncomeModal from "../modals/IncomeModal";
+import NotificationsView from "./NotificationScreen";
+import DeleteEnvelopeModal from "../modals/DeleteModal";
+import EditEnvelopeModal from "../modals/EditenvModal";
+import { useAuth } from "../hooks/context/userContext";
 function MainScreen() {
   const { screen, setScreen, modal, setModal } = GetData();
+  // const { envelopeData, incomeSource } = useAuth();
 
   return (
     <div className="d-flex vh-100 overflow-hidden">
@@ -30,8 +36,6 @@ function MainScreen() {
         />
       </div>
       <div className="d-flex flex-column flex-grow-1 overflow-auto">
-        <Topbar onNewEnvelope={() => setModal("env")} />
-
         <main>
           {screen === "Dashboard" && (
             <DashboardScreen
@@ -56,19 +60,32 @@ function MainScreen() {
               }}
             />
           )}
-          {screen === "Income" && (
-            <IncomeScreen
-              income={[]}
-              envelopes={[]}
-              totalInc={0}
-              totalAlloc={0}
-              unalloc={0}
-              setModal={() => {}}
-            />
-          )}
+          {screen === "Income" && <IncomeScreen />}
+          {screen === "Reports" && <ReportsScreen />}
+          {screen === "settings" && <SettingsContent />}
+          {screen === "Profile" && <UserProfileContent />}
+          {screen === "Notifications" && <NotificationsView />}
           {modal === "env" ? (
-            <EnvelopeModal onClose={() => setModal(null)} />
+            <CreateEnvelopeModal
+              isOpen={true}
+              onClose={() => {
+                setModal(null);
+              }}
+            />
           ) : null}
+          {modal === "exp" && (
+            <AddExpenseModal isOpen={true} onClose={() => setModal(null)} />
+          )}
+
+          {modal === "inc" && (
+            <AddIncomeModal isOpen={true} onClose={() => setModal(null)} />
+          )}
+          {modal === "del" && (
+            <DeleteEnvelopeModal isOpen={true} onClose={() => setModal(null)} />
+          )}
+          {modal === "edit" && (
+            <EditEnvelopeModal isOpen={true} onClose={() => setModal(null)} />
+          )}
         </main>
         <div
           className="d-flex bg-brand-light  sticky-bottom z-5 d-md-none"
