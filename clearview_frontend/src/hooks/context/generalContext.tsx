@@ -7,16 +7,24 @@ interface envelopeContextType {
   setScreen: any;
   modal: ModalKind;
   setModal: any;
+  selectedOption: any;
+  setSelectedOption: any;
 }
 
 export const generalContext = createContext<envelopeContextType | null>(null);
 
-function EnvelopeContext({ children }: { children: React.ReactNode }) {
+function DataContext({ children }: { children: React.ReactNode }) {
   const [screen, setScreen] = useState<ScreenKey>("Dashboard");
   const [modal, setModal] = useState<ModalKind>(null);
+  const [selectedOption, setSelectedOption] = useState<
+    "preset" | "scratch" | null
+  >(null);
+
   return (
     <generalContext.Provider
       value={{
+        selectedOption,
+        setSelectedOption,
         screen,
         setScreen,
         setModal,
@@ -27,7 +35,7 @@ function EnvelopeContext({ children }: { children: React.ReactNode }) {
     </generalContext.Provider>
   );
 }
-export default EnvelopeContext;
+export default DataContext;
 
 export const GetData = () => {
   const context = useContext(generalContext);

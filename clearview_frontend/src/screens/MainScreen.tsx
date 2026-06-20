@@ -15,7 +15,7 @@ import AddIncomeModal from "../modals/IncomeModal";
 import NotificationsView from "./NotificationScreen";
 import DeleteEnvelopeModal from "../modals/DeleteModal";
 import EditEnvelopeModal from "../modals/EditenvModal";
-import { useAuth } from "../hooks/context/userContext";
+import EnvelopeSuccessModal from "../modals/EnvelopeSucces";
 function MainScreen() {
   const { screen, setScreen, modal, setModal } = GetData();
   // const { envelopeData, incomeSource } = useAuth();
@@ -85,6 +85,12 @@ function MainScreen() {
           )}
           {modal === "edit" && (
             <EditEnvelopeModal isOpen={true} onClose={() => setModal(null)} />
+          )}
+          {modal === "envSuccess" && (
+            <EnvelopeSuccessModal
+              isOpen={true}
+              onClose={() => setModal(null)}
+            />
           )}
         </main>
         <div

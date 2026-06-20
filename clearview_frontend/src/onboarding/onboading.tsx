@@ -17,7 +17,6 @@ function Register() {
   const { registerUser } = useAuth();
   const [error, setError] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [checkemail, setCheckemail] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const { setEmailError, emailError, checkEmail } = useAuth();
@@ -275,7 +274,7 @@ function Login() {
                   New to ClearView?{" "}
                   <Link
                     className="text-primary text-decoration-none"
-                    to="/onboarding"
+                    to="/register"
                   >
                     Create an Account
                   </Link>

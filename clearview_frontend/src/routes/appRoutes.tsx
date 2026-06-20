@@ -6,10 +6,10 @@ import LandingPage from "../components/landingpage";
 import MainScreen from "../screens/MainScreen";
 import ProtectedRoute from "../components/protectedRoute";
 import { UserProvider } from "../hooks/context/userContext";
-import EnvelopeContext from "../hooks/context/generalContext";
 import OnboardingWelcome from "../onboarding/Step1";
 import OnboardingStep2 from "../onboarding/Step2";
 import OnboardingStep3 from "../onboarding/Step3";
+import DataContext from "../hooks/context/generalContext";
 
 const routes = createBrowserRouter([
   {
@@ -34,9 +34,9 @@ const routes = createBrowserRouter([
         element: (
           <UserProvider>
             <ProtectedRoute>
-              <EnvelopeContext>
+              <DataContext>
                 <MainScreen />
-              </EnvelopeContext>
+              </DataContext>
             </ProtectedRoute>
           </UserProvider>
         ),
@@ -77,9 +77,9 @@ const routes = createBrowserRouter([
         path: "/onboardingStep3",
         element: (
           <UserProvider>
-            <EnvelopeContext>
+            <DataContext>
               <OnboardingStep3 />
-            </EnvelopeContext>
+            </DataContext>
           </UserProvider>
         ),
       },

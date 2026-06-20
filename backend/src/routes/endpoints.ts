@@ -93,26 +93,28 @@ routes.post("/register", async (req: Request, res: Response) => {
 
     
     const payload={
-      userId:registerdetails.id,
+      userid:registerdetails.insertId,
       email: email
     }
     const token = generateToken(payload);
 
     res.cookie("token", token,{
       httpOnly:true,
-      secure:true,
+      secure:false,
       sameSite: "strict",
       maxAge: 36000000,
     })
+    console.log(registerdetails.insertId)
     return res.status(201).json({
       user: {
+        id:registerdetails.insertId,
         username: firstname,
         email:email
       },
       Message: "User registered succesfully",
     });
     
-  } catch (error) {
+  } catch (error) {/////j/j
     console.error("Registration error: ", error);
     res.status(500).json({
       Message: "Internal server error",
@@ -152,23 +154,22 @@ routes.get("/me", TokenAuthenticator, async(req:Request,res:Response)=>{
   )
 
   const [envelope]:any = await pool.query(
-    "SELECT name,monthly_limit,current_spend,color,description FROM Envelopes WHERE user_id = ?",[user.userid]
+    "SELECT name,monthly_limit,current_spend,icon_name FROM Envelopes WHERE user_id = ?",[user.userid]
   )
   const [expenses]:any = await pool.query(
     "SELECT envelope_id,amount,description FROM Expenses WHERE user_id=?",[user.userid]
   )
+  const [period]:any = await pool.query(
+    "SELECT * FROM BudgetPeriods WHERE user_id=?",[user.userid]
+  )
   // console.log(income);
-const response = {
-  user:rows,
-  incomesource: income,
-  envelope: envelope,
-  expense: expenses,
-}
+
   return res.status(200).json({
     user:rows[0],
   incomesource: income,
   envelope: envelope,
   expenses : expenses,
+  period:period,
   })
   
 })
@@ -194,7 +195,7 @@ routes.post("/allocateincome", TokenAuthenticator, async(req:Request, res:Respon
 
 routes.post("/addenvelope" , TokenAuthenticator, async(req:Request, res:Response)=>{
 
-  const{id,name,limit,color,description} = req.body;
+  const{id,name,limit,spend,icon} = req.body;
 
   if (!name|| !limit ){
     return res.status(400).json({
@@ -208,13 +209,59 @@ routes.post("/addenvelope" , TokenAuthenticator, async(req:Request, res:Response
     })}
   
     const response  = await pool.query(
-      "INSERT INTO Envelopes (name,monthly_limit,color,description) VALUES (?,?,?,?) WHERE id = ?",[name,limit,color,description]
+      "INSERT INTO Envelopes (user_id,name,monthly_limit,current_spend,icon_name) VALUES (?,?,?,?,?)",[id,name,limit,spend,icon]
     )
     return res.status(200).json({
       message:"Envelope registered succesfully"
     })
   });
+  routes.get("/getenvelopes" , TokenAuthenticator , async (req:Request,res:Response)=>{
+      const user = (req as any).user;
+    const [envelope] = await pool.query(
+      "SELECT name,monthly_limit,current_spend,icon_name FROM Envelopes WHERE user_id = ?",[user.userid]
+    )
+    return res.status(200).json({
+      envelope: envelope,
+    })
+  })
 
+  routes.post("/addexpense" , TokenAuthenticator, async(req:Request,res:Response)=>{
+    const {user_id,envelope_id,period_id,expense_name,amount,description,expense_date}= req.body
+
+    if(period_id === ""|| expense_name === ""|| expense_date === ""||amount === ""){
+      return res.status(400).json({
+      message: "All fields are required"
+    })
+    }
+    const response  = await pool.query(
+      "INSERT INTO Expenses(user_id,envelope_id,period_id,amount,description,expense_date,expense_name) VALUES (?,?,?,?,?)",[user_id,envelope_id,period_id,amount,description,expense_date,expense_name]
+    )
+    return res.status(200).json({
+      message:"Envelope registered succesfully"
+    })
+
+  })
+  routes.post("/addperiod", TokenAuthenticator, async(req:Request,res:Response)=>{
+    const {user_id,label,start_date,end_date}=req.body
+    const [period]:any = await pool.query(
+      "INSERT INTO BudgetPeriods(user_id,label,start_date,end_date) VALUES (?,?,?,?)",[user_id,label,start_date,end_date]
+    )
+    const period_id = period.insertId;
+    return res.status(200).json({period: {
+      id:period_id,
+      label:label,
+      start_date: start_date,
+      end_date:end_date,
+    },
+   message:"Period added succesfully",})
+  })
+routes.post("/addincome",TokenAuthenticator, async(req:Request,res:Response)=>{
+  const{user_id,period_id,source,total_amount}= req.body
+  await pool.query(
+    "INSERT INTO Income(user_id,period_id,source,total_amount) VALUES (?,?,?,?)",[user_id,period_id,source,total_amount]
+  )
+  return res.status(200).json({message:"Income source added succesfully"});
+})
 
 // routes.get("/:id", TokenAuthenticator, async (req:Request, res:Response)=>{
 //   const userId = req.params.id;

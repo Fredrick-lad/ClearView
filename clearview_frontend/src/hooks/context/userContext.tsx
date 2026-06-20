@@ -1,3 +1,4 @@
+"use server";
 import { createContext, useContext, useEffect, useState } from "react";
 import type {
   RegisterProps,
@@ -23,10 +24,15 @@ interface UserContextType {
   loginUser: (loginFormData: LoginProps) => Promise<boolean>;
 
   registerEnvelope: any;
+  addExpense: any;
+  addIncomePeriod: any;
+  addIncome: any;
   newEnvelope: any;
   setNewEnvelope: any;
   incomeSource: any;
   envelopeData: any;
+  setEnvelopeData: any;
+  getEnvelopes: any;
 
   logoutUser: () => void;
 }
@@ -41,7 +47,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [incomeSource, setIncomeSource] = useState<
     IncomeRecord | { source: ""; total_amount: ""; create_time: "" }
   >();
+  const [spend, setSpend] = useState(0);
   const [envelopeData, setEnvelopeData] = useState<any>(null);
+  const [periodData, setPeriodData] = useState<any>(null);
 
   const [error, setError] = useState("");
 
@@ -66,6 +74,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         setUserData(data.user);
         setEnvelopeData(data.envelope);
         setIncomeSource(data.incomesource);
+        setPeriodData(data.period);
       } catch (error) {
         console.error(error);
       } finally {
@@ -81,6 +90,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     console.log("envelopeData updated:", envelopeData);
   }, [envelopeData]);
+  useEffect(() => {
+    console.log("PeriodeData updated:", periodData);
+  }, [periodData]);
 
   if (isLoading) return <LoadingScreen />;
 
@@ -185,13 +197,14 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const response = await fetch("http://localhost:4000/register", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
       });
       if (response.ok) {
-        const { user, results } = await response.json();
+        const { user } = await response.json();
         setUserData(user);
         setIsLoading(false);
         console.log(userData?.id);
@@ -213,9 +226,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
       const payload = {
         ...envelope_data,
-        userid: userData?.id,
+        id: userData?.id,
       };
-      const response = await fetch("http://localhost:4000/envelopes", {
+      const response = await fetch("http://localhost:4000/addenvelope", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -223,19 +236,96 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         },
         body: JSON.stringify(payload),
       });
-
-      if (response.ok) {
-        console.log("Created a new envelope");
-        return true;
-      }
+      getEnvelopes();
       setIsLoading(false);
-      return false;
+      return response;
     } catch (error) {
       console.error(error);
     } finally {
       setIsLoading(false);
     }
   };
+
+  const getEnvelopes = async () => {
+    const response = await fetch("http://localhost:4000/getenvelopes", {
+      method: "GET",
+      credentials: "include",
+    });
+    const data = await response.json();
+    console.log(data);
+    setEnvelopeData(data.envelope);
+    return data.envelope;
+  };
+  const addIncomePeriod = async (period: any) => {
+    try {
+      const user_id = userData?.id;
+      const payload = {
+        ...period,
+        user_id,
+      };
+      const response = await fetch("http://localhost:4000/addperiod", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return data.period;
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const addIncome = async (incomeData: any) => {
+    const user_id = userData?.id;
+
+    const payload = {
+      ...incomeData,
+      user_id,
+    };
+    try {
+      await fetch("http://localhost:4000/addincome", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const addExpense = async (expenseData: any) => {
+    try {
+      const user_id = userData?.id;
+      const envelope_id = envelopeData.id;
+      const period_id = periodData.id;
+
+      const payload = {
+        ...expenseData,
+        user_id,
+        envelope_id,
+        period_id,
+      };
+
+      await fetch("http://localhost:4000/addexpense", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -244,6 +334,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         error,
         checkEmail,
         emailError,
+        addExpense,
+        addIncomePeriod,
+        addIncome,
         setEmailError,
         setError,
         registerUser,
@@ -253,6 +346,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         setNewEnvelope,
         incomeSource,
         envelopeData,
+        setEnvelopeData,
+        getEnvelopes,
         logoutUser,
       }}
     >

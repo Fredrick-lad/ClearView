@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { useAuth } from "../hooks/context/userContext";
+import type { ModalKind } from "../types";
+import { iconMap } from "../components/ui/iconMap";
 
 interface CreateEnvelopeModalProps {
   isOpen: boolean;
@@ -9,8 +12,22 @@ export default function CreateEnvelopeModal({
   isOpen,
   onClose,
 }: CreateEnvelopeModalProps) {
-  const [selectedIcon, setSelectedIcon] = useState<number>(0);
-  const [selectedColor, setSelectedColor] = useState<number>(0);
+  const { registerEnvelope } = useAuth();
+  const [icon, setIcon] = useState<any>("");
+
+  const [formdata, setFormdata] = useState({
+    name: "",
+    limit: "",
+  });
+
+  const handleChange = (event: any) => {
+    const { name, value } = event.target;
+
+    setFormdata((prevdata) => ({
+      ...prevdata,
+      [name]: value,
+    }));
+  };
 
   if (!isOpen) return null;
 
@@ -30,11 +47,17 @@ export default function CreateEnvelopeModal({
       "#2ED994", // Bright Mint
     ],
   };
+  const spend = 0.0;
+  const final = {
+    ...formdata,
+    spend,
+    icon,
+  };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Insert your layout envelope submission hook here
-    onClose();
+    console.log(final);
+    await registerEnvelope(final);
   };
 
   return (
@@ -91,6 +114,9 @@ export default function CreateEnvelopeModal({
                 className="form-control py-2.5 px-3 border rounded-3 shadow-none text-dark"
                 placeholder="e.g. Vacation Fund"
                 style={{ borderColor: colors.inputBorder }}
+                name="name"
+                value={formdata.name}
+                onChange={handleChange}
                 required
               />
             </div>
@@ -112,148 +138,60 @@ export default function CreateEnvelopeModal({
                   className="form-control py-2.5 pe-3 ps-1 border border-start-0 rounded-end-3 shadow-none text-dark"
                   placeholder="0.00"
                   style={{ borderColor: colors.inputBorder }}
+                  name="limit"
+                  value={formdata.limit}
+                  onChange={handleChange}
                   required
                 />
               </div>
             </div>
 
             {/* Icon Grid Choice */}
-            <div className="mb-4">
-              <label className="form-label text-dark small fw-medium mb-2">
-                Icon
-              </label>
-              <div className="d-flex gap-2">
-                {[
-                  // Piggy Bank Vector
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-100 h-100"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M21 12a2.25 2.25 0 0 0-2.25-2.25H15a3 3 0 1 1-6 0H5.25A2.25 2.25 0 0 0 3 12m18 0c0 1.214-.492 2.314-1.288 3.112A8.966 8.966 0 0 1 12 18.75m9-6.75a8.963 8.963 0 0 0-2.225-5.913M3 12c0 1.157.439 2.213 1.157 3A8.967 8.967 0 0 0 12 18.75M3 12a8.963 8.963 0 0 1 2.225-5.913M12 18.75A8.967 8.967 0 0 0 18.112 15M12 18.75A8.967 8.967 0 0 1 5.888 15m11.196-10.364A8.966 8.966 0 0 1 12 3c-1.804 0-3.468.531-4.862 1.442m10.12 1.254a8.955 8.955 0 0 1 1.63 2.054M7.138 4.442a8.955 8.955 0 0 0-1.63 2.054M16.5 10.5h-.008v.008H16.5V10.5Zm-6 0h-.008v.008h.008V10.5Z"
-                    />
-                  </svg>,
-                  // Home Layout Vector
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-100 h-100"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
-                    />
-                  </svg>,
-                  // Airplane Jet Vector
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-100 h-100"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L6 12Zm0 0h7.5"
-                    />
-                  </svg>,
-                  // Shopping Cart Vector
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-100 h-100"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm12 0a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm-13.5-9h14.532c.155 0 .299.109.326.262l1.07 6.42a.375.375 0 0 1-.369.436H6.457L4.41 3.899"
-                    />
-                  </svg>,
-                  // Dumbbell/Fitness Weight Vector
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                    stroke="currentColor"
-                    className="w-100 h-100"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M19.5 12h-15m0 0v-3.75m0 3.75v3.75m15-3.75v-3.75m0 3.75v3.75M3.375 7.5h1.5a1.125 1.125 0 0 1 1.125 1.125v6.75A1.125 1.125 0 0 1 4.875 16.5h-1.5a1.125 1.125 0 0 1-1.125-1.125v-6.75A1.125 1.125 0 0 1 3.375 7.5Zm15.75 0h1.5a1.125 1.125 0 0 1 1.125 1.125v6.75a1.125 1.125 0 0 1-1.125 1.125h-1.5a1.125 1.125 0 0 1-1.125-1.125v-6.75A1.125 1.125 0 0 1 19.125 7.5Z"
-                    />
-                  </svg>,
-                ].map((iconSvg, idx) => {
-                  const isActive = selectedIcon === idx;
+            <div
+              className="mb-4"
+              style={{
+                maxHeight: "220px",
+                overflowY: "auto",
+                overflowX: "hidden",
+              }}
+            >
+              <div className="row g-2">
+                <p>Select an icon to present your envelope </p>
+                {Object.entries(iconMap).map(([name, Icon]) => {
+                  const isActive = icon === name;
                   return (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setSelectedIcon(idx)}
-                      className="btn p-0 border rounded-3 d-flex align-items-center justify-content-center"
-                      style={{
-                        width: "56px",
-                        height: "46px",
-                        backgroundColor: isActive
-                          ? colors.mintActiveBg
-                          : "#fff",
-                        borderColor: isActive
-                          ? colors.mintActiveBorder
-                          : colors.inputBorder,
-                        color: isActive ? colors.deepGreen : "#6C757D",
-                        padding: "10px",
-                      }}
-                    >
-                      <div style={{ width: "22px", height: "22px" }}>
-                        {iconSvg}
+                    <>
+                      <div
+                        key={name}
+                        className="col-1 d-flex align-items-center justify-content-center"
+                        style={{
+                          cursor: "pointer",
+                          transition: "all 0.2s ease",
+                          borderRadius: "8px",
+                          backgroundColor:
+                            icon === name ? colors.mintActiveBg : "#f8f9fa",
+                          aspectRatio: "1",
+                        }}
+                        onClick={() => setIcon(name)}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.borderColor = colors.deepGreen;
+                          e.currentTarget.style.backgroundColor =
+                            colors.mintActiveBg;
+                          e.currentTarget.style.transform = "scale(1.05)";
+                        }}
+                        onMouseLeave={(e) => {
+                          // 3. Only reset the styles if this button is NOT the active one
+                          if (!isActive) {
+                            e.currentTarget.style.borderColor =
+                              colors.inputBorder;
+                            e.currentTarget.style.backgroundColor = "#f8f9fa";
+                          }
+                          e.currentTarget.style.transform = "scale(1)";
+                        }}
+                      >
+                        <Icon size={24} color={colors.deepGreen} />
                       </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Color Choice Array Row */}
-            <div className="mb-4">
-              <label className="form-label text-dark small fw-medium mb-2">
-                Color Choice
-              </label>
-              <div className="d-flex align-items-center gap-3">
-                {colors.pills.map((colorHex, idx) => {
-                  const isActive = selectedColor === idx;
-                  return (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setSelectedColor(idx)}
-                      className="rounded-circle border-0 p-0 position-relative d-flex align-items-center justify-content-center"
-                      style={{
-                        width: "30px",
-                        height: "30px",
-                        backgroundColor: colorHex,
-                        boxShadow: isActive
-                          ? `0 0 0 2px #fff, 0 0 0 3.5px ${colors.deepGreen}`
-                          : "none",
-                        transition: "box-shadow 0.2s",
-                      }}
-                      aria-label={`Color option ${idx + 1}`}
-                    />
+                    </>
                   );
                 })}
               </div>
@@ -282,4 +220,7 @@ export default function CreateEnvelopeModal({
       </div>
     </div>
   );
+}
+function useEffect(arg0: () => void, arg1: ModalKind[]) {
+  throw new Error("Function not implemented.");
 }

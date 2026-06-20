@@ -1,4 +1,6 @@
 import React from "react";
+import { useAuth } from "../hooks/context/userContext";
+import type { Envelope } from "../types";
 
 interface AddExpenseModalProps {
   isOpen: boolean;
@@ -10,6 +12,8 @@ export default function AddExpenseModal({
   onClose,
 }: AddExpenseModalProps) {
   if (!isOpen) return null;
+
+  const { envelopeData } = useAuth();
 
   // Brand identity design choices matching screen_3.png
   const brandSerif = { fontFamily: "Georgia, serif" };
@@ -125,10 +129,9 @@ export default function AddExpenseModal({
                 style={{ borderColor: colors.inputBorder }}
                 defaultValue="Groceries"
               >
-                <option value="Groceries">Groceries</option>
-                <option value="Rent">Rent & Housing</option>
-                <option value="Utilities">Utilities</option>
-                <option value="Entertainment">Entertainment</option>
+                {envelopeData.map((envelope: Envelope) => (
+                  <option value="Groceries">{envelope.name}</option>
+                ))}
               </select>
             </div>
 

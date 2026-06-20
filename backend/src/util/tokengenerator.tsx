@@ -9,7 +9,7 @@ export default function generateToken(payload: JwtPayload) {
   }
 
   try {
-    const accessToken = jwt.sign(payload, secret, { expiresIn: "1h" });
+    const accessToken = jwt.sign(payload, secret, { expiresIn: "8h" });
     return accessToken;
   } catch (error) {
     console.error("Error generating token:", error);

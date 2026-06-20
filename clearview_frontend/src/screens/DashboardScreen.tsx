@@ -15,10 +15,17 @@ type Props = {
 
 export default function DashboardScreen(_: Props) {
   const { setModal } = GetData();
+  const { incomeSource } = useAuth();
+  let total = 0;
+  incomeSource.map((income: any) => {
+    total += Number(income.total_amount);
+    console.log(total);
+  });
+
   const summaryCards = [
     {
       title: "Total Balance",
-      value: "Ksh 142,500",
+      value: "Ksh " + total,
       subtext: "2.4% vs last mo",
       isTrendUp: true,
       textColor: "text-dark",

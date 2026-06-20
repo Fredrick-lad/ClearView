@@ -31,7 +31,7 @@ export type Icons =
   | "moveLeft"
   | "moveRight"
 
-export type ModalKind = "env" | "exp" | "inc" |"del"|"edit" | null;
+export type ModalKind = "env" | "exp" | "inc" |"del"|"edit"|"env"|"envsetup" | null;
 
 export type Envelope = {
   id: number;
@@ -42,12 +42,14 @@ export type Envelope = {
 };
 
 export type Expense = {
-  id: number;
-  envelope: string;
+  user_id: number;
+  envelope_id: number;
+  period_id:number;
   amount: number;
   note: string;
   date: string;
 };
+
 
 export type IncomeRecord = {
   id: number;
