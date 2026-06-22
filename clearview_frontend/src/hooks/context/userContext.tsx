@@ -1,4 +1,4 @@
-"use server";
+"use client";
 import { createContext, useContext, useEffect, useState } from "react";
 import type {
   RegisterProps,
@@ -33,6 +33,7 @@ interface UserContextType {
   envelopeData: any;
   setEnvelopeData: any;
   getEnvelopes: any;
+  expenses: any;
 
   logoutUser: () => void;
 }
@@ -50,6 +51,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [spend, setSpend] = useState(0);
   const [envelopeData, setEnvelopeData] = useState<any>(null);
   const [periodData, setPeriodData] = useState<any>(null);
+  const [expenses, setExpenses] = useState<any[]>([]);
 
   const [error, setError] = useState("");
 
@@ -75,6 +77,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         setEnvelopeData(data.envelope);
         setIncomeSource(data.incomesource);
         setPeriodData(data.period);
+        setExpenses(data.expenses);
       } catch (error) {
         console.error(error);
       } finally {
@@ -120,7 +123,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         body: JSON.stringify(loginFormData),
       });
       if (response.ok) {
-        const { user, results } = await response.json();
+        const { user } = await response.json();
         setIsSignedin(true);
         setUserData(user);
         console.log(user.id);
@@ -228,7 +231,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         ...envelope_data,
         id: userData?.id,
       };
-      const response = await fetch("http://localhost:4000/addenvelope", {
+      await fetch("http://localhost:4000/addenvelope", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -238,7 +241,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       });
       getEnvelopes();
       setIsLoading(false);
-      return response;
     } catch (error) {
       console.error(error);
     } finally {
@@ -348,6 +350,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         envelopeData,
         setEnvelopeData,
         getEnvelopes,
+        expenses,
         logoutUser,
       }}
     >

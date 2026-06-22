@@ -147,17 +147,17 @@ routes.get("/me", TokenAuthenticator, async(req:Request,res:Response)=>{
   const user = (req as any).user;
 
   const [rows] : any  = await pool.query(
-    "SELECT firstName,lastName, email,id FROM Users WHERE id= ?",[user.userid]
+    "SELECT * FROM Users WHERE id= ?",[user.userid]
   )
   const [income]: any = await pool.query(
-    "SELECT source, total_amount FROM Income where user_id= ?",[user.userid]
+    "SELECT * FROM Income where user_id= ?",[user.userid]
   )
 
   const [envelope]:any = await pool.query(
-    "SELECT name,monthly_limit,current_spend,icon_name FROM Envelopes WHERE user_id = ?",[user.userid]
+    "SELECT * FROM Envelopes WHERE user_id = ?",[user.userid]
   )
   const [expenses]:any = await pool.query(
-    "SELECT envelope_id,amount,description FROM Expenses WHERE user_id=?",[user.userid]
+    "SELECT * FROM Expenses WHERE user_id=?",[user.userid]
   )
   const [period]:any = await pool.query(
     "SELECT * FROM BudgetPeriods WHERE user_id=?",[user.userid]
@@ -218,11 +218,23 @@ routes.post("/addenvelope" , TokenAuthenticator, async(req:Request, res:Response
   routes.get("/getenvelopes" , TokenAuthenticator , async (req:Request,res:Response)=>{
       const user = (req as any).user;
     const [envelope] = await pool.query(
-      "SELECT name,monthly_limit,current_spend,icon_name FROM Envelopes WHERE user_id = ?",[user.userid]
+      "SELECT * FROM Envelopes WHERE user_id = ?",[user.userid]
     )
     return res.status(200).json({
       envelope: envelope,
     })
+  })
+
+  routes.delete("/deleteenvelope/:id",TokenAuthenticator, async(req:Request,res:Response)=>{
+    const env_id = req.params.id;
+    try {
+      await pool.query(
+        "DELETE FROM Envelopes WHERE id= ?",[env_id]
+      )
+      return res.status(200).json({message:"envelope deleted succesfully"})
+    } catch (error) {
+      
+    }
   })
 
   routes.post("/addexpense" , TokenAuthenticator, async(req:Request,res:Response)=>{
@@ -261,6 +273,11 @@ routes.post("/addincome",TokenAuthenticator, async(req:Request,res:Response)=>{
     "INSERT INTO Income(user_id,period_id,source,total_amount) VALUES (?,?,?,?)",[user_id,period_id,source,total_amount]
   )
   return res.status(200).json({message:"Income source added succesfully"});
+})
+
+routes.post("/logout" , TokenAuthenticator, (req:Request,res:Response)=>{
+  res.clearCookie("token");
+  res.status(200).json({message:"Logged out succesfully"})
 })
 
 // routes.get("/:id", TokenAuthenticator, async (req:Request, res:Response)=>{

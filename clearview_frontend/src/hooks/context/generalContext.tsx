@@ -9,6 +9,8 @@ interface envelopeContextType {
   setModal: any;
   selectedOption: any;
   setSelectedOption: any;
+  selectedEnvelope: any;
+  setSelectedEnvelope: any;
 }
 
 export const generalContext = createContext<envelopeContextType | null>(null);
@@ -19,6 +21,7 @@ function DataContext({ children }: { children: React.ReactNode }) {
   const [selectedOption, setSelectedOption] = useState<
     "preset" | "scratch" | null
   >(null);
+  const [selectedEnvelope, setSelectedEnvelope] = useState<any>(null);
 
   return (
     <generalContext.Provider
@@ -29,6 +32,8 @@ function DataContext({ children }: { children: React.ReactNode }) {
         setScreen,
         setModal,
         modal,
+        selectedEnvelope,
+        setSelectedEnvelope,
       }}
     >
       {children}

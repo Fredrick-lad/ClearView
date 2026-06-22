@@ -10,6 +10,7 @@ import OnboardingWelcome from "../onboarding/Step1";
 import OnboardingStep2 from "../onboarding/Step2";
 import OnboardingStep3 from "../onboarding/Step3";
 import DataContext from "../hooks/context/generalContext";
+import MyEnvelopes from "../screens/EnvelopesScreen";
 
 const routes = createBrowserRouter([
   {
