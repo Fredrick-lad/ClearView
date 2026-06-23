@@ -1,5 +1,5 @@
-import React from "react";
-import { X, Calendar, Info, Plus } from "lucide-react";
+import React, { useState } from "react";
+import { useAuth } from "../hooks/context/userContext";
 
 interface AddIncomeModalProps {
   isOpen: boolean;
@@ -10,12 +10,56 @@ export default function AddIncomeModal({
   isOpen,
   onClose,
 }: AddIncomeModalProps) {
+  const { addIncome, addIncomePeriod, periodData } = useAuth();
+
+  const [source, setSource] = useState("");
+  const [amount, setAmount] = useState("");
+  const [date, setDate] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic here
-    onClose();
+    setError("");
+    setSaving(true);
+
+    try {
+      let period_id = periodData?.id;
+
+      if (!period_id) {
+        const now = new Date();
+        const start = new Date(now.getFullYear(), now.getMonth(), 1);
+        const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        const newPeriod = await addIncomePeriod({
+          label: `${start.toLocaleDateString("en-US", { month: "long", year: "numeric" })}`,
+          start_date: start.toISOString().split("T")[0],
+          end_date: end.toISOString().split("T")[0],
+        });
+        period_id = newPeriod?.id;
+      }
+
+      await addIncome({
+        period_id,
+        source,
+        total_amount: parseFloat(amount),
+      });
+
+      setSource("");
+      setAmount("");
+      setDate("");
+      onClose();
+    } catch {
+      setError("Failed to add income. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const colors = {
+    deepGreen: "#053225",
+    inputBorder: "rgba(0, 0, 0, 0.15)",
   };
 
   return (
@@ -27,15 +71,13 @@ export default function AddIncomeModal({
         backdropFilter: "blur(4px)",
       }}
     >
-      {/* Modal Container */}
       <div
         className="bg-white rounded shadow-lg w-100"
         style={{ maxWidth: "640px", overflow: "hidden" }}
       >
-        {/* Header */}
         <div
           className="text-white px-4 py-3 d-flex justify-content-between align-items-center"
-          style={{ backgroundColor: "#053225" }}
+          style={{ backgroundColor: colors.deepGreen }}
         >
           <h2 className="m-0 fs-5 fw-medium tracking-wide">Add Income</h2>
           <button
@@ -44,26 +86,27 @@ export default function AddIncomeModal({
             aria-label="Close modal"
             style={{ background: "none" }}
           >
-            <X size={20} />
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+            </svg>
           </button>
         </div>
 
-        {/* Form Body */}
         <form
           onSubmit={handleSubmit}
           className="p-4 p-md-5 overflow-auto"
           style={{ maxHeight: "85vh" }}
         >
-          {/* Income Source Section Card */}
+          {error && <div className="alert alert-danger py-2 small">{error}</div>}
+
           <div className="border rounded p-4 mb-4">
             <h3
               className="text-uppercase text-muted fw-bold mb-3"
               style={{ fontSize: "0.75rem", letterSpacing: "0.05em" }}
             >
-              Income Source 1
+              Income Source
             </h3>
 
-            {/* Source Name */}
             <div className="mb-3">
               <label className="form-label fw-medium text-secondary small">
                 Source Name
@@ -73,105 +116,51 @@ export default function AddIncomeModal({
                 placeholder="e.g. Acme Corp Salary"
                 className="form-control shadow-none"
                 style={{ padding: "0.625rem 0.75rem" }}
+                value={source}
+                onChange={(e) => setSource(e.target.value)}
+                required
               />
             </div>
 
-            {/* Category & Date Grid */}
             <div className="row g-3 mb-3">
-              {/* Category */}
-              <div className="col-12 col-sm-6">
-                <label className="form-label fw-medium text-secondary small">
-                  Category
-                </label>
-                <select
-                  defaultValue="Salary"
-                  className="form-select shadow-none"
-                  style={{ padding: "0.625rem 0.75rem" }}
-                >
-                  {" "}
-                  <option value="ParentsSupport">Parents Support</option>
-                  <option value="Salary">Salary</option>
-                  <option value="Freelance">Freelance</option>
-                  <option value="Investments">Investments</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-
-              {/* Date */}
               <div className="col-12 col-sm-6">
                 <label className="form-label fw-medium text-secondary small">
                   Date
                 </label>
-                <div className="position-relative">
-                  <input
-                    type="date"
-                    className="form-control shadow-none pe-5"
-                    style={{ padding: "0.625rem 0.75rem" }}
-                  />
-                  <Calendar
-                    className="position-absolute text-muted top-50 end-0 translate-middle-y me-3 pointer-events-none"
-                    size={16}
-                  />
-                </div>
+                <input
+                  type="date"
+                  className="form-control shadow-none"
+                  style={{ padding: "0.625rem 0.75rem" }}
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                />
               </div>
-            </div>
 
-            {/* Amount */}
-            <div className="mb-2">
-              <label className="form-label fw-medium text-secondary small">
-                Amount
-              </label>
-              <div className="position-relative">
-                <span className="position-absolute top-50 start-0 translate-middle-y ms-3 text-secondary small">
-                  $
-                </span>
+              <div className="col-12 col-sm-6">
+                <label className="form-label fw-medium text-secondary small">
+                  Amount (KES)
+                </label>
                 <input
                   type="number"
                   step="0.01"
                   placeholder="0.00"
                   className="form-control shadow-none"
-                  style={{ padding: "0.75rem 0.75rem 0.75rem 2.2rem" }}
+                  style={{ padding: "0.75rem 0.75rem" }}
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  required
                 />
               </div>
             </div>
           </div>
 
-          {/* Add Another Source Action */}
-          <button
-            type="button"
-            className="btn w-100 py-3 text-secondary fw-medium d-flex align-items-center justify-content-center gap-2 mb-4 shadow-none"
-            style={{
-              border: "1px dashed #dee2e6",
-              backgroundColor: "transparent",
-            }}
-          >
-            <Plus size={16} />
-            Add Another Source
-          </button>
-
-          {/* Info Banner */}
-          <div
-            className="alert border d-flex align-items-start gap-3 p-3 mb-4"
-            style={{
-              backgroundColor: "#f0f7f4",
-              borderColor: "#d2eae0",
-              color: "#053225",
-            }}
-          >
-            <Info className="flex-shrink-0 mt-1" size={18} />
-            <p className="m-0 small lh-base" style={{ opacity: 0.9 }}>
-              This entry will automatically update your projected reports and
-              envelope balances if linked.
-            </p>
-          </div>
-
-          {/* Footer Actions */}
           <div className="row g-3 pt-2">
             <div className="col-6">
               <button
                 type="button"
                 onClick={onClose}
                 className="btn btn-outline-dark w-100 py-3 fw-medium shadow-none"
+                disabled={saving}
               >
                 Cancel
               </button>
@@ -180,9 +169,10 @@ export default function AddIncomeModal({
               <button
                 type="submit"
                 className="btn text-white w-100 py-3 fw-medium shadow-none"
-                style={{ backgroundColor: "#053225", borderColor: "#053225" }}
+                style={{ backgroundColor: colors.deepGreen, borderColor: colors.deepGreen }}
+                disabled={saving}
               >
-                Save Income Sources
+                {saving ? "Saving…" : "Save Income Source"}
               </button>
             </div>
           </div>

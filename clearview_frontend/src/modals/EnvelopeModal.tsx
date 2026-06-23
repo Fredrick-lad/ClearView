@@ -56,8 +56,8 @@ export default function CreateEnvelopeModal({
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(final);
     await registerEnvelope(final);
+    onClose();
   };
 
   return (
@@ -220,7 +220,4 @@ export default function CreateEnvelopeModal({
       </div>
     </div>
   );
-}
-function useEffect(arg0: () => void, arg1: ModalKind[]) {
-  throw new Error("Function not implemented.");
 }
