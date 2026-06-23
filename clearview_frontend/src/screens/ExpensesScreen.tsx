@@ -1,6 +1,5 @@
 import type { JSX } from "react";
 import TopBar from "../components/layout/Topbar";
-import PageBackButton from "../components/ui/pageback";
 import { useAuth } from "../hooks/context/userContext";
 import { GetData } from "../hooks/context/generalContext";
 import { iconMap } from "../components/ui/iconMap";
@@ -17,15 +16,15 @@ function formatDate(dateStr: string): string {
   });
 }
 
-function formatTime(dateStr: string): string {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return "";
-  return d.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
+// function formatTime(dateStr: string): string {
+//   if (!dateStr) return "";
+//   const d = new Date(dateStr);
+//   if (isNaN(d.getTime())) return "";
+//   return d.toLocaleTimeString("en-US", {
+//     hour: "2-digit",
+//     minute: "2-digit",
+//   });
+// }
 
 export default function ExpensesScreen() {
   const { expenses, envelopeData } = useAuth();
@@ -68,7 +67,13 @@ export default function ExpensesScreen() {
     .sort((a, b) => b.amount - a.amount)
     .slice(0, 5);
 
-  const categoryColors = ["#0a3d34", "#34d399", "#a7f3d0", "#f59e0b", "#6366f1"];
+  const categoryColors = [
+    "#0a3d34",
+    "#34d399",
+    "#a7f3d0",
+    "#f59e0b",
+    "#6366f1",
+  ];
 
   const brandColors = {
     primaryDark: "var(--cv-primary-dark)",
@@ -377,7 +382,12 @@ export default function ExpensesScreen() {
                         <div className="d-flex align-items-center gap-2 small fw-semibold">
                           <span
                             className="rounded-circle flex-shrink-0"
-                            style={{ width: "8px", height: "8px", backgroundColor: categoryColors[idx % categoryColors.length] }}
+                            style={{
+                              width: "8px",
+                              height: "8px",
+                              backgroundColor:
+                                categoryColors[idx % categoryColors.length],
+                            }}
                           />
                           <span>{item.category}</span>
                         </div>
@@ -385,11 +395,19 @@ export default function ExpensesScreen() {
                           {formatCurrency(item.amount)}
                         </span>
                       </div>
-                      <div className="progress" style={{ height: "6px", backgroundColor: categoryColors[idx % categoryColors.length] + "20" }}>
+                      <div
+                        className="progress"
+                        style={{
+                          height: "6px",
+                          backgroundColor:
+                            categoryColors[idx % categoryColors.length] + "20",
+                        }}
+                      >
                         <div
                           className="progress-bar rounded-1"
                           style={{
-                            backgroundColor: categoryColors[idx % categoryColors.length],
+                            backgroundColor:
+                              categoryColors[idx % categoryColors.length],
                             width: `${item.progress}%`,
                           }}
                         ></div>
@@ -410,44 +428,122 @@ export default function ExpensesScreen() {
               {totalExpenses > 0 ? (
                 <div className="d-flex flex-column gap-3 flex-grow-1">
                   <div className="p-3 rounded-3 bg-light d-flex align-items-center gap-3">
-                    <div className="rounded-3 d-flex align-items-center justify-content-center" style={{ width: "40px", height: "40px", backgroundColor: "#e2f2ee", color: "#0a3d34" }}>
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: "18px", height: "18px" }}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12" />
+                    <div
+                      className="rounded-3 d-flex align-items-center justify-content-center"
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        backgroundColor: "#e2f2ee",
+                        color: "#0a3d34",
+                      }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2}
+                        stroke="currentColor"
+                        style={{ width: "18px", height: "18px" }}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12"
+                        />
                       </svg>
                     </div>
                     <div>
-                      <p className="small text-muted mb-0">Total Transactions</p>
-                      <p className="fw-bold text-dark mb-0">{expenseList.length}</p>
+                      <p className="small text-muted mb-0">
+                        Total Transactions
+                      </p>
+                      <p className="fw-bold text-dark mb-0">
+                        {expenseList.length}
+                      </p>
                     </div>
                   </div>
 
                   <div className="p-3 rounded-3 bg-light d-flex align-items-center gap-3">
-                    <div className="rounded-3 d-flex align-items-center justify-content-center" style={{ width: "40px", height: "40px", backgroundColor: "#fef3c7", color: "#b45309" }}>
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: "18px", height: "18px" }}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    <div
+                      className="rounded-3 d-flex align-items-center justify-content-center"
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        backgroundColor: "#fef3c7",
+                        color: "#b45309",
+                      }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2}
+                        stroke="currentColor"
+                        style={{ width: "18px", height: "18px" }}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                        />
                       </svg>
                     </div>
                     <div>
-                      <p className="small text-muted mb-0">Average per Transaction</p>
-                      <p className="fw-bold text-dark mb-0">{expenseList.length > 0 ? formatCurrency(totalExpenses / expenseList.length) : formatCurrency(0)}</p>
+                      <p className="small text-muted mb-0">
+                        Average per Transaction
+                      </p>
+                      <p className="fw-bold text-dark mb-0">
+                        {expenseList.length > 0
+                          ? formatCurrency(totalExpenses / expenseList.length)
+                          : formatCurrency(0)}
+                      </p>
                     </div>
                   </div>
 
                   <div className="p-3 rounded-3 bg-light d-flex align-items-center gap-3">
-                    <div className="rounded-3 d-flex align-items-center justify-content-center" style={{ width: "40px", height: "40px", backgroundColor: "#e0f2fe", color: "#0369a1" }}>
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" style={{ width: "18px", height: "18px" }}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605" />
+                    <div
+                      className="rounded-3 d-flex align-items-center justify-content-center"
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        backgroundColor: "#e0f2fe",
+                        color: "#0369a1",
+                      }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={2}
+                        stroke="currentColor"
+                        style={{ width: "18px", height: "18px" }}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605"
+                        />
                       </svg>
                     </div>
                     <div>
                       <p className="small text-muted mb-0">Envelopes Used</p>
-                      <p className="fw-bold text-dark mb-0">{envelopes.filter((e) => expenseList.some((ex) => Number(ex.envelope_id) === Number(e.id))).length} of {envelopes.length}</p>
+                      <p className="fw-bold text-dark mb-0">
+                        {
+                          envelopes.filter((e) =>
+                            expenseList.some(
+                              (ex) => Number(ex.envelope_id) === Number(e.id),
+                            ),
+                          ).length
+                        }{" "}
+                        of {envelopes.length}
+                      </p>
                     </div>
                   </div>
                 </div>
               ) : (
                 <div className="flex-grow-1 d-flex flex-column align-items-center justify-content-center text-muted">
-                  <p className="small text-center mb-0">Start tracking your expenses to see a summary.</p>
+                  <p className="small text-center mb-0">
+                    Start tracking your expenses to see a summary.
+                  </p>
                 </div>
               )}
             </div>

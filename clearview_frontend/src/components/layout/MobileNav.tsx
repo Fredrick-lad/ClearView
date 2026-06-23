@@ -1,7 +1,7 @@
-import { useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { Icon } from "../ui/iconMap";
 import type { ScreenKey } from "../../types";
-import { Settings, User, Bell, HelpCircle } from "lucide-react";
+import { User, HelpCircle } from "lucide-react";
 import { GetData } from "../../hooks/context/generalContext";
 
 function MobileNav() {
@@ -53,7 +53,9 @@ function MobileNav() {
             style={{
               padding: "4px 8px",
               cursor: "pointer",
-              color: isActive ? "var(--cv-nav-active-text)" : "var(--cv-nav-inactive-text)",
+              color: isActive
+                ? "var(--cv-nav-active-text)"
+                : "var(--cv-nav-inactive-text)",
               borderBottom: isActive
                 ? "3px solid var(--cv-nav-active-border)"
                 : "3px solid transparent",
@@ -84,7 +86,10 @@ function MobileNav() {
         style={{
           padding: "4px 8px",
           cursor: "pointer",
-          color: screen === "Profile" ? "var(--cv-nav-active-text)" : "var(--cv-nav-inactive-text)",
+          color:
+            screen === "Profile"
+              ? "var(--cv-nav-active-text)"
+              : "var(--cv-nav-inactive-text)",
           borderBottom:
             screen === "Profile"
               ? "3px solid var(--cv-nav-active-border)"
@@ -117,7 +122,10 @@ function MobileNav() {
         style={{
           padding: "4px 8px",
           cursor: "pointer",
-          color: screen === "helpCenter" ? "var(--cv-nav-active-text)" : "var(--cv-nav-inactive-text)",
+          color:
+            screen === "helpCenter"
+              ? "var(--cv-nav-active-text)"
+              : "var(--cv-nav-inactive-text)",
           borderBottom:
             screen === "helpCenter"
               ? "3px solid var(--cv-nav-active-border)"

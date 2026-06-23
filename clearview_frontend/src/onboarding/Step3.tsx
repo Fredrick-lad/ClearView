@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { HelpCircle, ArrowLeft, Check, Plus, Loader } from "lucide-react";
 
 import { iconMap } from "../components/ui/iconMap";
@@ -55,7 +55,10 @@ export default function OnboardingStep3() {
             ClearView
           </div>
 
-          <button className="btn d-flex align-items-center gap-1 text-secondary border-0 p-0 shadow-none small fw-medium" onClick={() => setShowHelp(true)}>
+          <button
+            className="btn d-flex align-items-center gap-1 text-secondary border-0 p-0 shadow-none small fw-medium"
+            onClick={() => setShowHelp(true)}
+          >
             <HelpCircle size={18} />
           </button>
         </header>
@@ -161,11 +164,17 @@ export default function OnboardingStep3() {
             <div className="d-flex gap-3 mb-4 flex-wrap justify-content-center">
               <div className="bg-light rounded-3 px-3 py-2 text-center">
                 <div className="fw-bold text-dark">{envelopes.length}</div>
-                <div className="text-muted" style={{ fontSize: "0.7rem" }}>Envelopes</div>
+                <div className="text-muted" style={{ fontSize: "0.7rem" }}>
+                  Envelopes
+                </div>
               </div>
               <div className="bg-light rounded-3 px-3 py-2 text-center">
-                <div className="fw-bold text-dark">{formatCurrency(totalBudget)}</div>
-                <div className="text-muted" style={{ fontSize: "0.7rem" }}>Total Budget</div>
+                <div className="fw-bold text-dark">
+                  {formatCurrency(totalBudget)}
+                </div>
+                <div className="text-muted" style={{ fontSize: "0.7rem" }}>
+                  Total Budget
+                </div>
               </div>
             </div>
           )}
@@ -289,7 +298,10 @@ export default function OnboardingStep3() {
 
           {envelopes.length === 0 && (
             <div className="text-center py-5 text-muted">
-              <p className="mb-3">No envelopes yet. Create one to start budgeting for the semester.</p>
+              <p className="mb-3">
+                No envelopes yet. Create one to start budgeting for the
+                semester.
+              </p>
             </div>
           )}
 
@@ -371,17 +383,29 @@ export default function OnboardingStep3() {
               onClick={handleFinish}
               disabled={finishing}
               className="btn text-white d-inline-flex align-items-center gap-2 px-5 py-2.5 fw-medium border-0 shadow-none"
-              style={{ backgroundColor: "#0F6E56", borderRadius: "4px", opacity: finishing ? 0.7 : 1 }}
+              style={{
+                backgroundColor: "#0F6E56",
+                borderRadius: "4px",
+                opacity: finishing ? 0.7 : 1,
+              }}
             >
               {finishing ? (
-                <><Loader size={16} className="spinner-border spinner-border-sm" /> Loading…</>
+                <>
+                  <Loader
+                    size={16}
+                    className="spinner-border spinner-border-sm"
+                  />{" "}
+                  Loading…
+                </>
               ) : (
                 "Finish Setup"
               )}
             </button>
           </div>
         </footer>
-        {showHelp && <OnboardingHelpModal step={3} onClose={() => setShowHelp(false)} />}
+        {showHelp && (
+          <OnboardingHelpModal step={3} onClose={() => setShowHelp(false)} />
+        )}
       </div>
     </>
   );

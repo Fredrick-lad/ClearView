@@ -1,16 +1,7 @@
 import type { ScreenKey, ModalKind } from "../../types";
-import { useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import { Icon } from "../ui/iconMap";
-import {
-  ArrowRight,
-  ArrowRightCircle,
-  ChevronRight,
-  Headset,
-  LogOut,
-  Settings,
-  User,
-  MessageSquare,
-} from "lucide-react";
+import { Headset, LogOut, Settings, MessageSquare } from "lucide-react";
 
 interface SidebarProps {
   title: string;
@@ -20,19 +11,8 @@ interface SidebarProps {
   setModal: (m: ModalKind) => void;
 }
 
-export default function Sidebar({
-  title,
-  screen,
-  setScreen,
-  setModal,
-}: SidebarProps) {
+export default function Sidebar({ title, screen, setScreen }: SidebarProps) {
   // const [user, setUser]= useState(username = "" , email="")
-  const details = {
-    username: "fred",
-    email: "fred@gmail.com",
-  };
-
-  const [fullSidebar, setFullSidebar] = useState(true);
 
   const items: Array<{ icon: ReactNode; id: ScreenKey; label: string }> = [
     {
@@ -109,16 +89,20 @@ export default function Sidebar({
           <div key={it.id} style={{ marginBottom: 8 }}>
             <button
               onClick={() => setScreen(it.id)}
-                style={{
-                  width: "100%",
-                  textAlign: "left",
-                  padding: "8px 10px",
-                  border: "none",
-                  background: screen === it.id ? "var(--cv-nav-active-bg)" : "transparent",
-                  cursor: "pointer",
-                  borderLeft: screen === it.id ? "3px solid var(--cv-nav-active-border)" : "none",
-                  paddingLeft: screen === it.id ? "8px" : "none",
-                }}
+              style={{
+                width: "100%",
+                textAlign: "left",
+                padding: "8px 10px",
+                border: "none",
+                background:
+                  screen === it.id ? "var(--cv-nav-active-bg)" : "transparent",
+                cursor: "pointer",
+                borderLeft:
+                  screen === it.id
+                    ? "3px solid var(--cv-nav-active-border)"
+                    : "none",
+                paddingLeft: screen === it.id ? "8px" : "none",
+              }}
             >
               <div className="d-flex gap-2">
                 {it.icon}
@@ -139,10 +123,16 @@ export default function Sidebar({
                 textAlign: "left",
                 padding: "8px 10px",
                 border: "none",
-                background: screen === supp.id ? "var(--cv-nav-active-bg)" : "transparent",
+                background:
+                  screen === supp.id
+                    ? "var(--cv-nav-active-bg)"
+                    : "transparent",
                 cursor: "pointer",
 
-                borderLeft: screen === supp.id ? "3px solid var(--cv-nav-active-border)" : "none",
+                borderLeft:
+                  screen === supp.id
+                    ? "3px solid var(--cv-nav-active-border)"
+                    : "none",
                 paddingLeft: screen === supp.id ? "8px" : "none",
               }}
             >

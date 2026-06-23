@@ -1,4 +1,4 @@
-import { X, Lightbulb, Info, ArrowRight } from "lucide-react";
+import { X, Lightbulb, Info } from "lucide-react";
 
 interface Props {
   step: 1 | 2 | 3;

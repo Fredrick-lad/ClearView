@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Plus, X, ArrowDown, DollarSign, Wallet } from "lucide-react";
-import type { ScreenKey, ModalKind } from "../types";
+import { Plus, ArrowDown, DollarSign, Wallet } from "lucide-react";
 import { GetData } from "../hooks/context/generalContext";
 import Sidebar from "../components/layout/Sidebar";
 import DashboardScreen from "./DashboardScreen";
@@ -60,7 +59,7 @@ function MainScreen() {
                 totalAlloc={12000}
                 totalSpent={1200}
                 unalloc={0}
-                setScreen={function (s: ScreenKey): void {
+                setScreen={function (): void {
                   throw new Error("Function not implemented.");
                 }}
               />
@@ -91,7 +90,10 @@ function MainScreen() {
               <AddIncomeModal isOpen={true} onClose={() => setModal(null)} />
             )}
             {modal === "del" && (
-              <DeleteEnvelopeModal isOpen={true} onClose={() => setModal(null)} />
+              <DeleteEnvelopeModal
+                isOpen={true}
+                onClose={() => setModal(null)}
+              />
             )}
             {modal === "edit" && (
               <EditEnvelopeModal isOpen={true} onClose={() => setModal(null)} />
@@ -109,29 +111,55 @@ function MainScreen() {
         </div>
 
         {/* Floating Action Button - mobile/tablet only */}
-        <div className="d-lg-none" style={{ position: "fixed", bottom: "76px", right: "16px", zIndex: 1030 }}>
+        <div
+          className="d-lg-none"
+          style={{
+            position: "fixed",
+            bottom: "76px",
+            right: "16px",
+            zIndex: 1030,
+          }}
+        >
           {/* FAB menu items */}
           {fabOpen && (
             <div className="d-flex flex-column align-items-end gap-2 mb-3">
               <button
                 className="btn btn-light shadow-sm d-flex align-items-center gap-2 border-0 fw-semibold"
-                style={{ borderRadius: "8px", padding: "8px 14px", fontSize: "13px" }}
+                style={{
+                  borderRadius: "8px",
+                  padding: "8px 14px",
+                  fontSize: "13px",
+                }}
                 onClick={() => handleFabAction(() => setModal("inc"))}
               >
-                <ArrowDown size={16} style={{ color: "var(--cv-insight-bg)" }} />
+                <ArrowDown
+                  size={16}
+                  style={{ color: "var(--cv-insight-bg)" }}
+                />
                 Add Income
               </button>
               <button
                 className="btn btn-light shadow-sm d-flex align-items-center gap-2 border-0 fw-semibold"
-                style={{ borderRadius: "8px", padding: "8px 14px", fontSize: "13px" }}
+                style={{
+                  borderRadius: "8px",
+                  padding: "8px 14px",
+                  fontSize: "13px",
+                }}
                 onClick={() => handleFabAction(() => setModal("exp"))}
               >
-                <DollarSign size={16} style={{ color: "var(--cv-insight-bg)" }} />
+                <DollarSign
+                  size={16}
+                  style={{ color: "var(--cv-insight-bg)" }}
+                />
                 Add Expense
               </button>
               <button
                 className="btn btn-light shadow-sm d-flex align-items-center gap-2 border-0 fw-semibold"
-                style={{ borderRadius: "8px", padding: "8px 14px", fontSize: "13px" }}
+                style={{
+                  borderRadius: "8px",
+                  padding: "8px 14px",
+                  fontSize: "13px",
+                }}
                 onClick={() => handleFabAction(() => setModal("env"))}
               >
                 <Wallet size={16} style={{ color: "var(--cv-insight-bg)" }} />

@@ -62,7 +62,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [incomeSource, setIncomeSource] = useState<
     IncomeRecord | { source: ""; total_amount: ""; create_time: "" }
   >();
-  const [spend, setSpend] = useState(0);
   const [envelopeData, setEnvelopeData] = useState<any>(null);
   const [periodData, setPeriodData] = useState<any>(null);
   const [expenses, setExpenses] = useState<any[]>([]);
@@ -70,7 +69,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [error, setError] = useState("");
 
   const [isSignedin, setIsSignedin] = useState(false);
-
+  console.log(email);
   const navigate = useNavigate();
 
   const fetchDashboardData = async () => {

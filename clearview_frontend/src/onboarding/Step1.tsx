@@ -1,5 +1,12 @@
-import React, { useState } from "react";
-import { HelpCircle, ArrowRight, Target, PiggyBank, Calendar, CreditCard } from "lucide-react";
+import { useState } from "react";
+import {
+  HelpCircle,
+  ArrowRight,
+  Target,
+  PiggyBank,
+  Calendar,
+  CreditCard,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import OnboardingHelpModal from "../components/OnboardingHelpModal";
 
@@ -60,7 +67,11 @@ export default function OnboardingWelcome() {
         >
           ClearView
         </div>
-        <button className="btn d-flex align-items-center gap-1 text-secondary border-0 p-0 shadow-none" style={{ fontSize: "0.9rem", fontWeight: 500 }} onClick={() => setShowHelp(true)}>
+        <button
+          className="btn d-flex align-items-center gap-1 text-secondary border-0 p-0 shadow-none"
+          style={{ fontSize: "0.9rem", fontWeight: 500 }}
+          onClick={() => setShowHelp(true)}
+        >
           <HelpCircle size={18} className="text-secondary" />
           Help
         </button>
@@ -68,7 +79,10 @@ export default function OnboardingWelcome() {
 
       <main className="flex-grow-1 d-flex flex-column align-items-center justify-content-center px-3 py-5">
         <div className="w-100 mb-4" style={{ maxWidth: "420px" }}>
-          <div className="d-flex justify-content-between mb-2" style={{ fontSize: "0.8rem", fontWeight: 600 }}>
+          <div
+            className="d-flex justify-content-between mb-2"
+            style={{ fontSize: "0.8rem", fontWeight: 600 }}
+          >
             <span style={{ color: "#053225", letterSpacing: "0.03em" }}>
               Step 1 of 3: Your Goal
             </span>
@@ -76,11 +90,22 @@ export default function OnboardingWelcome() {
               33% Complete
             </span>
           </div>
-          <div className="progress" style={{ height: "5px", backgroundColor: "#cbece1", borderRadius: "10px" }}>
+          <div
+            className="progress"
+            style={{
+              height: "5px",
+              backgroundColor: "#cbece1",
+              borderRadius: "10px",
+            }}
+          >
             <div
               className="progress-bar"
               role="progressbar"
-              style={{ width: "33%", backgroundColor: "#053225", borderRadius: "10px" }}
+              style={{
+                width: "33%",
+                backgroundColor: "#053225",
+                borderRadius: "10px",
+              }}
               aria-valuenow={33}
               aria-valuemin={0}
               aria-valuemax={100}
@@ -88,7 +113,10 @@ export default function OnboardingWelcome() {
           </div>
         </div>
 
-        <div className="text-center mx-auto px-2 mb-4" style={{ maxWidth: "640px" }}>
+        <div
+          className="text-center mx-auto px-2 mb-4"
+          style={{ maxWidth: "640px" }}
+        >
           <h1
             className="mb-3 fw-bold"
             style={{
@@ -100,12 +128,23 @@ export default function OnboardingWelcome() {
           >
             What brings you to ClearView?
           </h1>
-          <p className="text-secondary mx-auto mb-0" style={{ fontSize: "1rem", lineHeight: "1.6", maxWidth: "520px", fontWeight: 400 }}>
+          <p
+            className="text-secondary mx-auto mb-0"
+            style={{
+              fontSize: "1rem",
+              lineHeight: "1.6",
+              maxWidth: "520px",
+              fontWeight: 400,
+            }}
+          >
             Pick your main focus as a student so we can tailor your experience.
           </p>
         </div>
 
-        <div className="row g-3 mb-4" style={{ maxWidth: "600px", width: "100%" }}>
+        <div
+          className="row g-3 mb-4"
+          style={{ maxWidth: "600px", width: "100%" }}
+        >
           {goals.map((goal) => {
             const Icon = goal.icon;
             const isSelected = selectedGoal === goal.id;
@@ -124,7 +163,10 @@ export default function OnboardingWelcome() {
                 >
                   <div className="d-flex align-items-center gap-2 mb-2">
                     <Icon size={20} style={{ color: "#053225" }} />
-                    <span className="fw-bold text-dark" style={{ fontSize: "0.9rem" }}>
+                    <span
+                      className="fw-bold text-dark"
+                      style={{ fontSize: "0.9rem" }}
+                    >
                       {goal.label}
                     </span>
                   </div>
@@ -153,7 +195,9 @@ export default function OnboardingWelcome() {
           <ArrowRight size={16} strokeWidth={2.5} />
         </button>
       </main>
-      {showHelp && <OnboardingHelpModal step={1} onClose={() => setShowHelp(false)} />}
+      {showHelp && (
+        <OnboardingHelpModal step={1} onClose={() => setShowHelp(false)} />
+      )}
     </div>
   );
 }

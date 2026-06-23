@@ -1,20 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   UtensilsCrossed,
   BookOpen,
   Bus,
   Home,
-  Smile,
   GraduationCap,
   Target,
   DollarSign,
-  CheckCircle,
   ShieldCheck,
   Mail,
   Wallet,
   BarChart3,
-  Sparkles,
   PieChart,
   RotateCcw,
   Lightbulb,
@@ -27,8 +24,6 @@ import {
 } from "lucide-react";
 
 export default function ClearViewLanding() {
-  const [activeTab, setActiveTab] = useState<string>("all");
-
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {

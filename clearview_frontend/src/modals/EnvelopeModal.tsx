@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../hooks/context/userContext";
 import { GetData } from "../hooks/context/generalContext";
-import type { ModalKind } from "../types";
 import { iconMap } from "../components/ui/iconMap";
 
 interface CreateEnvelopeModalProps {

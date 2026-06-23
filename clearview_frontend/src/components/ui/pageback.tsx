@@ -1,5 +1,3 @@
-import React from "react";
-
 interface PageBackButtonProps {
   onBack?: () => void;
   label?: string;

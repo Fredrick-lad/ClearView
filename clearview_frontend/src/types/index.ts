@@ -32,7 +32,7 @@ export type Icons =
   | "moveLeft"
   | "moveRight"
 
-export type ModalKind = "env" | "exp" | "inc" |"del"|"edit"|"editexp"|"env"|"envsetup" | null;
+export type ModalKind = "env" | "exp" | "inc" |"del"|"edit"|"editexp"|"env"|"envsetup" |"envSuccess"| null;
 
 export type Envelope = {
   id: number;
