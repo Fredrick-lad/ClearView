@@ -2,16 +2,16 @@ import React from "react";
 import { GetData } from "../../hooks/context/generalContext";
 
 interface TopBarProps {
-  title: string; // e.g., "My Envelopes" or "Dashboard"
-  showActionBtn?: boolean; // Displays the primary button (e.g., "New Envelope")
-  actionBtnText?: string; // Button label
+  title: string;
+  showActionBtn?: boolean;
+  actionBtnText?: string;
   onActionClick?: () => void;
-  showExpenseBtn?: boolean; // Toggles the "Add Expense" action button
-  onExpenseClick?: () => void; // Click handler for the expense option
-  showIncomeBtn?: boolean; // NEW: Toggles the "Add Income" action button
-  onIncomeClick?: () => void; // NEW: Click handler for the income option
-  showHelpIcon?: boolean; // Displays the help circle icon
-  avatarUrl?: string; // Renders image avatar if provided, else user outline icon
+  showExpenseBtn?: boolean;
+  onExpenseClick?: () => void;
+  showIncomeBtn?: boolean;
+  onIncomeClick?: () => void;
+  showHelpIcon?: boolean;
+  avatarUrl?: string;
 }
 
 export default function TopBar({
@@ -29,72 +29,69 @@ export default function TopBar({
   const { setModal, setScreen } = GetData();
 
   return (
-    <div className="d-flex justify-content-between align-items-center py-3 z-2 sticky-top bg-ui-bg">
-      {/* --- LEFT SIDE: PAGE TITLE --- */}
-      <h1 className="h4 fw-bold mb-0 text-dark" style={{ fontFamily: "serif" }}>
+    <div className="d-flex justify-content-between align-items-center py-2 py-md-3 z-2 sticky-top bg-ui-bg">
+      {/* PAGE TITLE */}
+      <h1 className="h5 h-sm-4 fw-bold mb-0 text-dark" style={{ fontFamily: "serif" }}>
         {title}
       </h1>
 
-      {/* --- RIGHT SIDE: UTILITIES & ACTIONS --- */}
-      <div className="d-flex align-items-center gap-2">
-        {/* NEW: Add Income Button (Elegant Outline Style to complement primary actions) */}
-        {showIncomeBtn && (
-          <button
-            type="button"
-            className="btn fw-bold btn-sm bg-transparent"
-            style={{
-              color: "#013328",
-              border: "1px solid #013328",
-              borderRadius: "4px",
-              fontSize: "13px",
-            }}
-            onClick={onIncomeClick ? onIncomeClick : () => setModal("inc")}
-          >
-            <span className="me-1">↓</span> Add Income
-          </button>
-        )}
+      {/* UTILITIES & ACTIONS - action buttons hidden on mobile/tablet (handled by FAB), bell + profile always visible */}
+      <div className="d-flex align-items-center gap-2 flex-wrap">
+        <div className="d-none d-lg-flex align-items-center gap-2">
+          {showIncomeBtn && (
+            <button
+              type="button"
+              className="btn fw-bold btn-sm bg-transparent"
+              style={{
+                color: "#013328",
+                border: "1px solid #013328",
+                borderRadius: "4px",
+                fontSize: "13px",
+              }}
+              onClick={onIncomeClick ? onIncomeClick : () => setModal("inc")}
+            >
+              <span className="me-1">↓</span> Add Income
+            </button>
+          )}
 
-        {/* Add Expense Button */}
-        {showExpenseBtn && (
-          <button
-            type="button"
-            className="btn text-white px-3 py-2 fw-bold btn-sm border-0"
-            style={{
-              backgroundColor: "#013328",
-              borderRadius: "4px",
-              fontSize: "13px",
-            }}
-            onClick={onExpenseClick ? onExpenseClick : () => setModal("exp")}
-          >
-            <span className="me-1">+</span> Add Expense
-          </button>
-        )}
+          {showExpenseBtn && (
+            <button
+              type="button"
+              className="btn text-white px-3 py-2 fw-bold btn-sm border-0"
+              style={{
+                backgroundColor: "#013328",
+                borderRadius: "4px",
+                fontSize: "13px",
+              }}
+              onClick={onExpenseClick ? onExpenseClick : () => setModal("exp")}
+            >
+              <span className="me-1">+</span> Add Expense
+            </button>
+          )}
 
-        {/* Primary Call to Action Button (e.g., New Envelope) */}
-        {showActionBtn && (
-          <button
-            type="button"
-            className="btn text-white px-3 py-2 fw-bold btn-sm border-0"
-            style={{
-              backgroundColor: "#013328",
-              borderRadius: "4px",
-              fontSize: "13px",
-            }}
-            onClick={onActionClick ? onActionClick : () => setModal("env")}
-          >
-            {actionBtnText}
-          </button>
-        )}
+          {showActionBtn && (
+            <button
+              type="button"
+              className="btn text-white px-3 py-2 fw-bold btn-sm border-0"
+              style={{
+                backgroundColor: "#013328",
+                borderRadius: "4px",
+                fontSize: "13px",
+              }}
+              onClick={onActionClick ? onActionClick : () => setModal("env")}
+            >
+              {actionBtnText}
+            </button>
+          )}
 
-        {/* Divider Spacer elements shown only if buttons are paired with utility icons */}
-        {(showActionBtn || showExpenseBtn || showIncomeBtn) && (
-          <div
-            className="vr mx-2 text-secondary opacity-25"
-            style={{ height: "auto" }}
-          ></div>
-        )}
+          {(showActionBtn || showExpenseBtn || showIncomeBtn) && (
+            <div
+              className="vr mx-1 text-secondary opacity-25"
+              style={{ height: "auto" }}
+            ></div>
+          )}
+        </div>
 
-        {/* Notification Bell */}
         <button
           className="btn p-1 text-dark border-0 d-flex align-items-center justify-content-center opacity-75 hover-opacity-100"
           onClick={() => setScreen("Notifications")}
@@ -105,7 +102,6 @@ export default function TopBar({
           />
         </button>
 
-        {/* Support/Help Link */}
         {showHelpIcon && (
           <button className="btn p-1 text-dark border-0 d-flex align-items-center justify-content-center opacity-75 hover-opacity-100">
             <TopBarIconSwitcher
@@ -115,7 +111,6 @@ export default function TopBar({
           </button>
         )}
 
-        {/* Profile Avatar Slot */}
         <div className="ms-1 d-flex align-items-center">
           {avatarUrl ? (
             <img
@@ -141,7 +136,6 @@ export default function TopBar({
   );
 }
 
-// --- TOP BAR ATOMIC SVG ROUTER ---
 function TopBarIconSwitcher({
   type,
   style,

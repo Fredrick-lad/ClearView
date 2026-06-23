@@ -1,11 +1,12 @@
 import { useState, type ReactNode } from "react";
 import { Icon } from "../ui/iconMap";
 import type { ScreenKey } from "../../types";
-import { Settings, User } from "lucide-react";
+import { Settings, User, Bell } from "lucide-react";
 import { GetData } from "../../hooks/context/generalContext";
 
 function MobileNav() {
-  const { screen, setScreen, modal } = GetData();
+  const { screen, setScreen } = GetData();
+
   const items: Array<{ icon: ReactNode; id: ScreenKey; label: string }> = [
     {
       icon: <Icon name="dashboard" className="text-primary" />,
@@ -18,41 +19,90 @@ function MobileNav() {
       label: "Envelopes",
     },
     {
+      icon: <Icon name="expenses" className="text-danger" />,
+      id: "Expenses",
+      label: "Expenses",
+    },
+    {
+      icon: <Icon name="income" className="text-primary" />,
+      id: "Income",
+      label: "Income",
+    },
+    {
       icon: <Icon name="reports" className="text-primary" />,
       id: "Reports",
       label: "Reports",
     },
-    {
-      icon: <User className="text-primary" />,
-      id: "Profile",
-      label: "Profile",
-    },
   ];
 
   return (
-    <footer className="d-flex flex-row justify-content-between  z-2 w-100 ">
-      {items.map((it) => (
-        <div key={it.id} className=" bg-brand-light">
+    <nav
+      className="d-flex flex-row justify-content-around align-items-center w-100 bg-white border-top shadow-sm"
+      style={{
+        padding: "6px 0 constant(safe-area-inset-bottom)",
+        padding: "6px 0 env(safe-area-inset-bottom)",
+        minHeight: "60px",
+      }}
+    >
+      {items.map((it) => {
+        const isActive = screen === it.id;
+        return (
           <button
+            key={it.id}
             onClick={() => setScreen(it.id)}
+            className="d-flex flex-column align-items-center justify-content-center gap-1 border-0 bg-transparent"
             style={{
-              //   width: "100%",
-              //   textAlign: "left",
-              padding: "4px",
-              border: "none",
-              background: screen === it.id ? "#E1F5EE" : "transparent",
+              padding: "4px 8px",
               cursor: "pointer",
-              borderBottom: screen === it.id ? "3px solid #1D9E75" : "none",
-              // paddingBottom: screens === screen.id ? "10px" : "none",
+              color: isActive ? "#1D9E75" : "#6c757d",
+              borderBottom: isActive ? "3px solid #1D9E75" : "3px solid transparent",
+              transition: "color 0.15s, border-color 0.15s",
+              minWidth: "56px",
             }}
-            className="d-flex justify-content-center align-items-center flex-column"
           >
             {it.icon}
-            <div className="small">{it.label}</div>
+            <span
+              style={{
+                fontSize: "10px",
+                fontWeight: isActive ? 700 : 500,
+                lineHeight: 1.1,
+                letterSpacing: "0.02em",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {it.label}
+            </span>
           </button>
-        </div>
-      ))}
-    </footer>
+        );
+      })}
+
+      {/* Profile */}
+      <button
+        onClick={() => setScreen("Profile")}
+        className="d-flex flex-column align-items-center justify-content-center gap-1 border-0 bg-transparent"
+        style={{
+          padding: "4px 8px",
+          cursor: "pointer",
+          color: screen === "Profile" ? "#1D9E75" : "#6c757d",
+          borderBottom: screen === "Profile" ? "3px solid #1D9E75" : "3px solid transparent",
+          transition: "color 0.15s, border-color 0.15s",
+          minWidth: "56px",
+        }}
+      >
+        <User size={18} className={screen === "Profile" ? "text-success" : "text-secondary"} />
+        <span
+          style={{
+            fontSize: "10px",
+            fontWeight: screen === "Profile" ? 700 : 500,
+            lineHeight: 1.1,
+            letterSpacing: "0.02em",
+            whiteSpace: "nowrap",
+          }}
+        >
+          Profile
+        </span>
+      </button>
+    </nav>
   );
 }
 
