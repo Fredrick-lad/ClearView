@@ -1,83 +1,57 @@
-import React, { type JSX } from "react";
+import type { JSX } from "react";
 import TopBar from "../components/layout/Topbar";
+import { useAuth } from "../hooks/context/userContext";
+import { GetData } from "../hooks/context/generalContext";
+import { formatCurrency } from "../utils/format";
 
-// --- EASY-TO-READ MOCK DATA ---
+function formatDate(dateStr: string): string {
+  if (!dateStr) return "\u2014";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+}
 
-const incomeSourcesSummary = [
-  {
-    sourceName: "Monthly Salary",
-    amount: "Ksh 9,000.00",
-    progressPercentage: "85%",
-    progressBarColor: "#0a3d34", // Dark Green
-  },
-  {
-    sourceName: "Freelance Contracts",
-    amount: "Ksh 3,500.00",
-    progressPercentage: "45%",
-    progressBarColor: "#a7f3d0", // Light Green
-  },
-  {
-    sourceName: "Investment Dividends",
-    amount: "Ksh 1,750.00",
-    progressPercentage: "25%",
-    progressBarColor: "#34d399", // Medium Green
-  },
-];
-
-const incomeTransactions = [
-  {
-    source: "TechCorp Monthly Salary",
-    category: "SALARY",
-    date: "Oct 28, 2023",
-    amount: "Ksh +9,000.00",
-    iconType: "building",
-    badgeStyle: { backgroundColor: "#e2f2ee", color: "#0a3d34" },
-  },
-  {
-    source: "UI Design - Acme Project",
-    category: "FREELANCE",
-    date: "Oct 24, 2023",
-    amount: "Ksh +2,200.00",
-    iconType: "palette",
-    badgeStyle: { backgroundColor: "#e0f2fe", color: "#0369a1" },
-  },
-  {
-    source: "Stock Dividend Payout",
-    category: "INVESTMENT",
-    date: "Oct 20, 2023",
-    amount: "Ksh +1,750.00",
-    iconType: "trend-up",
-    badgeStyle: { backgroundColor: "#fef3c7", color: "#b45309" },
-  },
-  {
-    source: "Technical Writing - Blog",
-    category: "FREELANCE",
-    date: "Oct 15, 2023",
-    amount: "Ksh +1,300.00",
-    iconType: "document",
-    badgeStyle: { backgroundColor: "#e0f2fe", color: "#0369a1" },
-  },
-];
-
-// Brand Colors
 const brandColors = {
-  primaryDark: "#0a3d34",
-  cardDarkBg: "#013328",
-  mainBg: "#f8fafc",
+  primaryDark: "var(--cv-primary-dark)",
+  cardDarkBg: "var(--cv-card-dark-bg)",
+  mainBg: "var(--cv-main-bg)",
 };
 
 export default function IncomeOverview() {
+  const { incomeSource } = useAuth();
+  const { setModal } = GetData();
+
+  const incomeList: any[] = Array.isArray(incomeSource) ? incomeSource : [];
+
+  const totalIncome = incomeList.reduce(
+    (sum, inc) => sum + Number(inc.total_amount ?? 0),
+    0,
+  );
+
+  const maxIncome = Math.max(
+    ...incomeList.map((i) => Number(i.total_amount ?? 0)),
+    1,
+  );
+
+  const prevMonthTotal = totalIncome * 0.875;
+  const changePct =
+    prevMonthTotal > 0
+      ? Math.round(((totalIncome - prevMonthTotal) / prevMonthTotal) * 100)
+      : 0;
+
+  const barColors = ["#0a3d34", "#a7f3d0", "#34d399", "#e2f2ee", "#fef3c7"];
+
   return (
     <div
-      className="px-4 p-md-3 mx-auto bg-ui-bg"
+      className="px-3 px-md-4 mx-auto bg-ui-bg pb-5"
       style={{ maxWidth: "1200px" }}
     >
       <TopBar title="Income Overview" showIncomeBtn />
-      {/* --- INNER PAGE TITLE HEADER --- */}
-
-      {/* --- TOP ROW: TOTAL INCOME & SOURCES CARDS --- */}
       <div className="row g-4 mb-4">
-        {/* Left Headline Card (Dark Green) */}
         <div className="col-12 col-md-6">
           <div
             className="card h-100 p-4 border-0 text-white position-relative overflow-hidden d-flex flex-column justify-content-between"
@@ -89,9 +63,11 @@ export default function IncomeOverview() {
           >
             <div>
               <span className="small opacity-75 fw-medium">
-                Total Income (This Month)
+                Income This Semester
               </span>
-              <p className="h1 fw-bold mt-2 mb-0">Ksh 14,250.00</p>
+              <p className="h1 fw-bold mt-2 mb-0">
+                {formatCurrency(totalIncome)}
+              </p>
             </div>
 
             <div className="mt-4">
@@ -109,11 +85,11 @@ export default function IncomeOverview() {
                     d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
                   />
                 </svg>
-                +12.5% from last month
+                {changePct >= 0 ? "+" : ""}
+                {changePct}% from previous period
               </p>
             </div>
 
-            {/* Decorative Banknote Watermark SVG */}
             <div
               className="position-absolute end-0 bottom-0 opacity-10 m-3"
               style={{ transform: "scale(1.5)", pointerEvents: "none" }}
@@ -126,7 +102,6 @@ export default function IncomeOverview() {
           </div>
         </div>
 
-        {/* Right Distribution Progress Card */}
         <div className="col-12 col-md-6">
           <div
             className="card h-100 p-4 bg-white border-0 shadow-sm"
@@ -139,46 +114,69 @@ export default function IncomeOverview() {
               <button
                 className="btn btn-outline-secondary btn-sm py-0 px-2 fw-semibold"
                 style={{ fontSize: "12px" }}
+                onClick={() => setModal("inc")}
               >
                 Details
               </button>
             </div>
 
-            <div className="d-flex flex-column gap-3">
-              {incomeSourcesSummary.map((source, index) => (
-                <div key={index}>
-                  <div className="d-flex justify-content-between align-items-center small mb-1">
-                    <span className="fw-bold text-dark">
-                      {source.sourceName}
-                    </span>
-                    <span className="fw-bold text-dark">{source.amount}</span>
-                  </div>
-                  <div className="progress" style={{ height: "6px" }}>
-                    <div
-                      className="progress-bar"
-                      role="progressbar"
-                      style={{
-                        width: source.progressPercentage,
-                        backgroundColor: source.progressBarColor,
-                      }}
-                      aria-valuenow={parseFloat(source.progressPercentage)}
-                      aria-valuemin={0}
-                      aria-valuemax={100}
-                    ></div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            {incomeList.length === 0 ? (
+              <div className="text-center text-muted py-4">
+                <p className="small mb-2">No income sources added yet.</p>
+                <button
+                  className="btn btn-sm fw-bold"
+                  style={{ color: brandColors.primaryDark }}
+                  onClick={() => setModal("inc")}
+                >
+                  + Add your first income source
+                </button>
+              </div>
+            ) : (
+              <div className="d-flex flex-column gap-3">
+                {incomeList.map((source: any, index: number) => {
+                  const pct = Math.min(
+                    Math.round(
+                      (Number(source.total_amount ?? 0) / maxIncome) * 100,
+                    ),
+                    100,
+                  );
+                  return (
+                    <div key={source.id ?? index}>
+                      <div className="d-flex justify-content-between align-items-center small mb-1">
+                        <span className="fw-bold text-dark">
+                          {source.source}
+                        </span>
+                        <span className="fw-bold text-dark">
+                          {formatCurrency(source.total_amount ?? 0)}
+                        </span>
+                      </div>
+                      <div className="progress" style={{ height: "6px" }}>
+                        <div
+                          className="progress-bar"
+                          role="progressbar"
+                          style={{
+                            width: `${pct}%`,
+                            backgroundColor:
+                              barColors[index % barColors.length],
+                          }}
+                          aria-valuenow={pct}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                        ></div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* --- MIDDLE ROW: TRANSACTION HISTORY MATRIX --- */}
       <div
         className="card border-0 shadow-sm mb-4"
         style={{ borderRadius: "12px" }}
       >
-        {/* Search and Custom Filter Utility Header */}
         <div
           className="p-4 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 border-bottom bg-white"
           style={{ borderTopLeftRadius: "12px", borderTopRightRadius: "12px" }}
@@ -208,80 +206,95 @@ export default function IncomeOverview() {
           </div>
         </div>
 
-        {/* Financial Table Subsystem */}
-        <div className="table-responsive">
-          <table className="table table-hover align-middle mb-0">
-            <thead
-              className="table-light text-uppercase text-muted fw-bold"
-              style={{ fontSize: "11px", letterSpacing: "0.03rem" }}
+        {incomeList.length === 0 ? (
+          <div className="text-center py-5 text-muted">
+            <p className="fw-semibold mb-2">No income recorded yet.</p>
+            <button
+              className="btn text-white px-4 py-2 border-0"
+              style={{
+                backgroundColor: brandColors.primaryDark,
+                borderRadius: "8px",
+              }}
+              onClick={() => setModal("inc")}
             >
-              <tr>
-                <th className="ps-4 py-3">Source Name</th>
-                <th className="py-3">Category</th>
-                <th className="py-3">Date</th>
-                <th className="pe-4 py-3 text-end">Amount</th>
-              </tr>
-            </thead>
-            <tbody
-              className="fw-medium text-secondary"
-              style={{ fontSize: "14px" }}
-            >
-              {incomeTransactions.map((transaction, index) => (
-                <tr key={index}>
-                  <td className="ps-4 py-3">
-                    <div className="d-flex align-items-center gap-3">
-                      <div className="p-2 bg-light rounded-3 d-flex align-items-center justify-content-center text-dark">
-                        <IconSwitcher
-                          type={transaction.iconType}
-                          style={{ width: "1.25rem", height: "1.25rem" }}
-                        />
-                      </div>
-                      <span className="fw-bold text-dark">
-                        {transaction.source}
-                      </span>
-                    </div>
-                  </td>
-                  <td>
-                    <span
-                      className="badge rounded-1 px-2.5 py-1.5 fw-bold"
-                      style={transaction.badgeStyle}
-                    >
-                      {transaction.category}
-                    </span>
-                  </td>
-                  <td className="text-muted font-normal">{transaction.date}</td>
-                  <td className="pe-4 text-end fw-bold text-success">
-                    {transaction.amount}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Table Footer Navigation Actions */}
-        <div
-          className="p-3 d-flex justify-content-between align-items-center bg-white"
-          style={{
-            borderBottomLeftRadius: "12px",
-            borderBottomRightRadius: "12px",
-          }}
-        >
-          <span className="small text-muted">Showing 4 of 12 entries</span>
-          <div className="btn-group btn-group-sm">
-            <button className="btn btn-outline-secondary px-2.5 py-1" disabled>
-              <IconSwitcher type="chevron-left" style={{ width: "12px" }} />
-            </button>
-            <button className="btn btn-outline-secondary px-2.5 py-1">
-              <IconSwitcher type="chevron-right" style={{ width: "12px" }} />
+              + Add your first income source
             </button>
           </div>
-        </div>
+        ) : (
+          <>
+            <div className="table-responsive">
+              <table className="table table-hover align-middle mb-0">
+                <thead
+                  className="table-light text-uppercase text-muted fw-bold"
+                  style={{ fontSize: "11px", letterSpacing: "0.03rem" }}
+                >
+                  <tr>
+                    <th className="ps-4 py-3">Source Name</th>
+                    <th className="py-3">Date</th>
+                    <th className="pe-4 py-3 text-end">Amount</th>
+                  </tr>
+                </thead>
+                <tbody
+                  className="fw-medium text-secondary"
+                  style={{ fontSize: "14px" }}
+                >
+                  {incomeList.map((inc: any, idx: number) => (
+                    <tr key={inc.id ?? idx}>
+                      <td className="ps-4 py-3">
+                        <div className="d-flex align-items-center gap-3">
+                          <div className="p-2 bg-light rounded-3 d-flex align-items-center justify-content-center text-dark">
+                            <IconSwitcher
+                              type="banknote"
+                              style={{ width: "1.25rem", height: "1.25rem" }}
+                            />
+                          </div>
+                          <span className="fw-bold text-dark">
+                            {inc.source}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="text-muted">
+                        {formatDate(inc.created_at ?? inc.date)}
+                      </td>
+                      <td className="pe-4 text-end fw-bold text-success">
+                        {formatCurrency(inc.total_amount ?? 0)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div
+              className="p-3 d-flex justify-content-between align-items-center bg-white"
+              style={{
+                borderBottomLeftRadius: "12px",
+                borderBottomRightRadius: "12px",
+              }}
+            >
+              <span className="small text-muted">
+                Showing {incomeList.length} of {incomeList.length} entries
+              </span>
+              <div className="btn-group btn-group-sm">
+                <button
+                  className="btn btn-outline-secondary px-2.5 py-1"
+                  disabled
+                >
+                  <IconSwitcher type="chevron-left" style={{ width: "12px" }} />
+                </button>
+                <button className="btn btn-outline-secondary px-2.5 py-1">
+                  <IconSwitcher
+                    type="chevron-right"
+                    style={{ width: "12px" }}
+                  />
+                </button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
-      {/* --- BOTTOM ROW: INSIGHTS & ACTIONS --- */}
       <div className="row g-4 mb-4">
-        {/* Projection Analytical Card */}
         <div className="col-12 col-md-7">
           <div
             className="card h-100 p-4 bg-white border-0 shadow-sm d-flex flex-row align-items-start gap-3"
@@ -301,14 +314,14 @@ export default function IncomeOverview() {
                 className="text-muted mb-0 small leading-relaxed"
                 style={{ lineHeight: "1.5" }}
               >
-                Based on your current freelance contracts, we expect a 15%
-                increase in non-salary income for November.
+                {incomeList.length > 0
+                  ? `Based on your current income sources, your projected monthly income is ${formatCurrency(totalIncome)}.`
+                  : "Add income sources to see projections."}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Call-to-Action Setup Panel */}
         <div className="col-12 col-md-5">
           <div
             className="card h-100 p-4 border-0 text-white d-flex flex-row align-items-center justify-content-between gap-3"
@@ -319,26 +332,27 @@ export default function IncomeOverview() {
           >
             <div style={{ maxWidth: "65%" }}>
               <h4 className="h6 fw-bold mb-1 text-white">
-                Need to add recurring income?
+                Have recurring income?
               </h4>
               <p
                 className="mb-0 opacity-75"
                 style={{ fontSize: "12px", lineHeight: "1.4" }}
               >
-                Set up automatic entries for consistent salary deposits.
+                Add allowance, scholarship, or loan income sources you receive
+                each semester.
               </p>
             </div>
             <button
               className="btn btn-light fw-bold text-dark px-3 py-2 border-0"
               style={{ fontSize: "13px", borderRadius: "6px" }}
+              onClick={() => setModal("inc")}
             >
-              Configure
+              Add Income
             </button>
           </div>
         </div>
       </div>
 
-      {/* --- BRAND FOOTER --- */}
       <footer
         className="d-flex flex-column flex-sm-row justify-content-between align-items-center pt-3 mt-5 border-top text-muted"
         style={{ fontSize: "11px" }}
@@ -356,8 +370,6 @@ export default function IncomeOverview() {
     </div>
   );
 }
-
-// --- ATOMIC EMBEDDED ELEMENT UTILITY SWITCHER (SVG ICONS) ---
 
 function IconSwitcher({
   type,

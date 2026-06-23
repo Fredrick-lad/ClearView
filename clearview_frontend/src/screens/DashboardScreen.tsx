@@ -4,6 +4,7 @@ import { useAuth } from "../hooks/context/userContext";
 import { GetData } from "../hooks/context/generalContext";
 import { iconMap } from "../components/ui/iconMap";
 import ProgBar from "../hooks/ProgBar";
+import { formatCurrency } from "../utils/format";
 
 type Props = {
   envelopes: Envelope[];
@@ -28,7 +29,7 @@ function formatDate(dateStr: string): string {
 }
 
 export default function DashboardScreen(_: Props) {
-  const { setModal } = GetData();
+  const { setScreen, setModal, setSelectedEnvelope } = GetData();
   const { incomeSource, envelopeData, expenses, userData } = useAuth();
 
   // --- Derived totals ---
@@ -63,19 +64,19 @@ export default function DashboardScreen(_: Props) {
   const summaryCards = [
     {
       title: "Total Income",
-      value: `KES ${totalIncome.toLocaleString()}`,
+      value: formatCurrency(totalIncome),
       subtext: `${Array.isArray(incomeSource) ? incomeSource.length : 0} source${Array.isArray(incomeSource) && incomeSource.length !== 1 ? "s" : ""}`,
       textColor: "text-dark",
     },
     {
       title: "Total Budgeted",
-      value: `KES ${totalBudgeted.toLocaleString()}`,
+      value: formatCurrency(totalBudgeted),
       subtext: `Across ${Array.isArray(envelopeData) ? envelopeData.length : 0} envelopes`,
       textColor: "text-dark",
     },
     {
       title: "Total Spent",
-      value: `KES ${totalSpent.toLocaleString()}`,
+      value: formatCurrency(totalSpent),
       subtext:
         totalBudgeted > 0
           ? `${Math.round((totalSpent / totalBudgeted) * 100)}% of budget used`
@@ -84,7 +85,7 @@ export default function DashboardScreen(_: Props) {
     },
     {
       title: "Unallocated",
-      value: `KES ${unallocated.toLocaleString()}`,
+      value: formatCurrency(unallocated),
       hasProgressBar: true,
       progressPct: savingsPct,
       subtext: `${savingsPct}% saved`,
@@ -92,9 +93,9 @@ export default function DashboardScreen(_: Props) {
     },
   ];
 
-  // --- Active envelopes (max 3 shown on dashboard) ---
+  // --- Active envelopes ---
   const activeEnvelopes = Array.isArray(envelopeData)
-    ? envelopeData.slice(0, 3)
+    ? envelopeData.slice(0, 4)
     : [];
 
   // --- Recent transactions (last 4 expenses) ---
@@ -104,39 +105,39 @@ export default function DashboardScreen(_: Props) {
 
   // Custom Branding Palette
   const brandColors = {
-    primaryDark: "#0a3d34",
-    primaryLight: "#e2f2ee",
-    insightBg: "#013328",
+    primaryDark: "var(--cv-primary-dark)",
+    primaryLight: "var(--cv-primary-light)",
+    insightBg: "var(--cv-insight-bg)",
   };
 
   return (
     <>
       <div
-        className="px-4 p-md-3 mx-auto style-container"
+        className="px-3 px-md-4 mx-auto bg-ui-bg pb-5"
         style={{ maxWidth: "1300px" }}
       >
         <TopBar title="Dashboard" showIncomeBtn showActionBtn showExpenseBtn />
 
         {/* User Welcome */}
-        <div className="mb-4">
+        <div className="mb-3 mb-md-4">
           <h3
-            className="h1 fw-bold mb-1"
+            className="h4 h2-md fw-bold mb-1"
             style={{ fontFamily: "serif", color: brandColors.primaryDark }}
           >
             Hello, {userData?.firstName ?? userData?.username ?? "there"}
           </h3>
           <p className="text-muted small fw-semibold mb-0">
-            Here is your financial overview
+            Here's your student budget overview this semester
           </p>
         </div>
 
         {/* --- SUMMARY CARDS --- */}
-        <div className="row g-4 mb-4">
+        <div className="row g-2 g-md-4 mb-3 mb-md-4">
           {summaryCards.map((card, index) => (
             <div className="col-12 col-sm-6 col-lg-3" key={index}>
               <div
-                className="card h-100 p-4 bg-white border-light shadow-sm d-flex flex-column justify-content-between"
-                style={{ minHeight: "140px", borderRadius: "12px" }}
+                className="card h-100 p-3 p-md-4 bg-white border-light shadow-sm d-flex flex-column justify-content-between"
+                style={{ borderRadius: "12px" }}
               >
                 <div>
                   <span
@@ -166,26 +167,26 @@ export default function DashboardScreen(_: Props) {
           ))}
         </div>
 
-        {/* --- ENVELOPES & INSIGHTS --- */}
+        {/* --- ENVELOPES --- */}
         <div className="row g-4 mb-4">
           {/* Active Envelopes */}
-          <div className="col-12 col-lg-8">
+          <div className="col-12">
             <div
-              className="card h-100 p-4 bg-white border-light shadow-sm"
+              className="card h-100 p-3 p-md-4 bg-white border-light shadow-sm"
               style={{ borderRadius: "12px" }}
             >
-              <div className="d-flex align-items-center justify-content-between mb-4">
+              <div className="d-flex align-items-center justify-content-between mb-3 mb-md-4">
                 <h4
                   className="h6 fw-bold mb-0"
-                  style={{ color: brandColors.primaryDark, fontSize: "18px" }}
+                  style={{ color: brandColors.primaryDark }}
                 >
-                  Active Envelopes
+My Semester Envelopes
                 </h4>
                 <button
                   className="btn btn-link p-0 text-muted small fw-bold text-decoration-none"
-                  onClick={() => {}}
+                  onClick={() => setScreen("Envelopes")}
                 >
-                  View all
+                  View All
                 </button>
               </div>
 
@@ -201,7 +202,7 @@ export default function DashboardScreen(_: Props) {
                   </button>
                 </div>
               ) : (
-                <div className="row g-3">
+                <div className="row g-2 g-md-3">
                   {activeEnvelopes.map((envelope: any, idx: number) => {
                     const limit = Number(envelope.monthly_limit ?? 0);
                     const spent = Number(envelope.current_spend ?? 0);
@@ -218,13 +219,12 @@ export default function DashboardScreen(_: Props) {
                           : brandColors.primaryDark;
 
                     return (
-                      <div className="col-12 col-md-4" key={idx}>
+                      <div className="col-12 col-sm-6 col-lg-3" key={idx}>
                         <div
                           className="card h-100 p-3 border-0 d-flex flex-column justify-content-between"
                           style={{
-                            minHeight: "176px",
                             borderTop: `4px solid ${topColor}`,
-                            backgroundColor: "#f8fafc",
+                            backgroundColor: "var(--cv-main-bg)",
                           }}
                         >
                           {/* Icon + actions */}
@@ -238,7 +238,10 @@ export default function DashboardScreen(_: Props) {
                             <div className="d-flex gap-1 text-secondary">
                               <button
                                 className="btn btn-link p-1 text-secondary border-0"
-                                onClick={() => setModal("edit")}
+                                onClick={() => {
+                                  setSelectedEnvelope(envelope);
+                                  setModal("edit");
+                                }}
                                 title="Edit"
                               >
                                 <svg
@@ -257,7 +260,10 @@ export default function DashboardScreen(_: Props) {
                               </button>
                               <button
                                 className="btn btn-link p-1 text-danger border-0"
-                                onClick={() => setModal("del")}
+                                onClick={() => {
+                                  setSelectedEnvelope(envelope);
+                                  setModal("del");
+                                }}
                                 title="Delete"
                               >
                                 <svg
@@ -284,9 +290,9 @@ export default function DashboardScreen(_: Props) {
                             </h5>
                             <p className="text-muted small fw-medium mb-0">
                               <span className="fw-bold text-secondary">
-                                KES {spent.toLocaleString()}
+                                {formatCurrency(spent)}
                               </span>{" "}
-                              / KES {limit.toLocaleString()}
+                              / {formatCurrency(limit)}
                             </p>
                           </div>
 
@@ -310,88 +316,17 @@ export default function DashboardScreen(_: Props) {
               )}
             </div>
           </div>
-
-          {/* Smart Insights */}
-          <div className="col-12 col-lg-4">
-            <div
-              className="card h-100 p-4 border-0 text-white d-flex flex-column justify-content-between"
-              style={{
-                backgroundColor: brandColors.insightBg,
-                borderRadius: "12px",
-              }}
-            >
-              <div>
-                <h4
-                  className="h6 fw-bold mb-0 text-white"
-                  style={{ fontSize: "18px" }}
-                >
-                  Smart Insights
-                </h4>
-                <ul
-                  className="mt-4 ps-3 opacity-75 small"
-                  style={{ lineHeight: "1.8" }}
-                >
-                  {totalSpent > totalBudgeted ? (
-                    <li>
-                      You've exceeded your total budget by KES{" "}
-                      {(totalSpent - totalBudgeted).toLocaleString()}.
-                    </li>
-                  ) : (
-                    <li>
-                      You've used{" "}
-                      {totalBudgeted > 0
-                        ? Math.round((totalSpent / totalBudgeted) * 100)
-                        : 0}
-                      % of your total budget.
-                    </li>
-                  )}
-                  {unallocated > 0 && (
-                    <li>
-                      KES {unallocated.toLocaleString()} of your income is still
-                      unallocated.
-                    </li>
-                  )}
-                  {Array.isArray(envelopeData) &&
-                    envelopeData.filter(
-                      (e: any) =>
-                        e.monthly_limit > 0 &&
-                        e.current_spend / e.monthly_limit >= 0.9,
-                    ).length > 0 && (
-                      <li>
-                        {
-                          envelopeData.filter(
-                            (e: any) =>
-                              e.monthly_limit > 0 &&
-                              e.current_spend / e.monthly_limit >= 0.9,
-                          ).length
-                        }{" "}
-                        envelope(s) are nearly at their limit.
-                      </li>
-                    )}
-                </ul>
-              </div>
-              <button
-                className="btn btn-outline-light w-100 py-2 border-0 mt-4 fw-bold"
-                style={{
-                  backgroundColor: "rgba(255,255,255,0.1)",
-                  fontSize: "13px",
-                }}
-              >
-                View Detailed Report
-              </button>
-            </div>
-          </div>
         </div>
 
         {/* --- RECENT TRANSACTIONS --- */}
         <div
-          className="card bg-white border-light shadow-sm overflow-hidden"
+          className="card bg-white border-light shadow-sm overflow-hidden mb-5 mb-lg-0"
           style={{ borderRadius: "12px" }}
         >
-          <div className="p-4 d-flex align-items-center justify-content-between border-bottom">
+          <div className="p-3 p-md-4 d-flex align-items-center justify-content-between border-bottom">
             <h4
               className="h6 fw-bold mb-0"
-              style={{ color: brandColors.primaryDark, fontSize: "18px" }}
+              style={{ color: brandColors.primaryDark }}
             >
               Recent Transactions
             </h4>
@@ -410,21 +345,21 @@ export default function DashboardScreen(_: Props) {
             </div>
           ) : (
             <div className="table-responsive">
-              <table className="table table-hover align-middle mb-0 text-nowrap">
+              <table className="table table-hover align-middle mb-0">
                 <thead
                   className="table-light text-uppercase text-muted fw-bold"
-                  style={{ fontSize: "11px", letterSpacing: "0.05rem" }}
+                  style={{ fontSize: "10px", letterSpacing: "0.05rem" }}
                 >
                   <tr>
-                    <th className="py-3 px-4">Envelope</th>
-                    <th className="py-3 px-4">Description</th>
-                    <th className="py-3 px-4">Date</th>
-                    <th className="py-3 px-4 text-end">Amount</th>
+                    <th className="py-2 py-md-3 px-3 px-md-4">Envelope</th>
+                    <th className="py-2 py-md-3 px-3 px-md-4">Description</th>
+                    <th className="py-2 py-md-3 px-3 px-md-4">Date</th>
+                    <th className="py-2 py-md-3 px-3 px-md-4 text-end">Amount</th>
                   </tr>
                 </thead>
                 <tbody
                   className="text-secondary fw-medium"
-                  style={{ fontSize: "14px" }}
+                  style={{ fontSize: "13px" }}
                 >
                   {recentExpenses.map((exp: any, idx: number) => {
                     // Match envelope name by id if possible
@@ -436,19 +371,19 @@ export default function DashboardScreen(_: Props) {
 
                     return (
                       <tr key={idx}>
-                        <td className="py-3 px-4">
-                          <span className="badge bg-light text-muted border px-3 py-2 rounded-pill fw-bold">
+                        <td className="py-2 py-md-3 px-3 px-md-4">
+                          <span className="badge bg-light text-muted border px-2 px-md-3 py-1 py-md-2 rounded-pill fw-bold" style={{ fontSize: "11px" }}>
                             {envName}
                           </span>
                         </td>
-                        <td className="py-3 px-4 fw-bold text-dark">
+                        <td className="py-2 py-md-3 px-3 px-md-4 fw-bold text-dark text-truncate" style={{ maxWidth: "120px" }}>
                           {exp.description || "—"}
                         </td>
-                        <td className="py-3 px-4 text-muted fw-normal">
+                        <td className="py-2 py-md-3 px-3 px-md-4 text-muted fw-normal text-nowrap">
                           {formatDate(exp.expense_date)}
                         </td>
-                        <td className="py-3 px-4 text-end fw-bold text-danger">
-                          KES {Number(exp.amount).toLocaleString()}
+                        <td className="py-2 py-md-3 px-3 px-md-4 text-end fw-bold text-danger text-nowrap">
+                          {formatCurrency(exp.amount)}
                         </td>
                       </tr>
                     );

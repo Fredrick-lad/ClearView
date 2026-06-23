@@ -3,6 +3,7 @@ import { GetData } from "../hooks/context/generalContext";
 import { useAuth } from "../hooks/context/userContext";
 import { iconMap } from "../components/ui/iconMap";
 import ProgBar from "../hooks/ProgBar";
+import { formatCurrency } from "../utils/format";
 
 export default function MyEnvelopes() {
   const { setModal, setSelectedEnvelope } = GetData();
@@ -24,17 +25,17 @@ export default function MyEnvelopes() {
   const summaryCards = [
     {
       title: "Total Budgeted",
-      value: `KES ${totalBudgeted.toLocaleString()}`,
+      value: formatCurrency(totalBudgeted),
       valueColor: "text-dark",
     },
     {
       title: "Total Spent",
-      value: `KES ${totalSpent.toLocaleString()}`,
+      value: formatCurrency(totalSpent),
       valueColor: totalSpent > totalBudgeted ? "text-danger" : "text-dark",
     },
     {
       title: "Remaining",
-      value: `KES ${remaining.toLocaleString()}`,
+      value: formatCurrency(remaining),
       valueColor: remaining < 0 ? "text-danger" : "text-success",
     },
     {
@@ -46,8 +47,8 @@ export default function MyEnvelopes() {
   ];
 
   const designTokens = {
-    cardBg: "#daf5ee",
-    primaryDark: "#0a3d34",
+    cardBg: "var(--cv-envelope-card-bg)",
+    primaryDark: "var(--cv-primary-dark)",
   };
 
   const openEdit = (envelope: any) => {
@@ -61,7 +62,7 @@ export default function MyEnvelopes() {
   };
   return (
     <div
-      className="px-4 p-md-3 mx-auto bg-ui-bg"
+      className="px-3 px-md-4 mx-auto bg-ui-bg pb-5"
       style={{ maxWidth: "1300px" }}
     >
       <TopBar title="My Envelopes" showActionBtn />
@@ -99,7 +100,7 @@ export default function MyEnvelopes() {
         >
           <p className="mb-2 fw-semibold">No envelopes yet.</p>
           <p className="small mb-3">
-            Create your first envelope to start budgeting.
+            Create your first semester envelope to start budgeting.
           </p>
           <button
             className="btn text-white px-4 py-2 border-0"
@@ -219,7 +220,7 @@ export default function MyEnvelopes() {
                           Spent
                         </span>
                         <span className="fw-bold text-dark h6 mb-0">
-                          KES {spent.toLocaleString()}
+                          {formatCurrency(spent)}
                         </span>
                       </div>
                       <div className="text-end">
@@ -230,7 +231,7 @@ export default function MyEnvelopes() {
                           Limit
                         </span>
                         <span className="fw-bold text-secondary small d-block">
-                          KES {limit.toLocaleString()}
+                          {formatCurrency(limit)}
                         </span>
                       </div>
                     </div>

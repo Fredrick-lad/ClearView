@@ -1,529 +1,456 @@
 import type { JSX } from "react";
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, LineChart, Line, CartesianGrid, Legend,
+} from "recharts";
 import TopBar from "../components/layout/Topbar";
+import { useAuth } from "../hooks/context/userContext";
+import { iconMap } from "../components/ui/iconMap";
+import { formatCurrency } from "../utils/format";
+
+function formatDate(dateStr: string): string {
+  if (!dateStr) return "—";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString("en-US", {
+    year: "numeric", month: "short", day: "numeric",
+  });
+}
+
+const brandColors = {
+  primaryDark: "var(--cv-primary-dark)",
+  accentGreen: "var(--cv-accent-green)",
+  darkBg: "var(--cv-insight-bg)",
+  lightGray: "var(--cv-light-gray)",
+};
+
+const CHART_COLORS = ["#0a3d34", "#34d399", "#a7f3d0", "#e2f2ee", "#fef3c7", "#f59e0b", "#6366f1", "#ec4899"];
+
+function groupBy<T>(items: T[], keyFn: (item: T) => string): Record<string, T[]> {
+  const map: Record<string, T[]> = {};
+  for (const item of items) {
+    const k = keyFn(item);
+    if (!map[k]) map[k] = [];
+    map[k].push(item);
+  }
+  return map;
+}
 
 export default function ReportsScreen() {
+  const { incomeSource, envelopeData, expenses } = useAuth();
+
+  const incomeList: any[] = Array.isArray(incomeSource) ? incomeSource : [];
+  const envelopes: any[] = Array.isArray(envelopeData) ? envelopeData : [];
+  const expenseList: any[] = Array.isArray(expenses) ? expenses : [];
+
+  // ---- Derived totals ----
+  const totalIncome = incomeList.reduce((s, i) => s + Number(i.total_amount ?? 0), 0);
+  const totalSpending = expenseList.reduce((s, e) => s + Number(e.amount ?? 0), 0);
+  const savingsRate = totalIncome > 0 ? Math.round(((totalIncome - totalSpending) / totalIncome) * 100) : 0;
+  const transactionCount = expenseList.length;
+
+  // ---- Monthly Cash Flow ----
+  const monthlyMap: Record<string, { income: number; spending: number }> = {};
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  for (const inc of incomeList) {
+    const d = new Date(inc.date || inc.created_at);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    if (!monthlyMap[key]) monthlyMap[key] = { income: 0, spending: 0 };
+    monthlyMap[key].income += Number(inc.total_amount ?? 0);
+  }
+  for (const exp of expenseList) {
+    const d = new Date(exp.expense_date);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    if (!monthlyMap[key]) monthlyMap[key] = { income: 0, spending: 0 };
+    monthlyMap[key].spending += Number(exp.amount ?? 0);
+  }
+  const monthlyCashFlow = Object.entries(monthlyMap)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, val]) => {
+      const [y, m] = key.split("-");
+      return { month: monthNames[parseInt(m, 10) - 1] + " " + y, income: val.income, spending: val.spending };
+    });
+
+  // ---- Income Breakdown ----
+  const incomeBySource = groupBy(incomeList, (i) => i.source || "Other");
+  const incomeBreakdown = Object.entries(incomeBySource).map(([source, items]) => ({
+    name: source,
+    value: items.reduce((s, i) => s + Number(i.total_amount ?? 0), 0),
+  })).sort((a, b) => b.value - a.value);
+
+  // ---- Daily Spending Trend (last 14 days) ----
+  const now = new Date();
+  const dailyMap: Record<string, number> = {};
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const key = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    dailyMap[key] = 0;
+  }
+  for (const exp of expenseList) {
+    const d = new Date(exp.expense_date);
+    const diff = Math.round((now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
+    if (diff >= 0 && diff <= 13) {
+      const key = d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      dailyMap[key] = (dailyMap[key] || 0) + Number(exp.amount ?? 0);
+    }
+  }
+  const dailyTrend = Object.entries(dailyMap).map(([day, amount]) => ({ day, amount }));
+
+  // ---- Spending by Envelope ----
+  const spendingByEnv: { name: string; amount: number; color: string }[] =
+    envelopes.map((env, idx) => {
+      const total = expenseList
+        .filter((e) => Number(e.envelope_id) === Number(env.id))
+        .reduce((sum, e) => sum + Number(e.amount ?? 0), 0);
+      return {
+        name: env.name,
+        amount: total,
+        color: CHART_COLORS[idx % CHART_COLORS.length],
+      };
+    }).filter((s) => s.amount > 0).sort((a, b) => b.amount - a.amount);
+
+  const totalSpendingDisplay = spendingByEnv.reduce((s, e) => s + e.amount, 0);
+
+  // ---- Envelope Allocation ----
+  const envelopeAllocations = envelopes.map((env) => {
+    const limit = Number(env.monthly_limit ?? 0);
+    const spent = Number(env.current_spend ?? 0);
+    const pct = limit > 0 ? Math.min(Math.round((spent / limit) * 100), 100) : 0;
+    const Icon = iconMap[env.icon_name] ?? null;
+    return { ...env, pct, Icon };
+  });
+
+  // ---- Category Leaderboard ----
+  const leaderboard = envelopes
+    .map((env) => ({
+      name: env.name,
+      limit: Number(env.monthly_limit ?? 0),
+      spent: Number(env.current_spend ?? 0),
+      pct: Number(env.monthly_limit ?? 0) > 0
+        ? Math.round((Number(env.current_spend ?? 0) / Number(env.monthly_limit ?? 0)) * 100)
+        : 0,
+    }))
+    .sort((a, b) => b.spent - a.spent);
+
+  // ---- Extra Metrics ----
+  const today = new Date();
+  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  const daysSinceMonthStart = Math.max(1, Math.ceil((today.getTime() - firstDayOfMonth.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+  const avgDailySpend = daysSinceMonthStart > 0 ? totalSpending / daysSinceMonthStart : 0;
+
+  let highestExpense = { amount: 0, name: "", date: "" };
+  const dayCount: Record<string, number> = {};
+  for (const exp of expenseList) {
+    const amt = Number(exp.amount ?? 0);
+    if (amt > highestExpense.amount) {
+      highestExpense = { amount: amt, name: exp.expense_name || exp.description || "—", date: exp.expense_date };
+    }
+    const d = new Date(exp.expense_date);
+    const key = d.toLocaleDateString("en-US", { weekday: "long" });
+    dayCount[key] = (dayCount[key] || 0) + 1;
+  }
+  const busiestDay = Object.entries(dayCount).sort((a, b) => b[1] - a[1])[0]?.[0] || "—";
+  const highestSingleExpense = highestExpense;
+
+  // ---- Recent Activity ----
+  const unusualActivity = [...expenseList]
+    .sort((a, b) => new Date(b.expense_date ?? 0).getTime() - new Date(a.expense_date ?? 0).getTime())
+    .slice(0, 5);
+
+  // ---- Summary Metrics ----
   const summaryMetrics = [
-    {
-      title: "Net Worth",
-      value: "$142,500.00",
-      subtext: "+2.4% this month",
-      subtextColor: "text-success",
-      isTrendUp: true,
-      bgClass: "bg-white",
-    },
-    {
-      title: "Total Income",
-      value: "$8,420.00",
-      subtext: "Past 30 days",
-      subtextColor: "text-muted",
-      bgClass: "bg-white",
-    },
-    {
-      title: "Total Spending",
-      value: "$4,115.30",
-      subtext: "12% below budget",
-      subtextColor: "text-success",
-      isTrendDown: true,
-      bgClass: "bg-success-subtle", // Highlighted card matching design
-    },
+    { title: "Total Income", value: formatCurrency(totalIncome), subtext: `${incomeList.length} source${incomeList.length !== 1 ? "s" : ""}`, subtextColor: "text-muted", bgClass: "bg-white" },
+    { title: "Total Spending", value: formatCurrency(totalSpending), subtext: totalIncome > 0 ? `${Math.round((totalSpending / totalIncome) * 100)}% of income` : "No income data", subtextColor: totalSpending > totalIncome ? "text-danger" : "text-success", bgClass: totalSpending > totalIncome ? "bg-danger-subtle" : "bg-success-subtle" },
+    { title: "Transactions", value: String(transactionCount), subtext: `${expenseList.length > 0 ? "All time" : "No data"}`, subtextColor: "text-muted", bgClass: "bg-white" },
+    { title: "Avg Daily Spend", value: formatCurrency(avgDailySpend), subtext: "This month", subtextColor: "text-muted", bgClass: "bg-white" },
   ];
 
-  const spendingCategories = [
-    { name: "Housing", amount: "$1,850", color: "#013328" },
-    { name: "Food & Dining", amount: "$1,028", color: "#34d399" },
-    { name: "Transport", amount: "$617", color: "#a7f3d0" },
-  ];
-
-  const envelopeAllocations = [
-    {
-      name: "Monthly Rent & Utilities",
-      current: "$1,850",
-      max: "$2,000",
-      percent: "92%",
-      color: "#013328",
-      icon: "home",
-    },
-    {
-      name: "Groceries",
-      current: "$450",
-      max: "$600",
-      percent: "75%",
-      color: "#34d399",
-      icon: "utensils",
-    },
-    {
-      name: "Summer Vacation 2024",
-      current: "$3,400",
-      max: "$5,000",
-      percent: "68%",
-      color: "#a7f3d0",
-      icon: "plane",
-    },
-  ];
-
-  const unusualActivity = [
-    {
-      date: "May 14",
-      merchant: "Apple Store",
-      category: "Electronics",
-      amount: "$1,299.00",
-    },
-    {
-      date: "May 12",
-      merchant: "Lush Floral",
-      category: "Gifts",
-      amount: "$85.00",
-    },
-    {
-      date: "May 09",
-      merchant: "Aura Spa & Wellness",
-      category: "Self-Care",
-      amount: "$210.00",
-    },
-  ];
-
-  // Color palette definitions
-  const colors = {
-    primaryDark: "#0a3d34",
-    accentGreen: "#34d399",
-    darkBg: "#013328",
-    lightGray: "#f8fafc",
-  };
   return (
     <>
-      <div
-        className="px-4 p-md-3 mx-auto bg-ui-bg"
-        style={{ maxWidth: "1200px" }}
-      >
+      <div className="px-3 px-md-4 py-3 mx-auto bg-ui-bg min-vh-100" style={{ maxWidth: "1200px" }}>
         <TopBar title="Financial Reports" />
-        {/* --- PAGE SUB-HEADER NAVIGATION --- */}
-        <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
-          <div
-            className="d-flex align-items-center gap-3 bg-white p-1 rounded-3 shadow-sm border"
-            style={{ fontSize: "13px" }}
-          >
-            <button
-              className="btn btn-sm fw-bold px-3 py-1.5"
-              style={{
-                backgroundColor: colors.lightGray,
-                color: colors.primaryDark,
-              }}
-            >
-              Monthly View
-            </button>
-            <button className="btn btn-sm fw-medium text-muted px-3 py-1.5 border-0 bg-transparent">
-              Annual Summary
-            </button>
-          </div>
+
+        {/* Period selector */}
+        <div className="d-flex align-items-center gap-2 bg-white p-1 rounded-3 shadow-sm border mb-3 mb-md-4 overflow-auto" style={{ fontSize: "13px", width: "fit-content", maxWidth: "100%" }}>
+          <button className="btn btn-sm fw-bold px-2 px-md-3 py-1.5 text-nowrap" style={{ backgroundColor: "var(--cv-light-gray)", color: brandColors.primaryDark }}>This Semester</button>
+          <button className="btn btn-sm fw-medium text-muted px-2 px-md-3 py-1.5 border-0 bg-transparent text-nowrap">All Periods</button>
         </div>
 
-        {/* --- TOP MATRIX: SUMMARY CARDS --- */}
-        <div className="row g-4 mb-4">
+        {/* Summary row */}
+        <div className="row g-2 g-md-4 mb-3 mb-md-4">
           {summaryMetrics.map((card, i) => (
-            <div className="col-12 col-md-6 col-lg-3" key={i}>
-              <div
-                className={`card h-100 p-4 border-0 shadow-sm ${card.bgClass}`}
-                style={{ borderRadius: "12px" }}
-              >
-                <span
-                  className="text-uppercase text-muted fw-bold small tracking-wider"
-                  style={{ fontSize: "11px" }}
-                >
-                  {card.title}
-                </span>
-                <p className="h3 fw-bold my-2 text-dark">{card.value}</p>
-                <span
-                  className={`small fw-bold ${card.subtextColor} d-flex align-items-center gap-1`}
-                >
-                  {card.isTrendUp && "↗"} {card.isTrendDown && "↘"}{" "}
-                  {card.subtext}
-                </span>
+            <div className="col-6 col-md-3" key={i}>
+              <div className={`card h-100 p-3 p-md-4 border-0 shadow-sm ${card.bgClass}`} style={{ borderRadius: "12px" }}>
+                <span className="text-uppercase text-muted fw-bold" style={{ fontSize: "10px" }}>{card.title}</span>
+                <p className="h5 h4-md fw-bold my-1 my-md-2 text-dark">{card.value}</p>
+                <span className={`small fw-bold ${card.subtextColor} d-flex align-items-center gap-1`}>{card.subtext}</span>
               </div>
             </div>
           ))}
-
-          {/* Savings Rate Card with Inline Indicator */}
-          <div className="col-12 col-md-6 col-lg-3">
-            <div
-              className="card h-100 p-4 bg-white border-0 shadow-sm"
-              style={{ borderRadius: "12px" }}
-            >
-              <span
-                className="text-uppercase text-muted fw-bold small tracking-wider"
-                style={{ fontSize: "11px" }}
-              >
-                Savings Rate
-              </span>
-              <p className="h3 fw-bold my-2 text-dark">51.2%</p>
-              <div className="progress mt-2" style={{ height: "6px" }}>
-                <div
-                  className="progress-bar"
-                  style={{
-                    backgroundColor: colors.primaryDark,
-                    width: "51.2%",
-                  }}
-                ></div>
+          <div className="col-6 col-md-3">
+            <div className="card h-100 p-3 p-md-4 bg-white border-0 shadow-sm" style={{ borderRadius: "12px" }}>
+              <span className="text-uppercase text-muted fw-bold" style={{ fontSize: "10px" }}>Savings Rate</span>
+              <p className="h5 h4-md fw-bold my-1 my-md-2 text-dark">{savingsRate}%</p>
+              <div className="progress mt-1 mt-md-2" style={{ height: "6px" }}>
+                <div className="progress-bar" style={{ backgroundColor: "var(--cv-primary-dark)", width: `${Math.min(savingsRate, 100)}%` }} />
               </div>
             </div>
           </div>
         </div>
 
-        {/* --- CASH FLOW TREND LINE CHART VISUALIZATION --- */}
-        <div
-          className="card border-0 shadow-sm p-4 mb-4"
-          style={{ borderRadius: "12px" }}
-        >
+        {/* Extra info chips */}
+        <div className="d-flex flex-column flex-sm-row flex-wrap gap-2 gap-md-3 mb-3 mb-md-4">
+          <div className="d-flex align-items-center gap-1 gap-md-2 bg-white px-2 px-md-3 py-2 rounded-3 shadow-sm border flex-fill" style={{ fontSize: "11px" }}>
+            <span className="text-muted fw-semibold text-nowrap">Highest:</span>
+            <span className="fw-bold text-dark text-nowrap">{formatCurrency(highestSingleExpense.amount)}</span>
+            <span className="text-muted text-truncate d-none d-sm-inline">— {highestSingleExpense.name}</span>
+          </div>
+          <div className="d-flex align-items-center gap-1 gap-md-2 bg-white px-2 px-md-3 py-2 rounded-3 shadow-sm border" style={{ fontSize: "11px" }}>
+            <span className="text-muted fw-semibold text-nowrap">Busiest Day:</span>
+            <span className="fw-bold text-dark text-nowrap">{busiestDay}</span>
+          </div>
+        </div>
+
+        {/* Monthly Cash Flow */}
+        <div className="card border-0 shadow-sm p-3 p-md-4 mb-3 mb-md-4" style={{ borderRadius: "12px" }}>
           <div className="d-flex justify-content-between align-items-start mb-3">
             <div>
-              <h3 className="h6 fw-bold mb-1">Cash Flow Trend</h3>
-              <p className="small text-muted mb-0">
-                Comparative analysis of monthly earnings vs expenditure
-              </p>
+              <h3 className="h6 fw-bold mb-1">Monthly Cash Flow</h3>
+              <p className="small text-muted mb-0 d-none d-sm-block">Income vs spending per month</p>
             </div>
-            <div className="d-flex gap-3 small fw-bold">
-              <span
-                className="d-flex align-items-center gap-1.5"
-                style={{ color: colors.darkBg }}
-              >
-                <span
-                  className="d-inline-block rounded-circle"
-                  style={{
-                    width: "8px",
-                    height: "8px",
-                    backgroundColor: colors.darkBg,
-                  }}
-                ></span>{" "}
-                Income
-              </span>
-              <span
-                className="d-flex align-items-center gap-1.5"
-                style={{ color: colors.accentGreen }}
-              >
-                <span
-                  className="d-inline-block rounded-circle"
-                  style={{
-                    width: "8px",
-                    height: "8px",
-                    backgroundColor: colors.accentGreen,
-                  }}
-                ></span>{" "}
-                Spending
-              </span>
+          </div>
+          {monthlyCashFlow.length === 0 ? (
+            <p className="text-muted small text-center py-4">No data yet. Add income and expenses to see your cash flow.</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={monthlyCashFlow} barGap={4}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
+                <XAxis dataKey="month" tick={{ fontSize: 11 }} angle={-15} textAnchor="end" height={50} />
+                <YAxis tick={{ fontSize: 11 }} />
+                <Tooltip formatter={(v: number) => formatCurrency(v)} />
+                <Legend />
+                <Bar dataKey="income" name="Income" fill="var(--cv-insight-bg)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="spending" name="Spending" fill="var(--cv-accent-green)" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+
+        <div className="row g-3 g-md-4 mb-3 mb-md-4">
+          {/* Income Breakdown */}
+          <div className="col-12 col-md-6">
+            <div className="card h-100 p-3 p-md-4 bg-white border-0 shadow-sm" style={{ borderRadius: "12px" }}>
+              <h3 className="h6 fw-bold mb-3 mb-md-4">Income Breakdown</h3>
+              {incomeBreakdown.length === 0 ? (
+                <p className="text-muted small text-center py-4">No income sources yet.</p>
+              ) : (
+                <div className="d-flex flex-column align-items-center">
+                  <ResponsiveContainer width="100%" height={180}>
+                    <PieChart>
+                      <Pie data={incomeBreakdown} cx="50%" cy="50%" innerRadius={50} outerRadius={75} dataKey="value" nameKey="name">
+                        {incomeBreakdown.map((_, idx) => (
+                          <Cell key={idx} fill={CHART_COLORS[idx % CHART_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip formatter={(v: number) => formatCurrency(v)} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="d-flex flex-wrap gap-2 gap-md-3 mt-3 justify-content-center">
+                    {incomeBreakdown.map((item, idx) => (
+                      <div className="d-flex align-items-center gap-1 small fw-semibold" key={idx}>
+                        <span className="d-inline-block rounded-circle flex-shrink-0" style={{ width: "8px", height: "8px", backgroundColor: CHART_COLORS[idx % CHART_COLORS.length] }} />
+                        <span className="text-secondary text-nowrap">{item.name}</span>
+                        <span className="text-dark text-nowrap">{formatCurrency(item.value)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Scalable SVG Line Graphics Layout */}
-          <div
-            className="position-relative w-100 pt-2"
-            style={{ height: "220px" }}
-          >
-            <svg
-              className="w-100 h-100"
-              viewBox="0 0 600 160"
-              preserveAspectRatio="none"
-            >
-              {/* Grid horizontal markers */}
-              <line
-                x1="0"
-                y1="30"
-                x2="600"
-                y2="30"
-                stroke="#f1f5f9"
-                strokeWidth="1"
-              />
-              <line
-                x1="0"
-                y1="70"
-                x2="600"
-                y2="70"
-                stroke="#f1f5f9"
-                strokeWidth="1"
-              />
-              <line
-                x1="0"
-                y1="110"
-                x2="600"
-                y2="110"
-                stroke="#f1f5f9"
-                strokeWidth="1"
-              />
-
-              {/* Income Wavy Path Line */}
-              <path
-                d="M 10,60 Q 130,10 230,65 T 450,40 T 590,30"
-                fill="none"
-                stroke={colors.darkBg}
-                strokeWidth="2.5"
-              />
-              <circle cx="230" cy="65" r="3.5" fill={colors.darkBg} />
-
-              {/* Spending Wavy Path Line */}
-              <path
-                d="M 10,110 Q 125,120 230,95 T 450,110 T 590,110"
-                fill="none"
-                stroke={colors.accentGreen}
-                strokeWidth="2.5"
-              />
-              <circle cx="230" cy="95" r="3.5" fill={colors.accentGreen} />
-            </svg>
-
-            {/* Timeline Horizontal Label Grid Axis */}
-            <div
-              className="d-flex justify-content-between text-muted mt-2 px-1 fw-semibold"
-              style={{ fontSize: "11px" }}
-            >
-              <span>Jan</span>
-              <span>Feb</span>
-              <span>Mar</span>
-              <span>Apr</span>
-              <span>May</span>
-              <span>Jun</span>
+          {/* Daily Spending Trend */}
+          <div className="col-12 col-md-6">
+            <div className="card h-100 p-3 p-md-4 bg-white border-0 shadow-sm" style={{ borderRadius: "12px" }}>
+              <h3 className="h6 fw-bold mb-3 mb-md-4">Daily Spending <span className="fw-normal text-muted">(14 days)</span></h3>
+              {dailyTrend.every(d => d.amount === 0) ? (
+                <p className="text-muted small text-center py-4">No spending in the last 14 days.</p>
+              ) : (
+                <ResponsiveContainer width="100%" height={180}>
+                  <LineChart data={dailyTrend}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
+                    <XAxis dataKey="day" tick={{ fontSize: 9 }} interval="preserveStartEnd" />
+                    <YAxis tick={{ fontSize: 9 }} />
+                    <Tooltip formatter={(v: number) => formatCurrency(v)} />
+                    <Line type="monotone" dataKey="amount" stroke="var(--cv-insight-bg)" strokeWidth={2} dot={{ r: 2 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
         </div>
 
-        {/* --- MIDDLE ROW: CATEGORIES & ALLOCATIONS SPLIT --- */}
-        <div className="row g-4 mb-4">
-          {/* Left Card: Spending by Category Donut Representation */}
+        <div className="row g-3 g-md-4 mb-3 mb-md-4">
+          {/* Spending by Category */}
           <div className="col-12 col-lg-5">
-            <div
-              className="card h-100 p-4 bg-white border-0 shadow-sm"
-              style={{ borderRadius: "12px" }}
-            >
-              <h3 className="h6 fw-bold mb-4">Spending by Category</h3>
-
-              {/* Built-in SVG Donut Graphics Box */}
-              <div className="d-flex justify-content-center position-relative my-4">
-                <svg
-                  width="150"
-                  height="150"
-                  viewBox="0 0 42 42"
-                  className="transform-rotate-90"
-                >
-                  <circle
-                    cx="21"
-                    cy="21"
-                    r="15.91"
-                    fill="transparent"
-                    stroke="#a7f3d0"
-                    strokeWidth="4.5"
-                    strokeDasharray="100 0"
-                    strokeDashoffset="0"
-                  ></circle>
-                  <circle
-                    cx="21"
-                    cy="21"
-                    r="15.91"
-                    fill="transparent"
-                    stroke="#34d399"
-                    strokeWidth="4.5"
-                    strokeDasharray="65 35"
-                    strokeDashoffset="100"
-                  ></circle>
-                  <circle
-                    cx="21"
-                    cy="21"
-                    r="15.91"
-                    fill="transparent"
-                    stroke="#013328"
-                    strokeWidth="4.5"
-                    strokeDasharray="40 60"
-                    strokeDashoffset="35"
-                  ></circle>
-                </svg>
-                <div className="position-absolute top-50 start-50 translate-middle text-center">
-                  <span
-                    className="text-uppercase text-muted fw-bold d-block"
-                    style={{ fontSize: "10px" }}
-                  >
-                    Total
-                  </span>
-                  <span className="fw-bold text-dark h5 mb-0">$4,115</span>
-                </div>
-              </div>
-
-              {/* Custom Data Key Legending Rows */}
-              <div className="d-flex flex-column gap-2 mt-3 pt-2">
-                {spendingCategories.map((item, idx) => (
-                  <div
-                    className="d-flex justify-content-between align-items-center small fw-semibold"
-                    key={idx}
-                  >
-                    <div className="d-flex align-items-center gap-2">
-                      <span
-                        className="d-inline-block rounded-circle"
-                        style={{
-                          width: "10px",
-                          height: "10px",
-                          backgroundColor: item.color,
-                        }}
-                      ></span>
-                      <span className="text-secondary">{item.name}</span>
+            <div className="card h-100 p-3 p-md-4 bg-white border-0 shadow-sm" style={{ borderRadius: "12px" }}>
+              <h3 className="h6 fw-bold mb-3 mb-md-4">Spending by Category</h3>
+              {spendingByEnv.length === 0 ? (
+                <p className="text-muted small text-center py-4">No spending data yet.</p>
+              ) : (
+                <>
+                  <div className="d-flex justify-content-center position-relative my-3">
+                    <svg width="130" height="130" viewBox="0 0 42 42" className="transform-rotate-90">
+                      {spendingByEnv.slice(0, 3).map((cat, idx) => {
+                        const pct = totalSpendingDisplay > 0 ? Math.round((cat.amount / totalSpendingDisplay) * 100) : 0;
+                        const offsets = [0, 100, 65, 40];
+                        return (
+                          <circle key={cat.name} cx="21" cy="21" r="15.91" fill="transparent" stroke={cat.color} strokeWidth="4.5"
+                            strokeDasharray={`${pct} ${100 - pct}`} strokeDashoffset={offsets[idx] ?? 0} />
+                        );
+                      })}
+                    </svg>
+                    <div className="position-absolute top-50 start-50 translate-middle text-center">
+                      <span className="text-uppercase text-muted fw-bold d-block" style={{ fontSize: "9px" }}>Total</span>
+                      <span className="fw-bold text-dark" style={{ fontSize: "14px" }}>{formatCurrency(totalSpendingDisplay)}</span>
                     </div>
-                    <span className="text-dark fw-bold">{item.amount}</span>
                   </div>
-                ))}
-              </div>
+                  <div className="d-flex flex-column gap-1 gap-md-2 mt-2 pt-2">
+                    {spendingByEnv.slice(0, 5).map((item, idx) => (
+                      <div className="d-flex justify-content-between align-items-center small fw-semibold" key={idx}>
+                        <div className="d-flex align-items-center gap-2 min-w-0">
+                          <span className="d-inline-block rounded-circle flex-shrink-0" style={{ width: "10px", height: "10px", backgroundColor: item.color }} />
+                          <span className="text-secondary text-truncate">{item.name}</span>
+                        </div>
+                        <span className="text-dark fw-bold text-nowrap ms-2">{formatCurrency(item.amount)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
-          {/* Right Card: Budget Envelopes Progress Lists */}
+          {/* Category Leaderboard */}
           <div className="col-12 col-lg-7">
-            <div
-              className="card h-100 p-4 bg-white border-0 shadow-sm d-flex flex-column justify-content-between"
-              style={{ borderRadius: "12px" }}
-            >
-              <div>
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                  <h3 className="h6 fw-bold mb-0">Envelope Allocation</h3>
-                  <button
-                    className="btn btn-outline-dark btn-sm fw-bold px-3 py-1"
-                    style={{ fontSize: "12px", borderRadius: "6px" }}
-                  >
-                    Adjust Limits
-                  </button>
-                </div>
-
-                <div className="d-flex flex-column gap-4 mb-4">
-                  {envelopeAllocations.map((env, idx) => (
-                    <div className="d-flex align-items-start gap-3" key={idx}>
-                      <div className="p-2 bg-light text-secondary rounded-3 d-flex align-items-center justify-content-center">
-                        <IconSwitcher
-                          type={env.icon}
-                          style={{ width: "18px", height: "18px" }}
-                        />
-                      </div>
-                      <div className="flex-grow-1">
-                        <div className="d-flex justify-content-between text-dark small fw-bold mb-1">
-                          <span>{env.name}</span>
-                          <span>
-                            {env.current}{" "}
-                            <span className="text-muted fw-medium">
-                              / {env.max}
-                            </span>
+            <div className="card h-100 p-3 p-md-4 bg-white border-0 shadow-sm" style={{ borderRadius: "12px" }}>
+              <h3 className="h6 fw-bold mb-3 mb-md-4">Category Leaderboard</h3>
+              {leaderboard.length === 0 ? (
+                <p className="text-muted small text-center py-4">No envelopes created yet.</p>
+              ) : (
+                <div className="d-flex flex-column gap-2 gap-md-3">
+                  {leaderboard.map((env, idx) => (
+                    <div key={idx}>
+                      <div className="d-flex justify-content-between align-items-center mb-1">
+                        <div className="d-flex align-items-center gap-1 gap-md-2 min-w-0">
+                          <span className="fw-bold text-muted flex-shrink-0" style={{ fontSize: "11px", width: "18px" }}>#{idx + 1}</span>
+                          <span className="small fw-semibold text-dark text-truncate">{env.name}</span>
+                        </div>
+                        <div className="d-flex align-items-center gap-1 gap-md-2 flex-shrink-0">
+                          <span className="small fw-bold text-dark text-nowrap">{formatCurrency(env.spent)}</span>
+                          <span className="small text-muted d-none d-sm-inline">/ {formatCurrency(env.limit)}</span>
+                          <span className={`small fw-bold ${env.pct >= 90 ? "text-danger" : env.pct >= 70 ? "text-warning" : "text-success"}`}>
+                            {env.pct}%
                           </span>
                         </div>
-                        <div className="progress" style={{ height: "6px" }}>
-                          <div
-                            className="progress-bar"
-                            style={{
-                              backgroundColor: env.color,
-                              width: env.percent,
-                            }}
-                          ></div>
-                        </div>
+                      </div>
+                      <div className="progress" style={{ height: "6px" }}>
+                        <div className="progress-bar" style={{
+                          width: `${Math.min(env.pct, 100)}%`,
+                          backgroundColor: env.pct >= 90 ? "#e74c3c" : env.pct >= 70 ? "#f39c12" : "var(--cv-primary-dark)",
+                          borderRadius: "4px",
+                        }} />
                       </div>
                     </div>
                   ))}
                 </div>
-              </div>
-
-              {/* Banner Inside Allocation Subsystem */}
-              <div
-                className="p-3 text-white d-flex align-items-center justify-content-between gap-3 mt-2"
-                style={{ backgroundColor: colors.darkBg, borderRadius: "10px" }}
-              >
-                <div style={{ maxWidth: "70%" }}>
-                  <h4 className="fw-bold mb-1" style={{ fontSize: "14px" }}>
-                    Financial Clarity Found
-                  </h4>
-                  <p
-                    className="mb-0 opacity-75"
-                    style={{ fontSize: "11px", lineHeight: "1.4" }}
-                  >
-                    Your spending on non-essential items decreased by 14%
-                    compared to last quarter. You're on track to reach goals
-                    early.
-                  </p>
-                </div>
-                <button
-                  className="btn btn-light fw-bold text-dark btn-sm px-3 py-2 text-nowrap"
-                  style={{ fontSize: "12px", borderRadius: "6px" }}
-                >
-                  Review Strategy
-                </button>
-              </div>
+              )}
             </div>
           </div>
         </div>
 
-        {/* --- BOTTOM MATRIX: UNUSUAL ACTIVITY & MILESTONE BANNER --- */}
-        <div className="row g-4">
-          {/* Table Column Grid Block */}
-          <div className="col-12 col-lg-8">
-            <div
-              className="card h-100 bg-white border-0 shadow-sm"
-              style={{ borderRadius: "12px" }}
-            >
-              <div className="p-4 border-bottom">
-                <h3 className="h6 fw-bold mb-0">Unusual Activity</h3>
-              </div>
-              <div className="table-responsive">
-                <table className="table table-hover align-middle mb-0">
-                  <thead
-                    className="table-light text-uppercase text-muted fw-bold"
-                    style={{ fontSize: "11px" }}
-                  >
-                    <tr>
-                      <th className="ps-4 py-3">Date</th>
-                      <th className="py-3">Merchant</th>
-                      <th className="py-3">Category</th>
-                      <th className="pe-4 py-3 text-end">Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody
-                    className="fw-medium text-secondary"
-                    style={{ fontSize: "13px" }}
-                  >
-                    {unusualActivity.map((act, idx) => (
-                      <tr key={idx}>
-                        <td className="ps-4 py-3 text-muted">{act.date}</td>
-                        <td className="fw-bold text-dark">{act.merchant}</td>
-                        <td>{act.category}</td>
-                        <td className="pe-4 text-end fw-bold text-dark">
-                          {act.amount}
-                        </td>
-                      </tr>
+        <div className="row g-3 g-md-4">
+          {/* Envelope Allocation */}
+          <div className="col-12 col-lg-7">
+            <div className="card h-100 p-3 p-md-4 bg-white border-0 shadow-sm d-flex flex-column justify-content-between" style={{ borderRadius: "12px" }}>
+              <div>
+                <div className="d-flex justify-content-between align-items-center mb-3 mb-md-4">
+                  <h3 className="h6 fw-bold mb-0">Envelope Allocation</h3>
+                </div>
+                {envelopeAllocations.length === 0 ? (
+                  <p className="text-muted small text-center py-4">No envelopes created yet.</p>
+                ) : (
+                  <div className="d-flex flex-column gap-3 gap-md-4 mb-3 mb-md-4">
+                    {envelopeAllocations.map((env: any, idx: number) => (
+                      <div className="d-flex align-items-start gap-2 gap-md-3" key={idx}>
+                        <div className="p-1 p-md-2 bg-light text-secondary rounded-3 d-flex align-items-center justify-content-center flex-shrink-0">
+                          {env.Icon ? <env.Icon size={16} /> : <IconSwitcher type="envelope" style={{ width: "16px", height: "16px" }} />}
+                        </div>
+                        <div className="flex-grow-1 min-w-0">
+                          <div className="d-flex justify-content-between text-dark small fw-bold mb-1">
+                            <span className="text-truncate">{env.name}</span>
+                            <span className="text-nowrap ms-2">{formatCurrency(env.current_spend ?? 0)} <span className="text-muted fw-medium">/ {formatCurrency(env.monthly_limit ?? 0)}</span></span>
+                          </div>
+                          <div className="progress" style={{ height: "6px" }}>
+                            <div className="progress-bar" style={{
+                              backgroundColor: env.pct >= 90 ? "#e74c3c" : env.pct >= 70 ? "#f39c12" : "var(--cv-insight-bg)",
+                              width: `${env.pct}%`,
+                            }} />
+                          </div>
+                        </div>
+                      </div>
                     ))}
-                  </tbody>
-                </table>
+                  </div>
+                )}
+              </div>
+              <div className="p-2 p-md-3 text-white d-flex align-items-center justify-content-between gap-2 gap-md-3" style={{ backgroundColor: "var(--cv-insight-bg)", borderRadius: "10px" }}>
+                <div className="min-w-0">
+                  <h4 className="fw-bold mb-1" style={{ fontSize: "13px" }}>Financial Clarity Found</h4>
+                  <p className="mb-0 opacity-75" style={{ fontSize: "10px", lineHeight: "1.3" }}>
+                    {totalIncome > 0
+                      ? `You're saving ${savingsRate}% of your income. ${totalSpending <= totalIncome ? "You're on track!" : "Review your spending."}`
+                      : "Add income and expenses to get insights."}
+                  </p>
+                </div>
+                <button className="btn btn-light fw-bold text-dark btn-sm px-2 px-md-3 py-1 py-md-2 text-nowrap flex-shrink-0" style={{ fontSize: "11px", borderRadius: "6px" }}>Review</button>
               </div>
             </div>
           </div>
 
-          {/* Milestone Display Dynamic Column Card Block */}
-          <div className="col-12 col-lg-4">
-            <div
-              className="card h-100 p-4 text-white text-center d-flex flex-column justify-content-between position-relative overflow-hidden shadow-sm"
-              style={{
-                borderRadius: "12px",
-                minHeight: "220px",
-                background: `linear-gradient(rgba(10,61,52,0.85), rgba(1,35,27,0.95)), url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=400&q=80') center/cover`,
-              }}
-            >
-              <div className="pt-2 z-1">
-                <span
-                  className="text-uppercase tracking-widest opacity-75 d-block mb-1 fw-bold"
-                  style={{ fontSize: "10px", letterSpacing: "0.1rem" }}
-                >
-                  Next Milestone
-                </span>
-                <h3
-                  className="h4 fw-bold px-2 leading-tight"
-                  style={{ fontFamily: "serif" }}
-                >
-                  Retirement Portfolio Goal
-                </h3>
+          {/* Recent Activity */}
+          <div className="col-12 col-lg-5">
+            <div className="card h-100 bg-white border-0 shadow-sm" style={{ borderRadius: "12px" }}>
+              <div className="p-3 p-md-4 border-bottom">
+                <h3 className="h6 fw-bold mb-0">Recent Activity</h3>
               </div>
-
-              <div className="pb-2 z-1">
-                <button
-                  className="btn btn-light w-100 fw-bold py-2 text-dark border-0"
-                  style={{ fontSize: "13px", borderRadius: "8px" }}
-                >
-                  View Roadmap
-                </button>
-              </div>
+              {unusualActivity.length === 0 ? (
+                <div className="text-center py-4 py-md-5 text-muted">
+                  <p className="mb-0 small">No expenses recorded yet.</p>
+                </div>
+              ) : (
+                <div className="table-responsive">
+                  <table className="table table-hover align-middle mb-0">
+                    <thead className="table-light text-uppercase text-muted fw-bold" style={{ fontSize: "10px" }}>
+                      <tr>
+                        <th className="ps-3 ps-md-4 py-2 py-md-3">Date</th>
+                        <th className="py-2 py-md-3">Description</th>
+                        <th className="pe-3 pe-md-4 py-2 py-md-3 text-end">Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody className="fw-medium text-secondary" style={{ fontSize: "12px" }}>
+                      {unusualActivity.map((exp: any, idx: number) => (
+                        <tr key={exp.id ?? idx}>
+                          <td className="ps-3 ps-md-4 py-2 py-md-3 text-muted text-nowrap">{formatDate(exp.expense_date)}</td>
+                          <td className="fw-bold text-dark text-truncate" style={{ maxWidth: "120px" }}>{exp.expense_name || exp.description || "—"}</td>
+                          <td className="pe-3 pe-md-4 text-end fw-bold text-dark text-nowrap">{formatCurrency(exp.amount)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -531,51 +458,10 @@ export default function ReportsScreen() {
     </>
   );
 }
-function IconSwitcher({
-  type,
-  style,
-  className,
-}: {
-  type: string;
-  style?: React.CSSProperties;
-  className?: string;
-}) {
-  const paths: Record<string, JSX.Element> = {
-    home: (
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-      />
-    ),
-    utensils: (
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M12 19l9 2m-9-2v-6a3 3 0 00-3-3H4m6 9l-9 2m9-2v-6a3 3 0 013-3h7M7 5V3m4 2V3M3 5V3"
-      />
-    ),
-    plane: (
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M12 19l9 2m-9-2v-6a3 3 0 00-3-3H4m6 9l-9 2m9-2v-6a3 3 0 013-3h7M7 5V3m4 2V3M3 5V3"
-      />
-    ), // Simplified for view structure representation
-  };
 
-  return (
-    <svg
-      className={className}
-      style={style}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      {paths[type] || null}
-    </svg>
-  );
+function IconSwitcher({ type, style, className }: { type: string; style?: React.CSSProperties; className?: string }) {
+  const paths: Record<string, JSX.Element> = {
+    envelope: (<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2zm0 0l9 6 9-6" />),
+  };
+  return (<svg className={className} style={style} fill="none" viewBox="0 0 24 24" stroke="currentColor">{paths[type] || null}</svg>);
 }
