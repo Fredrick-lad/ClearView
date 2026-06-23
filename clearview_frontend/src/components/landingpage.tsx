@@ -1,11 +1,34 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import {
+  UtensilsCrossed,
+  BookOpen,
+  Bus,
+  Home,
+  Smile,
+  GraduationCap,
+  Target,
+  DollarSign,
+  CheckCircle,
+  ShieldCheck,
+  Mail,
+  Wallet,
+  BarChart3,
+  Sparkles,
+  PieChart,
+  RotateCcw,
+  Lightbulb,
+  Code2,
+  Server,
+  Globe,
+  Database,
+  Key,
+  TrendingUp,
+} from "lucide-react";
 
 export default function ClearViewLanding() {
-  // State for active dynamic controls (if expanded later)
   const [activeTab, setActiveTab] = useState<string>("all");
 
-  // React Implementation of the Intersection Observer for Fade-In animations
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -27,7 +50,6 @@ export default function ClearViewLanding() {
 
   return (
     <div style={styles.appContainer}>
-      {/* Dynamic Injector for Google Fonts */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap');
         
@@ -53,35 +75,46 @@ export default function ClearViewLanding() {
           to { opacity: 1; transform: translateY(0); }
         }
 
+        @keyframes shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+
         @media (max-width: 768px) {
           .responsive-hero { grid-template-columns: 1fr !important; gap: 3rem !important; padding: 4rem 1.5rem 3rem !important; }
           .responsive-hero-visual { order: -1 !important; }
           .responsive-grid-2 { grid-template-columns: 1fr !important; gap: 2rem !important; }
           .responsive-grid-3 { grid-template-columns: 1fr !important; }
           .responsive-nav-links { display: none !important; }
-          .responsive-method { grid-template-columns: 1fr !important; gap: 3rem !important; }
           .responsive-sticky { position: static !important; }
+          .responsive-testimonials { grid-template-columns: 1fr !important; }
         }
       `}</style>
-      {/* NAVBAR SECTION */}
+
+      {/* NAVBAR */}
       <nav style={styles.nav}>
         <Link to="/" style={styles.navLogo}>
-          <span style={styles.logoDot}></span>Clear View
+          <span style={styles.logoDot}></span>ClearView
         </Link>
         <ul className="responsive-nav-links" style={styles.navLinks}>
+          <li>
+            <a href="#how-it-works" style={styles.navLinkItem}>
+              How it Works
+            </a>
+          </li>
           <li>
             <a href="#features" style={styles.navLinkItem}>
               Features
             </a>
           </li>
           <li>
-            <a href="#tech" style={styles.navLinkItem}>
-              Technologies
+            <a href="#outcomes" style={styles.navLinkItem}>
+              Outcomes
             </a>
           </li>
         </ul>
         <Link to="/register" style={styles.navCta}>
-          Get started
+          Start Budgeting
         </Link>
       </nav>
 
@@ -90,30 +123,50 @@ export default function ClearViewLanding() {
         <div className="responsive-hero" style={styles.hero}>
           <div style={styles.heroContent}>
             <div style={styles.heroBadge}>
-              <span style={styles.pulseDot}></span>A Project meant to help spend
-              wisely{" "}
+              <span style={styles.pulseDot}></span>Built for university students
             </div>
             <h1 style={styles.heroTitle}>
-              Budget <em>before</em> you overspend, not after.
+              Make your <em>semester money</em> last.
             </h1>
             <p style={styles.heroDescription}>
-              A cross-platform digital envelope budgeting system purpose-built
-              for university students managing semester disbursements on mobile
-              money.
+              The envelope budgeting system designed for students — track your
+              allowance, bursary, or part-time income across categories, and
+              never run out of cash before disbursement again.
             </p>
             <div style={styles.heroActions}>
-              <Link to="/login" style={styles.btnPrimary}>
-                Log in
+              <Link to="/register" style={styles.btnPrimary}>
+                Create Free Account
               </Link>
-              <Link to="/register" style={styles.btnSecondary}>
-                Register
+              <Link to="/login" style={styles.btnSecondary}>
+                I already have one
               </Link>
+            </div>
+            <div
+              style={{
+                marginTop: "16px",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                fontSize: "13px",
+                color: "#8A8A94",
+              }}
+            >
+              <span style={{ color: "#1D9E75", fontWeight: 600 }}>✓</span> No
+              bank sync needed
+              <span style={{ margin: "0 4px", color: "#ddd" }}>·</span>
+              <span style={{ color: "#1D9E75", fontWeight: 600 }}>✓</span> Works
+              with M-Pesa
+              <span style={{ margin: "0 4px", color: "#ddd" }}>·</span>
+              <span style={{ color: "#1D9E75", fontWeight: 600 }}>✓</span> Free
+              for students
             </div>
           </div>
 
           <div className="responsive-hero-visual" style={styles.heroVisual}>
             <div style={styles.floatingBadge}>
-              <div style={styles.badgeIcon}>✓</div>
+              <div style={styles.badgeIcon}>
+                <GraduationCap size={16} style={{ color: "#0F6E56" }} />
+              </div>
               <div style={styles.badgeText}>
                 <strong
                   style={{
@@ -124,23 +177,25 @@ export default function ClearViewLanding() {
                     lineHeight: 1.2,
                   }}
                 >
-                  UAT Passed
+                  Final Year Project
                 </strong>
                 <span style={{ color: "#8A8A94", fontSize: "11px" }}>
-                  30 student testers
+                  BBIT · Kabarak University
                 </span>
               </div>
             </div>
 
             <div style={styles.appMockup}>
               <div style={styles.mockupHeader}>
-                <span style={styles.mockupHeaderTitle}>My Budget</span>
+                <span style={styles.mockupHeaderTitle}>My Semester Budget</span>
                 <span style={styles.mockupHeaderPeriod}>Semester 2</span>
               </div>
 
               <div style={styles.budgetTotal}>
                 <div>
-                  <div style={styles.budgetTotalLabel}>Total Budget</div>
+                  <div style={styles.budgetTotalLabel}>
+                    Total Semester Funds
+                  </div>
                   <div style={styles.budgetTotalAmount}>KES 18,000</div>
                 </div>
                 <div style={styles.budgetTotalUnalloc}>
@@ -158,10 +213,9 @@ export default function ClearViewLanding() {
               </div>
 
               <div style={styles.envelopesContainer}>
-                {/* Envelope 1 */}
                 <div style={styles.envelopeRow}>
                   <div style={{ ...styles.envIcon, background: "#E1F5EE" }}>
-                    🍽️
+                    <UtensilsCrossed size={16} style={{ color: "#1D9E75" }} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={styles.envName}>Food &amp; Groceries</div>
@@ -178,13 +232,12 @@ export default function ClearViewLanding() {
                   <div style={styles.envAmount}>KES 3,720 left</div>
                 </div>
 
-                {/* Envelope 2 */}
                 <div style={styles.envelopeRow}>
                   <div style={{ ...styles.envIcon, background: "#FAEEDA" }}>
-                    📚
+                    <BookOpen size={16} style={{ color: "#EF9F27" }} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={styles.envName}>Academic Materials</div>
+                    <div style={styles.envName}>Academic Supplies</div>
                     <div style={styles.envTrack}>
                       <div
                         style={{
@@ -198,10 +251,9 @@ export default function ClearViewLanding() {
                   <div style={styles.envAmount}>KES 875 left</div>
                 </div>
 
-                {/* Envelope 3 */}
                 <div style={styles.envelopeRow}>
                   <div style={{ ...styles.envIcon, background: "#FCEBEB" }}>
-                    🚌
+                    <Bus size={16} style={{ color: "#E24B4A" }} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={styles.envName}>Transport</div>
@@ -218,13 +270,12 @@ export default function ClearViewLanding() {
                   <div style={styles.envAmount}>KES 360 left</div>
                 </div>
 
-                {/* Envelope 4 */}
                 <div style={styles.envelopeRow}>
                   <div style={{ ...styles.envIcon, background: "#EEEDFE" }}>
-                    💆
+                    <Home size={16} style={{ color: "#7F77DD" }} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={styles.envName}>Personal &amp; Self-Care</div>
+                    <div style={styles.envName}>Housing &amp; Utilities</div>
                     <div style={styles.envTrack}>
                       <div
                         style={{
@@ -243,255 +294,325 @@ export default function ClearViewLanding() {
         </div>
       </section>
 
-      {/* STATS STRIP */}
+      {/* EXPECTATIONS */}
       <div style={styles.statsStrip}>
         <div style={styles.statsInner}>
           <div className="fade-in" style={styles.stat}>
-            <div style={styles.statNumber}>30+</div>
-            <div style={styles.statLabel}>Students surveyed</div>
+            <div style={styles.statNumber}>100%</div>
+            <div style={styles.statLabel}>of funds allocated upfront</div>
           </div>
           <div className="fade-in" style={styles.stat}>
-            <div style={styles.statNumber}>6</div>
-            <div style={styles.statLabel}>Agile sprint cycles</div>
+            <div style={styles.statNumber}>70%</div>
+            <div style={styles.statLabel}>of income auto-enveloped</div>
           </div>
           <div className="fade-in" style={styles.stat}>
-            <div style={styles.statNumber}>2</div>
-            <div style={styles.statLabel}>Platforms (web + mobile)</div>
+            <div style={styles.statNumber}>0</div>
+            <div style={styles.statLabel}>Bank account needed</div>
           </div>
         </div>
       </div>
 
-      {/* THE PROBLEM SECTION */}
-      <section id="problem" style={styles.sectionSurface}>
+      {/* HOW IT WORKS */}
+      <section id="how-it-works" style={styles.sectionBase}>
         <div style={styles.sectionInner}>
-          <div style={styles.sectionTag}>The Problem</div>
+          <div style={styles.sectionTag}>How It Works</div>
           <h2 style={styles.sectionTitle}>
-            Why students run out of money
+            Three steps to semester
             <br />
-            halfway through semester
+            financial peace of mind
           </h2>
+          <p style={styles.sectionSub}>
+            No complicated setup. Just tell us about your money and we'll handle
+            the rest.
+          </p>
 
-          <div className="responsive-grid-2" style={styles.problemGrid}>
-            <div>
-              <div className="fade-in" style={styles.problemPoint}>
-                <div style={styles.problemNum}>01</div>
-                <div>
-                  <h3 style={styles.problemPointTitle}>
-                    Bank-centric apps don't fit
-                  </h3>
-                  <p style={styles.problemPointText}>
-                    Apps like Mint and YNAB require formal bank account sync —
-                    irrelevant for students transacting on M-Pesa and cash.
-                  </p>
+          <div
+            className="responsive-grid-3"
+            style={{ ...styles.featuresGrid, gap: "2rem" }}
+          >
+            {[
+              {
+                step: "01",
+                title: "Set your goal",
+                desc: "Pick what matters most — tracking spending, saving for fees, budgeting allowance, or managing loans.",
+              },
+              {
+                step: "02",
+                title: "Add your income",
+                desc: "Record your allowance, scholarship, part-time job, or any semester income. We auto-allocate 70% into smart envelopes.",
+              },
+              {
+                step: "03",
+                title: "Track & stay on top",
+                desc: "Log expenses, watch your envelope balances shrink in real time, and get alerts before you overspend.",
+              },
+            ].map((item, i) => (
+              <div key={i} className="fade-in" style={styles.featureCard}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    marginBottom: "1rem",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "40px",
+                      height: "40px",
+                      borderRadius: "10px",
+                      background: "#E1F5EE",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "18px",
+                      fontWeight: 700,
+                      color: "#0F6E56",
+                      fontFamily: "'Playfair Display', Georgia, serif",
+                    }}
+                  >
+                    {item.step}
+                  </div>
                 </div>
+                <h3 style={styles.featureCardTitle}>{item.title}</h3>
+                <p style={styles.featureCardText}>{item.desc}</p>
               </div>
-              <div className="fade-in" style={styles.problemPoint}>
-                <div style={styles.problemNum}>02</div>
-                <div>
-                  <h3 style={styles.problemPointTitle}>
-                    Reactive, not proactive
-                  </h3>
-                  <p style={styles.problemPointText}>
-                    Most tools report overspending after it happens. Students
-                    need a signal before the money is gone, not a post-mortem.
-                  </p>
-                </div>
-              </div>
-              <div className="fade-in" style={styles.problemPoint}>
-                <div style={styles.problemNum}>03</div>
-                <div>
-                  <h3 style={styles.problemPointTitle}>
-                    Feature bloat drives abandonment
-                  </h3>
-                  <p style={styles.problemPointText}>
-                    Investment trackers, credit scores, social sharing — none of
-                    this is relevant for a student trying to stretch KES 18,000
-                    across four months.
-                  </p>
-                </div>
-              </div>
-              <div className="fade-in" style={styles.problemPoint}>
-                <div style={styles.problemNum}>04</div>
-                <div>
-                  <h3 style={styles.problemPointTitle}>
-                    No cross-device, offline-friendly option
-                  </h3>
-                  <p style={styles.problemPointText}>
-                    Students switch between phone and laptop throughout the day.
-                    Intermittent campus Wi-Fi makes heavy cloud-first apps
-                    unreliable.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="responsive-sticky" style={styles.solutionSticky}>
-              <div className="fade-in" style={styles.solutionCard}>
-                <h3 style={styles.solutionCardTitle}>
-                  The Envelope Method, digitized.
-                </h3>
-                <p style={styles.solutionCardText}>
-                  Dave Ramsey's cash-envelope system enforces category
-                  discipline through a hard constraint: once an envelope is
-                  empty, spending stops. Clear View brings this same discipline
-                  into a mobile-friendly digital format — no bank account
-                  required.
-                </p>
-                <p style={styles.solutionCardText}>
-                  Mental accounting theory (Thaler &amp; Sunstein, 2008) shows
-                  that naming and separating money by purpose reduces
-                  overspending. This system makes that psychological effect
-                  tangible with colour-coded real-time indicators.
-                </p>
-                <div style={{ flexWrap: "wrap", display: "flex" }}>
-                  {[
-                    "Manual entry",
-                    "M-Pesa compatible",
-                    "Mobile-first",
-                    "No bank sync needed",
-                    "Real-time alerts",
-                  ].map((tag, i) => (
-                    <span key={i} style={styles.solutionTag}>
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* CORE FEATURES SECTION */}
-      <section id="features" style={styles.sectionBase}>
+      {/* CORE FEATURES */}
+      <section id="features" style={styles.sectionSurface}>
         <div style={styles.sectionInner}>
-          <div style={styles.sectionTag}>System Modules</div>
+          <div style={styles.sectionTag}>Everything a student needs</div>
           <h2 style={styles.sectionTitle}>
-            Everything a student needs.
+            Built around how students
             <br />
-            Nothing they don't.
+            actually manage money
           </h2>
           <p style={styles.sectionSub}>
-            Five focused modules built around the real financial workflows of
-            Kabarak University students.
+            Five focused modules designed for Kabarak University students — no
+            bank sync, no credit scores, no clutter.
           </p>
 
           <div className="responsive-grid-3" style={styles.featuresGrid}>
             {[
               {
-                icon: "🔐",
-                title: "User Authentication",
-                desc: "Secure account creation and login using bcrypt password hashing and JWT-based session management. Each student's financial data remains entirely private.",
+                icon: ShieldCheck,
+                title: "Private & Secure",
+                desc: "Your financial data stays yours. JWT-authenticated sessions and bcrypt-hashed passwords keep everything safe.",
               },
               {
-                icon: "✉️",
-                title: "Envelope Management",
-                desc: "Create custom spending categories, set monetary limits, and allocate income at the start of each cycle. Colour-coded progress bars (green → amber → red) surface status at a glance.",
+                icon: Mail,
+                title: "Smart Envelopes",
+                desc: "We auto-create food, transport, housing, academic, and entertainment envelopes. Colour-coded bars (green → amber → red) show your status instantly.",
               },
               {
-                icon: "💸",
-                title: "Expense Tracking",
-                desc: "Log expenses manually in seconds. Each entry immediately deducts from the relevant envelope. Supports recurring expenses like weekly food deductions.",
+                icon: Wallet,
+                title: "Instant Expense Logging",
+                desc: "Record what you spend in seconds. Every entry deducts from the right envelope. Works offline-friendly on campus Wi-Fi.",
               },
               {
-                icon: "💰",
-                title: "Income Management",
-                desc: "Record bursaries, family remittances, or part-time income. The system shows allocated versus unallocated funds clearly before you begin spending.",
+                icon: DollarSign,
+                title: "Income That Fits You",
+                desc: "Record bursaries, parental allowance, part-time gigs, or M-Pesa remittances. See exactly what's allocated vs unallocated.",
               },
               {
-                icon: "📊",
-                title: "Reports & Dashboard",
-                desc: "Weekly and monthly bar and pie charts reveal spending patterns across cycles. Compare planned versus actual spend per category to track discipline over time.",
+                icon: BarChart3,
+                title: "Semester Reports",
+                desc: "Weekly and monthly charts reveal your real spending patterns. Compare planned vs actual and adjust next semester.",
               },
-            ].map((feat, index) => (
-              <div key={index} className="fade-in" style={styles.featureCard}>
-                <div style={styles.featureIcon}>{feat.icon}</div>
-                <h3 style={styles.featureCardTitle}>{feat.title}</h3>
-                <p style={styles.featureCardText}>{feat.desc}</p>
-              </div>
-            ))}
+            ].map((feat, i) => {
+              const Icon = feat.icon;
+              return (
+                <div key={i} className="fade-in" style={styles.featureCard}>
+                  <div style={styles.featureIcon}>
+                    <Icon size={20} style={{ color: "#0F6E56" }} />
+                  </div>
+                  <h3 style={styles.featureCardTitle}>{feat.title}</h3>
+                  <p style={styles.featureCardText}>{feat.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* TECHNICAL STACK SECTION */}
+      {/* EXPECTED OUTCOMES */}
+      <section id="outcomes" style={styles.sectionBase}>
+        <div style={styles.sectionInner}>
+          <div style={styles.sectionTag}>What We Aim To Achieve</div>
+          <h2 style={styles.sectionTitle}>
+            Expected outcomes for
+            <br />
+            student users
+          </h2>
+
+          <div
+            className="responsive-testimonials"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "1.5rem",
+              marginTop: "3rem",
+            }}
+          >
+            {[
+              {
+                icon: Target,
+                title: "End mid-semester money anxiety",
+                desc: "Students will know exactly how much they have left in each category at all times, eliminating the uncertainty that leads to running out of cash before the next disbursement.",
+              },
+              {
+                icon: PieChart,
+                title: "Build spending awareness",
+                desc: "By logging expenses and seeing real-time balances, students will develop a clearer picture of their actual spending habits and identify areas where they can cut back.",
+              },
+              {
+                icon: RotateCcw,
+                title: "Semester-over-semester improvement",
+                desc: "With data persisting across periods, students will be able to compare their spending patterns across semesters and set measurable improvement goals.",
+              },
+              {
+                icon: Lightbulb,
+                title: "Financial habit formation",
+                desc: "The envelope method teaches proactive budgeting rather than reactive tracking. Over time, students will internalise the discipline of allocating before spending.",
+              },
+            ].map((item, i) => {
+              const Icon = item.icon;
+              return (
+                <div
+                  key={i}
+                  className="fade-in"
+                  style={{
+                    background: "#FFFFFF",
+                    border: "0.5px solid rgba(24,24,26,0.10)",
+                    borderRadius: "20px",
+                    padding: "1.75rem",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: "44px",
+                      height: "44px",
+                      background: "#E1F5EE",
+                      borderRadius: "10px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      marginBottom: "10px",
+                    }}
+                  >
+                    <Icon size={22} style={{ color: "#0F6E56" }} />
+                  </div>
+                  <h3
+                    style={{
+                      fontSize: "15px",
+                      fontWeight: 600,
+                      color: "#18181A",
+                      marginBottom: "6px",
+                    }}
+                  >
+                    {item.title}
+                  </h3>
+                  <p
+                    style={{
+                      fontSize: "13.5px",
+                      color: "#4A4A50",
+                      lineHeight: 1.65,
+                      marginBottom: 0,
+                    }}
+                  >
+                    {item.desc}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* TECHNICAL STACK */}
       <section id="tech" style={styles.sectionSurface}>
         <div style={styles.sectionInner}>
-          <div style={styles.sectionTag}>Technical Stack</div>
-          <h2 style={styles.sectionTitle}>
-            Built on solid, open-source foundations
-          </h2>
+          <div style={styles.sectionTag}>Built With</div>
+          <h2 style={styles.sectionTitle}>Solid, open-source foundations</h2>
           <p style={styles.sectionSub}>
-            Every tool selected for compatibility with a student development
-            context — free, well-documented, and production-grade.
+            Every tool was chosen to be free, well-documented, and
+            production-grade — perfect for a student development context.
           </p>
 
           <div className="responsive-grid-3" style={styles.techRow}>
             {[
-              { badge: "⚛️", name: "React.js", role: "Frontend UI Framework" },
-              { badge: "🟩", name: "Node.js", role: "Backend Runtime" },
-              {
-                badge: "🚀",
-                name: "Express.js",
-                role: "REST API Middleware Layer",
-              },
-              {
-                badge: "🗄️",
-                name: "MySQL / PostgreSQL",
-                role: "Relational Database Layer",
-              },
-              {
-                badge: "🔑",
-                name: "JWT + bcrypt",
-                role: "Authentication & Hashing",
-              },
-              {
-                badge: "📈",
-                name: "Recharts",
-                role: "Data Dashboard Visualizations",
-              },
-            ].map((tech, i) => (
-              <div key={i} className="fade-in" style={styles.techPill}>
-                <div style={styles.techBadge}>{tech.badge}</div>
-                <div>
-                  <div style={styles.techPillName}>{tech.name}</div>
-                  <div style={styles.techPillRole}>{tech.role}</div>
+              { icon: Code2, name: "React.js", role: "Frontend UI" },
+              { icon: Server, name: "Node.js", role: "Backend Runtime" },
+              { icon: Globe, name: "Express.js", role: "REST API Layer" },
+              { icon: Database, name: "MySQL", role: "Database" },
+              { icon: Key, name: "JWT + bcrypt", role: "Auth & Security" },
+              { icon: TrendingUp, name: "Recharts", role: "Charts & Reports" },
+            ].map((tech, i) => {
+              const Icon = tech.icon;
+              return (
+                <div key={i} className="fade-in" style={styles.techPill}>
+                  <div style={styles.techBadge}>
+                    <Icon size={16} style={{ color: "#0F6E56" }} />
+                  </div>
+                  <div>
+                    <div style={styles.techPillName}>{tech.name}</div>
+                    <div style={styles.techPillRole}>{tech.role}</div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* CALL TO ACTION SECTION */}
+      {/* CTA */}
       <section style={styles.ctaSection}>
-        <div style={{ ...styles.sectionTag, textAlign: "center" }}>
+        <div
+          style={{ ...styles.sectionTag, textAlign: "center", color: "#fff" }}
+        >
           Get Started
         </div>
-        <h2 className="fade-in" style={styles.sectionTitle}>
-          Take control of your semester budget
+        <h2
+          className="fade-in"
+          style={{ ...styles.sectionTitle, color: "#fff" }}
+        >
+          Ready to take control of your semester budget?
         </h2>
         <p
           className="fade-in"
-          style={{ ...styles.sectionSub, margin: "0 auto 2.5rem" }}
+          style={{
+            ...styles.sectionSub,
+            margin: "0 auto 2.5rem",
+            color: "rgba(255,255,255,0.85)",
+          }}
         >
-          Allocate your funds, track every shilling, and never be caught
-          off-guard before disbursement again.
+          Join students who never run out of money before disbursement.
         </p>
         <div className="fade-in" style={styles.ctaActions}>
-          <a href="#features" style={styles.btnPrimary}>
-            Explore the System
-          </a>
-          <a href="#about" style={styles.btnSecondary}>
-            Read the Research
-          </a>
+          <Link to="/register" style={styles.btnPrimary}>
+            Create Free Account
+          </Link>
+          <Link
+            to="/login"
+            style={{
+              ...styles.btnSecondary,
+              border: "0.5px solid rgba(255,255,255,0.3)",
+              color: "#fff",
+            }}
+          >
+            Log In
+          </Link>
         </div>
       </section>
 
       {/* FOOTER */}
       <footer style={styles.footer}>
         <div style={styles.footerInner}>
-          <span style={styles.footerLogo}>Clear View</span>
+          <span style={styles.footerLogo}>ClearView</span>
           <p style={styles.footerText}>
             BBIT Final Year Project · Kabarak University · 2025 · Mwangangi
             Fredrick
@@ -505,7 +626,6 @@ export default function ClearViewLanding() {
   );
 }
 
-// STRICT TYPED COMPREHENSIVE STYLING SCHEME (Raw CSS to React Native Objects Mapping)
 const styles: Record<string, React.CSSProperties> = {
   appContainer: {
     background: "#F9F8F4",
@@ -550,6 +670,8 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     gap: "2rem",
     listStyle: "none",
+    margin: 0,
+    padding: 0,
   },
   navLinkItem: {
     fontSize: "14px",
@@ -615,7 +737,7 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#4A4A50",
     lineHeight: 1.75,
     marginBottom: "2.25rem",
-    maxWidth: "440px",
+    maxWidth: "480px",
   },
   heroActions: {
     display: "flex",
@@ -645,9 +767,7 @@ const styles: Record<string, React.CSSProperties> = {
     transition: "background 0.2s, transform 0.15s",
     display: "inline-block",
   },
-  heroVisual: {
-    position: "relative",
-  },
+  heroVisual: { position: "relative" },
   floatingBadge: {
     position: "absolute",
     top: "-14px",
@@ -725,16 +845,8 @@ const styles: Record<string, React.CSSProperties> = {
     color: "rgba(255,255,255,0.65)",
     textAlign: "right",
   },
-  envelopesContainer: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "10px",
-  },
-  envelopeRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-  },
+  envelopesContainer: { display: "flex", flexDirection: "column", gap: "10px" },
+  envelopeRow: { display: "flex", alignItems: "center", gap: "12px" },
   envIcon: {
     width: "34px",
     height: "34px",
@@ -745,11 +857,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: "15px",
     flexShrink: 0,
   },
-  envName: {
-    fontSize: "13px",
-    fontWeight: 500,
-    color: "#18181A",
-  },
+  envName: { fontSize: "13px", fontWeight: 500, color: "#18181A" },
   envTrack: {
     height: "4px",
     borderRadius: "99px",
@@ -782,9 +890,7 @@ const styles: Record<string, React.CSSProperties> = {
     justifyContent: "center",
     flexWrap: "wrap",
   },
-  stat: {
-    textAlign: "center",
-  },
+  stat: { textAlign: "center" },
   statNumber: {
     fontFamily: "'Playfair Display', Georgia, serif",
     fontSize: "2rem",
@@ -792,26 +898,10 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#18181A",
     lineHeight: 1.1,
   },
-  statLabel: {
-    fontSize: "13px",
-    color: "#8A8A94",
-    marginTop: "3px",
-  },
-  sectionBase: {
-    padding: "5.5rem 2rem",
-  },
-  sectionSurface: {
-    padding: "5.5rem 2rem",
-    background: "#FFFFFF",
-  },
-  sectionDark: {
-    padding: "5.5rem 2rem",
-    background: "#18181A",
-  },
-  sectionInner: {
-    maxWidth: "1120px",
-    margin: "0 auto",
-  },
+  statLabel: { fontSize: "13px", color: "#8A8A94", marginTop: "3px" },
+  sectionBase: { padding: "5.5rem 2rem" },
+  sectionSurface: { padding: "5.5rem 2rem", background: "#FFFFFF" },
+  sectionInner: { maxWidth: "1120px", margin: "0 auto" },
   sectionTag: {
     fontSize: "11px",
     fontWeight: 500,
@@ -833,71 +923,6 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#4A4A50",
     maxWidth: "540px",
     lineHeight: 1.75,
-  },
-  problemGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: "5rem",
-    alignItems: "start",
-    marginTop: "3.5rem",
-  },
-  problemPoint: {
-    display: "flex",
-    gap: "1rem",
-    padding: "1.5rem 0",
-    borderTop: "0.5px solid rgba(24,24,26,0.10)",
-  },
-  problemNum: {
-    fontFamily: "'Playfair Display', Georgia, serif",
-    fontSize: "1.4rem",
-    fontWeight: 700,
-    color: "rgba(24,24,26,0.18)",
-    minWidth: "36px",
-    lineHeight: 1.2,
-  },
-  problemPointTitle: {
-    fontSize: "15px",
-    fontWeight: 500,
-    color: "#18181A",
-    marginBottom: "4px",
-  },
-  problemPointText: {
-    fontSize: "14px",
-    color: "#4A4A50",
-    lineHeight: 1.6,
-  },
-  solutionSticky: {
-    position: "sticky",
-    top: "80px",
-  },
-  solutionCard: {
-    background: "#F9F8F4",
-    border: "0.5px solid rgba(24,24,26,0.18)",
-    borderRadius: "20px",
-    padding: "2.5rem",
-  },
-  solutionCardTitle: {
-    fontFamily: "'Playfair Display', Georgia, serif",
-    fontSize: "1.3rem",
-    fontWeight: 600,
-    marginBottom: "0.75rem",
-    color: "#18181A",
-  },
-  solutionCardText: {
-    fontSize: "14px",
-    color: "#4A4A50",
-    lineHeight: 1.7,
-    marginBottom: "1.5rem",
-  },
-  solutionTag: {
-    display: "inline-block",
-    background: "#E1F5EE",
-    color: "#0F6E56",
-    fontSize: "12px",
-    fontWeight: 500,
-    padding: "4px 10px",
-    borderRadius: "100px",
-    margin: "3px",
   },
   featuresGrid: {
     display: "grid",
@@ -929,11 +954,7 @@ const styles: Record<string, React.CSSProperties> = {
     marginBottom: "6px",
     color: "#18181A",
   },
-  featureCardText: {
-    fontSize: "13.5px",
-    color: "#4A4A50",
-    lineHeight: 1.65,
-  },
+  featureCardText: { fontSize: "13.5px", color: "#4A4A50", lineHeight: 1.65 },
   techRow: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
@@ -960,87 +981,12 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: "14px",
     flexShrink: 0,
   },
-  techPillName: {
-    fontSize: "13px",
-    fontWeight: 500,
-    color: "#18181A",
-  },
-  techPillRole: {
-    fontSize: "11px",
-    color: "#8A8A94",
-    marginTop: "1px",
-  },
-  methodologyParagraph: {
-    fontSize: "14px",
-    color: "#4A4A50",
-    marginTop: "1.5rem",
-    lineHeight: 1.75,
-  },
-  methodTimeline: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "0",
-    borderLeft: "1.5px solid rgba(24,24,26,0.18)",
-    paddingLeft: "2rem",
-    maxWidth: "640px",
-  },
-  methodItem: {
-    paddingBottom: "1.5rem",
-    position: "relative",
-  },
-  sprintLabel: {
-    fontSize: "11px",
-    fontWeight: 500,
-    letterSpacing: "0.08em",
-    textTransform: "uppercase",
-    color: "#0F6E56",
-    marginBottom: "4px",
-  },
-  methodItemTitle: {
-    fontSize: "15px",
-    fontWeight: 500,
-    color: "#18181A",
-    marginBottom: "4px",
-  },
-  methodItemDesc: {
-    fontSize: "13.5px",
-    color: "#4A4A50",
-  },
-  aboutGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-    gap: "1.5rem",
-    marginTop: "3rem",
-  },
-  aboutCard: {
-    background: "rgba(255,255,255,0.04)",
-    border: "0.5px solid rgba(255,255,255,0.1)",
-    borderRadius: "20px",
-    padding: "1.75rem",
-  },
-  aboutCardLabel: {
-    fontSize: "11px",
-    fontWeight: 500,
-    letterSpacing: "0.1em",
-    textTransform: "uppercase",
-    color: "rgba(255,255,255,0.35)",
-    marginBottom: "10px",
-  },
-  aboutCardValue: {
-    fontFamily: "'Playfair Display', Georgia, serif",
-    fontSize: "1.05rem",
-    fontWeight: 600,
-    color: "#fff",
-    lineHeight: 1.4,
-  },
-  aboutCardSub: {
-    fontSize: "13px",
-    color: "rgba(255,255,255,0.45)",
-    marginTop: "6px",
-  },
+  techPillName: { fontSize: "13px", fontWeight: 500, color: "#18181A" },
+  techPillRole: { fontSize: "11px", color: "#8A8A94", marginTop: "1px" },
   ctaSection: {
     textAlign: "center",
     padding: "7rem 2rem",
+    background: "#0F6E56",
   },
   ctaActions: {
     display: "flex",
