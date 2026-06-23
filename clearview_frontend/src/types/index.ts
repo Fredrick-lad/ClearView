@@ -8,6 +8,7 @@ export type ScreenKey =
   | "Reports"
   | "settings"
   | "helpCenter"
+  | "contactSupport"
   | "logout"
   | "Profile"
   | "Notifications"
@@ -31,7 +32,7 @@ export type Icons =
   | "moveLeft"
   | "moveRight"
 
-export type ModalKind = "env" | "exp" | "inc" |"del"|"edit"|"env"|"envsetup" | null;
+export type ModalKind = "env" | "exp" | "inc" |"del"|"edit"|"editexp"|"env"|"envsetup" | null;
 
 export type Envelope = {
   id: number;
@@ -42,12 +43,14 @@ export type Envelope = {
 };
 
 export type Expense = {
+  id: number;
   user_id: number;
   envelope_id: number;
   period_id:number;
   amount: number;
-  note: string;
-  date: string;
+  description: string;
+  expense_name: string;
+  expense_date: string;
 };
 
 
