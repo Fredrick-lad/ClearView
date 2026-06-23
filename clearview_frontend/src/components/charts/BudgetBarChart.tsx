@@ -11,6 +11,7 @@ import {
 
 import type { Envelope } from "../../types";
 import { C } from "../../styles/colors";
+import { formatCurrency } from "../../utils/format";
 
 interface Props {
   envelopes: Envelope[];
@@ -54,7 +55,7 @@ export default function BudgetBarChart({ envelopes }: Props) {
             fontSize: 12,
           }}
           formatter={(v: any) =>
-            v == null || v === "" ? "" : `KES ${Number(v).toLocaleString()}`
+            v == null || v === "" ? "" : formatCurrency(v)
           }
         />
 

@@ -2,6 +2,7 @@ import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
 
 import type { Envelope } from "../../types";
 import { C, PALETTE } from "../../styles/colors";
+import { formatCurrency } from "../../utils/format";
 
 interface Props {
   envelopes: Envelope[];
@@ -39,7 +40,7 @@ export default function SpendingPieChart({ envelopes }: Props) {
               color: C.text,
               fontSize: 12,
             }}
-            formatter={(v: any) => `KES ${(v ?? 0).toLocaleString()}`}
+            formatter={(v: any) => formatCurrency(v ?? 0)}
           />
         </PieChart>
       </ResponsiveContainer>

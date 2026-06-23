@@ -9,6 +9,7 @@ import {
 } from "recharts";
 
 import { C } from "../../styles/colors";
+import { formatCurrency } from "../../utils/format";
 
 interface WeeklyData {
   week: string;
@@ -58,7 +59,7 @@ export default function WeeklyTrendChart({ data }: Props) {
             color: C.text,
             fontSize: 12,
           }}
-          formatter={(v: any) => `KES ${v.toLocaleString()}`}
+          formatter={(v: any) => formatCurrency(v)}
         />
 
         <Area
