@@ -1,26 +1,39 @@
-import { useEffect } from "react";
-import { HelpCircle, ArrowLeft, Check, Plus } from "lucide-react";
+import { useEffect, useState } from "react";
+import { HelpCircle, ArrowLeft, Check, Plus, Loader } from "lucide-react";
 
 import { iconMap } from "../components/ui/iconMap";
 
 import { useNavigate } from "react-router-dom";
 import { GetData } from "../hooks/context/generalContext";
 import CreateEnvelopeModal from "../modals/EnvelopeModal";
-import { EnvelopeSetupModal } from "../modals/EnvelopeSetupModal";
 import { useAuth } from "../hooks/context/userContext";
 
 export default function OnboardingStep3() {
-  const { getEnvelopes, envelopeData, registerEnvelope, incomeSource } =
-    useAuth();
-  const { selectedOption, modal, setModal } = GetData();
+  const { getEnvelopes, envelopeData, fetchDashboardData } = useAuth();
+  const { modal, setModal } = GetData();
 
   const navigate = useNavigate();
+  const [finishing, setFinishing] = useState(false);
 
-  console.log(envelopeData);
-
-  console.log(modal);
-  const handleFinish = () => {
+  const handleFinish = async () => {
+    setFinishing(true);
+    try {
+      await fetchDashboardData();
+    } catch {
+      // proceed regardless
+    }
     navigate("/dashboard");
+  };
+
+  const envelopes: any[] = Array.isArray(envelopeData) ? envelopeData : [];
+  const totalBudget = envelopes.reduce(
+    (sum: number, e: any) => sum + Number(e.monthly_limit || 0),
+    0,
+  );
+
+  const handleModalClose = async () => {
+    setModal(null);
+    await getEnvelopes();
   };
 
   return (
@@ -130,19 +143,33 @@ export default function OnboardingStep3() {
                 fontSize: "2rem",
               }}
             >
-              Create your first envelopes.
+              Your student budget is ready.
             </h1>
             <p
               className="text-secondary mb-0 px-2"
               style={{ fontSize: "0.95rem" }}
             >
-              Envelopes help you allocate your income into categories like
-              Groceries, Rent, or Savings.
+              We've created envelopes based on your income. Each one helps you
+              track a specific part of your student spending.
             </p>
           </div>
+          {/* Summary stats */}
+          {envelopes.length > 0 && (
+            <div className="d-flex gap-3 mb-4 flex-wrap justify-content-center">
+              <div className="bg-light rounded-3 px-3 py-2 text-center">
+                <div className="fw-bold text-dark">{envelopes.length}</div>
+                <div className="text-muted" style={{ fontSize: "0.7rem" }}>Envelopes</div>
+              </div>
+              <div className="bg-light rounded-3 px-3 py-2 text-center">
+                <div className="fw-bold text-dark">KES {totalBudget.toLocaleString()}</div>
+                <div className="text-muted" style={{ fontSize: "0.7rem" }}>Total Budget</div>
+              </div>
+            </div>
+          )}
+
           {/* 1. Wrap the loop in a Bootstrap row with responsive column rules */}
           <div className="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3">
-            {envelopeData.map((envelope: any) => {
+            {envelopes.map((envelope: any) => {
               const Icon = iconMap[envelope.icon_name] ?? iconMap["Tag"];
               const remainingBudget =
                 envelope.monthly_limit - envelope.current_spend;
@@ -257,8 +284,14 @@ export default function OnboardingStep3() {
             })}
           </div>
 
+          {envelopes.length === 0 && (
+            <div className="text-center py-5 text-muted">
+              <p className="mb-3">No envelopes yet. Create one to start budgeting for the semester.</p>
+            </div>
+          )}
+
           {/* Action Button: Create Custom Envelope */}
-          <div className="row mb-5">
+          <div className="row mt-4 mb-5">
             <div className="col-12 col-md-4">
               <button
                 type="button"
@@ -275,7 +308,10 @@ export default function OnboardingStep3() {
                   className="small fw-semibold"
                   style={{ letterSpacing: "0.02em" }}
                 >
-                  Create Custom Envelope
+                  Add a custom envelope
+                </span>
+                <span className="text-muted" style={{ fontSize: "0.7rem" }}>
+                  e.g. Books, Hostel, Data, Savings
                 </span>
               </button>
             </div>
@@ -283,10 +319,7 @@ export default function OnboardingStep3() {
           {modal === "env" ? (
             <CreateEnvelopeModal
               isOpen={modal === "env"}
-              onClose={() => {
-                setModal(null);
-                navigate("onboardingStep3");
-              }}
+              onClose={handleModalClose}
             />
           ) : null}
 
@@ -333,10 +366,15 @@ export default function OnboardingStep3() {
             {/* Next Action Progression */}
             <button
               onClick={handleFinish}
+              disabled={finishing}
               className="btn text-white d-inline-flex align-items-center gap-2 px-5 py-2.5 fw-medium border-0 shadow-none"
-              style={{ backgroundColor: "#0F6E56", borderRadius: "4px" }}
+              style={{ backgroundColor: "#0F6E56", borderRadius: "4px", opacity: finishing ? 0.7 : 1 }}
             >
-              Finish Setup
+              {finishing ? (
+                <><Loader size={16} className="spinner-border spinner-border-sm" /> Loading…</>
+              ) : (
+                "Finish Setup"
+              )}
             </button>
           </div>
         </footer>
