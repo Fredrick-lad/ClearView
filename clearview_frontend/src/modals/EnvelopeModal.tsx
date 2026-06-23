@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../hooks/context/userContext";
+import { GetData } from "../hooks/context/generalContext";
 import type { ModalKind } from "../types";
 import { iconMap } from "../components/ui/iconMap";
 
@@ -13,6 +14,7 @@ export default function CreateEnvelopeModal({
   onClose,
 }: CreateEnvelopeModalProps) {
   const { registerEnvelope } = useAuth();
+  const { addNotification } = GetData();
   const [icon, setIcon] = useState<any>("");
 
   const [formdata, setFormdata] = useState({
@@ -57,6 +59,11 @@ export default function CreateEnvelopeModal({
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await registerEnvelope(final);
+    addNotification({
+      title: "Envelope Created",
+      description: `New envelope "${formdata.name}" created with a monthly limit of Ksh ${parseFloat(formdata.limit || "0").toLocaleString()}.`,
+      type: "envelope",
+    });
     onClose();
   };
 

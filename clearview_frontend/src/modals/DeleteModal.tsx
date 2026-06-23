@@ -12,7 +12,7 @@ export default function DeleteEnvelopeModal({
   onClose,
 }: DeleteEnvelopeModalProps) {
   const { getEnvelopes } = useAuth();
-  const { selectedEnvelope, setSelectedEnvelope } = GetData();
+  const { selectedEnvelope, setSelectedEnvelope, addNotification } = GetData();
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState("");
 
@@ -45,6 +45,11 @@ export default function DeleteEnvelopeModal({
       );
       if (response.ok) {
         await getEnvelopes();
+        addNotification({
+          title: "Envelope Deleted",
+          description: `"${envelopeName}" has been deleted.`,
+          type: "envelope",
+        });
         setSelectedEnvelope(null);
         onClose();
       } else {

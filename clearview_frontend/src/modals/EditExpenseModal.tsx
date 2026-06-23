@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../hooks/context/userContext";
 import { GetData } from "../hooks/context/generalContext";
+import { formatCurrency } from "../utils/format";
 
 interface EditExpenseModalProps {
   isOpen: boolean;
@@ -12,7 +13,7 @@ export default function EditExpenseModal({
   onClose,
 }: EditExpenseModalProps) {
   const { envelopeData, updateExpense } = useAuth();
-  const { selectedExpense } = GetData();
+  const { selectedExpense, addNotification } = GetData();
 
   const [expenseName, setExpenseName] = useState(selectedExpense?.expense_name || "");
   const [amount, setAmount] = useState(selectedExpense?.amount?.toString() || "");
@@ -53,6 +54,11 @@ export default function EditExpenseModal({
       });
 
       if (ok) {
+        addNotification({
+          title: "Expense Updated",
+          description: `"${expenseName}" updated to ${formatCurrency(parseFloat(amount))}.`,
+          type: "edit",
+        });
         onClose();
       } else {
         setError("Failed to update expense. Please try again.");

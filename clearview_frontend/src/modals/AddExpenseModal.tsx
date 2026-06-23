@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../hooks/context/userContext";
+import { GetData } from "../hooks/context/generalContext";
+import { formatCurrency } from "../utils/format";
 
 interface AddExpenseModalProps {
   isOpen: boolean;
@@ -11,6 +13,7 @@ export default function AddExpenseModal({
   onClose,
 }: AddExpenseModalProps) {
   const { periodData, envelopeData, addExpense } = useAuth();
+  const { addNotification } = GetData();
 
   const [expenseName, setExpenseName] = useState("");
   const [amount, setAmount] = useState("");
@@ -47,6 +50,12 @@ export default function AddExpenseModal({
       });
 
       if (ok) {
+        const matched = envelopes.find((e) => e.id === parseInt(envelopeId));
+        addNotification({
+          title: "Expense Added",
+          description: `${formatCurrency(parseFloat(amount))} spent on "${expenseName}"${matched ? ` in ${matched.name}` : ""}.`,
+          type: "expense",
+        });
         setExpenseName("");
         setAmount("");
         setDate("");

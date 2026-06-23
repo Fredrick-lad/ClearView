@@ -13,7 +13,7 @@ export default function EditEnvelopeModal({
   onClose,
 }: EditEnvelopeModalProps) {
   const { getEnvelopes } = useAuth();
-  const { selectedEnvelope } = GetData();
+  const { selectedEnvelope, addNotification } = GetData();
 
   const [formdata, setFormdata] = useState({
     name: "",
@@ -37,12 +37,12 @@ export default function EditEnvelopeModal({
   if (!isOpen) return null;
 
   const colors = {
-    deepGreen: "#013328",
-    inputBg: "#F8F9FA",
+    deepGreen: "var(--cv-deep-green)",
+    inputBg: "var(--cv-older-card-bg)",
     inputBorder: "rgba(0, 0, 0, 0.12)",
-    mintActiveBg: "#CCECE0",
-    mintActiveBorder: "#0A4433",
-    footerBg: "#F3F4F6",
+    mintActiveBg: "var(--cv-light-green-accent)",
+    mintActiveBorder: "var(--cv-deep-green)",
+    footerBg: "var(--cv-older-card-bg)",
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,6 +74,11 @@ export default function EditEnvelopeModal({
       );
       if (response.ok) {
         await getEnvelopes();
+        addNotification({
+          title: "Envelope Updated",
+          description: `"${formdata.name}" has been updated.`,
+          type: "edit",
+        });
         onClose();
       } else {
         const data = await response.json().catch(() => ({}));

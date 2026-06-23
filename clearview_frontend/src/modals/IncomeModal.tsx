@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../hooks/context/userContext";
+import { GetData } from "../hooks/context/generalContext";
+import { formatCurrency } from "../utils/format";
 
 interface AddIncomeModalProps {
   isOpen: boolean;
@@ -11,6 +13,7 @@ export default function AddIncomeModal({
   onClose,
 }: AddIncomeModalProps) {
   const { addIncome, addIncomePeriod, periodData } = useAuth();
+  const { addNotification } = GetData();
 
   const [source, setSource] = useState("");
   const [amount, setAmount] = useState("");
@@ -44,6 +47,12 @@ export default function AddIncomeModal({
         period_id,
         source,
         total_amount: parseFloat(amount),
+      });
+
+      addNotification({
+        title: "Income Received",
+        description: `${formatCurrency(parseFloat(amount))} from "${source}" has been recorded.`,
+        type: "income",
       });
 
       setSource("");
