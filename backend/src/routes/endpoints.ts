@@ -225,6 +225,21 @@ routes.post("/addenvelope" , TokenAuthenticator, async(req:Request, res:Response
     })
   })
 
+  routes.put("/editenvelope/:id", TokenAuthenticator, async (req: Request, res: Response) => {
+    const env_id = req.params.id;
+    const { name, limit, icon } = req.body;
+    try {
+      await pool.query(
+        "UPDATE Envelopes SET name = ?, monthly_limit = ?, icon_name = ? WHERE id = ?",
+        [name, limit, icon, env_id],
+      );
+      return res.status(200).json({ message: "Envelope updated successfully" });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  })
+
   routes.delete("/deleteenvelope/:id",TokenAuthenticator, async(req:Request,res:Response)=>{
     const env_id = req.params.id;
     try {
@@ -246,13 +261,55 @@ routes.post("/addenvelope" , TokenAuthenticator, async(req:Request, res:Response
     })
     }
     const response  = await pool.query(
-      "INSERT INTO Expenses(user_id,envelope_id,period_id,amount,description,expense_date,expense_name) VALUES (?,?,?,?,?)",[user_id,envelope_id,period_id,amount,description,expense_date,expense_name]
+      "INSERT INTO Expenses(user_id,envelope_id,period_id,amount,description,expense_date,expense_name) VALUES (?,?,?,?,?,?,?)",[user_id,envelope_id,period_id,amount,description,expense_date,expense_name]
+    )
+    await pool.query(
+      "UPDATE Envelopes SET current_spend = current_spend + ? WHERE id = ?",
+      [amount, envelope_id],
     )
     return res.status(200).json({
       message:"Envelope registered succesfully"
     })
 
   })
+  routes.put("/editexpense/:id", TokenAuthenticator, async (req: Request, res: Response) => {
+    const expense_id = req.params.id;
+    const { expense_name, amount, expense_date, envelope_id, description } = req.body;
+    try {
+      const [oldRows]: any = await pool.query(
+        "SELECT envelope_id, amount FROM Expenses WHERE id = ?",
+        [expense_id],
+      );
+      const oldEnvelopeId = oldRows[0]?.envelope_id;
+      const oldAmount = oldRows[0]?.amount;
+
+      await pool.query(
+        "UPDATE Expenses SET expense_name = ?, amount = ?, expense_date = ?, envelope_id = ?, description = ? WHERE id = ?",
+        [expense_name, amount, expense_date, envelope_id, description, expense_id],
+      );
+
+      const affected = new Set<number>();
+      if (oldEnvelopeId) affected.add(oldEnvelopeId);
+      if (envelope_id) affected.add(envelope_id);
+
+      for (const envId of affected) {
+        const [sumRows]: any = await pool.query(
+          "SELECT COALESCE(SUM(amount), 0) AS total FROM Expenses WHERE envelope_id = ?",
+          [envId],
+        );
+        await pool.query(
+          "UPDATE Envelopes SET current_spend = ? WHERE id = ?",
+          [sumRows[0].total, envId],
+        );
+      }
+
+      return res.status(200).json({ message: "Expense updated successfully" });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  })
+
   routes.post("/addperiod", TokenAuthenticator, async(req:Request,res:Response)=>{
     const {user_id,label,start_date,end_date}=req.body
     const [period]:any = await pool.query(
@@ -280,34 +337,88 @@ routes.post("/logout" , TokenAuthenticator, (req:Request,res:Response)=>{
   res.status(200).json({message:"Logged out succesfully"})
 })
 
-// routes.get("/:id", TokenAuthenticator, async (req:Request, res:Response)=>{
-//   const userId = req.params.id;
-//   try {
-//     const [rows] = await pool.query<UserRow[]>(
-//     "SELECT username,email FROM users WHERE id=?",[userId]
-//   )
-//   if(rows.length === 0){
-//     return res.status(404).json({message: "User Not Found"})
-//   }
-//   const user = rows[0];
+routes.put("/update-profile", TokenAuthenticator, async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const { firstName, lastName, email } = req.body;
 
-//   return res.status(200).json({
-//     user : user?.username,
-//     email: user?.email,
-//   })
-// } catch (error) {
-//   console.log(error);
-//   return res.status(500).json({message: "INTERNAL SERVER ERROR"})
-    
-//   }
-// })
-  
-// routes.get("envelopes", TokenAuthenticator, async (req: Request, res:Response)=> {
+    if (!firstName || !email) {
+      return res.status(400).json({ message: "First name and email are required" });
+    }
 
-// } )
-// routes.get("/dashboardData", TokenAuthenticator, async (req:Request, res:Response)=>{
-  
-// })
+    await pool.query(
+      "UPDATE Users SET firstName = ?, lastName = ?, email = ? WHERE id = ?",
+      [firstName, lastName || null, email, user.userid],
+    );
+
+    return res.status(200).json({ message: "Profile updated successfully" });
+  } catch (error) {
+    console.error("Update profile error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+routes.put("/change-password", TokenAuthenticator, async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: "Current and new password are required" });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: "New password must be at least 6 characters" });
+    }
+
+    const [rows]: any = await pool.query(
+      "SELECT password_hash FROM Users WHERE id = ?",
+      [user.userid],
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, rows[0].password_hash);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Current password is incorrect" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const password_hash = await bcrypt.hash(newPassword, salt);
+
+    await pool.query(
+      "UPDATE Users SET password_hash = ? WHERE id = ?",
+      [password_hash, user.userid],
+    );
+
+    return res.status(200).json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error("Change password error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+routes.delete("/delete-account", TokenAuthenticator, async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const userId = user.userid;
+
+    await pool.query("DELETE FROM Expenses WHERE user_id = ?", [userId]);
+    await pool.query("DELETE FROM IncomeAllocation WHERE income_id IN (SELECT id FROM Income WHERE user_id = ?)", [userId]);
+    await pool.query("DELETE FROM Income WHERE user_id = ?", [userId]);
+    await pool.query("DELETE FROM Envelopes WHERE user_id = ?", [userId]);
+    await pool.query("DELETE FROM BudgetPeriods WHERE user_id = ?", [userId]);
+    await pool.query("DELETE FROM Users WHERE id = ?", [userId]);
+
+    res.clearCookie("token");
+    return res.status(200).json({ message: "Account deleted successfully" });
+  } catch (error) {
+    console.error("Delete account error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 export default routes;
 
