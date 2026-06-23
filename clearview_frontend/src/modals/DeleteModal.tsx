@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../hooks/context/userContext";
 import { GetData } from "../hooks/context/generalContext";
+import API_BASE_URL from "../utils/api";
 
 interface DeleteEnvelopeModalProps {
   isOpen: boolean;
@@ -37,7 +38,7 @@ export default function DeleteEnvelopeModal({
     setError("");
     try {
       const response = await fetch(
-        `http://localhost:4000/deleteenvelope/${selectedEnvelope.id}`,
+        `${API_BASE_URL}/deleteenvelope/${selectedEnvelope.id}`,
         {
           method: "DELETE",
           credentials: "include",

@@ -51,12 +51,13 @@ routes.post("/login", async (req: Request, res: Response) => {
     }
     const token = generateToken(payload);
 
+    const isProd = process.env.VERCEL === "1";
     res.cookie("token", token, {
       httpOnly: true,
-      secure:true,
-      sameSite: "strict",
-      maxAge: 36000000
-    })
+      secure: isProd,
+      sameSite: isProd ? "none" : "strict",
+      maxAge: 36000000,
+    });
     console.log(user.id)
     return res.json({
       user: {
@@ -98,12 +99,13 @@ routes.post("/register", async (req: Request, res: Response) => {
     }
     const token = generateToken(payload);
 
-    res.cookie("token", token,{
-      httpOnly:true,
-      secure:false,
-      sameSite: "strict",
+    const isProd = process.env.VERCEL === "1";
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "none" : "strict",
       maxAge: 36000000,
-    })
+    });
     console.log(registerdetails.insertId)
     return res.status(201).json({
       user: {

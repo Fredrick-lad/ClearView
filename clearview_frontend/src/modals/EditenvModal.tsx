@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../hooks/context/userContext";
 import { GetData } from "../hooks/context/generalContext";
 import { iconMap } from "../components/ui/iconMap";
+import API_BASE_URL from "../utils/api";
 
 interface EditEnvelopeModalProps {
   isOpen: boolean;
@@ -60,7 +61,7 @@ export default function EditEnvelopeModal({
     setError("");
     try {
       const response = await fetch(
-        `http://localhost:4000/editenvelope/${selectedEnvelope.id}`,
+        `${API_BASE_URL}/editenvelope/${selectedEnvelope.id}`,
         {
           method: "PUT",
           credentials: "include",

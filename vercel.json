@@ -1,0 +1,7 @@
+{
+  "buildCommand": "cd clearview_frontend && npm install && npm run build",
+  "outputDirectory": "clearview_frontend/dist",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

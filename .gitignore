@@ -17,3 +17,6 @@ build/
 .idea/
 *.swp
 *~
+
+# Vercel
+.vercel

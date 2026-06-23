@@ -9,6 +9,7 @@ import type {
 } from "../../types";
 import LoadingScreen from "../../components/loadingscreen";
 import { useNavigate } from "react-router-dom";
+import API_BASE_URL from "../../utils/api";
 
 // The context bluePrint
 
@@ -74,7 +75,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const fetchDashboardData = async () => {
     try {
-      const response = await fetch(`http://localhost:4000/me`, {
+      const response = await fetch(`${API_BASE_URL}/me`, {
         method: "GET",
         credentials: "include",
       });
@@ -135,7 +136,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         setError("All fields need to be filled");
         return false;
       }
-      const response = await fetch("http://localhost:4000/login", {
+      const response = await fetch(`${API_BASE_URL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -179,7 +180,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     setEmail(trimmedEmail);
 
     try {
-      const emailresponse = await fetch("http://localhost:4000/checkemail", {
+      const emailresponse = await fetch(`${API_BASE_URL}/checkemail`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: trimmedEmail }),
@@ -219,7 +220,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     };
     setIsLoading(true);
     try {
-      const response = await fetch("http://localhost:4000/register", {
+      const response = await fetch(`${API_BASE_URL}/register`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -252,7 +253,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         ...envelope_data,
         id: userData?.id,
       };
-      await fetch("http://localhost:4000/addenvelope", {
+      await fetch(`${API_BASE_URL}/addenvelope`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -270,7 +271,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const getEnvelopes = async () => {
-    const response = await fetch("http://localhost:4000/getenvelopes", {
+    const response = await fetch(`${API_BASE_URL}/getenvelopes`, {
       method: "GET",
       credentials: "include",
     });
@@ -286,7 +287,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         ...period,
         user_id,
       };
-      const response = await fetch("http://localhost:4000/addperiod", {
+      const response = await fetch(`${API_BASE_URL}/addperiod`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -310,7 +311,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       user_id,
     };
     try {
-      const response = await fetch("http://localhost:4000/addincome", {
+      const response = await fetch(`${API_BASE_URL}/addincome`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -333,7 +334,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         ...expenseData,
       };
 
-      const response = await fetch("http://localhost:4000/addexpense", {
+      const response = await fetch(`${API_BASE_URL}/addexpense`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -355,7 +356,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const updateExpense = async (id: number, expenseData: any) => {
     try {
-      const response = await fetch(`http://localhost:4000/editexpense/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/editexpense/${id}`, {
         method: "PUT",
         credentials: "include",
         headers: {
@@ -381,7 +382,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     email: string;
   }) => {
     try {
-      const response = await fetch("http://localhost:4000/update-profile", {
+      const response = await fetch(`${API_BASE_URL}/update-profile`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -403,7 +404,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     newPassword: string,
   ) => {
     try {
-      const response = await fetch("http://localhost:4000/change-password", {
+      const response = await fetch(`${API_BASE_URL}/change-password`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -419,7 +420,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const deleteAccount = async () => {
     try {
-      const response = await fetch("http://localhost:4000/delete-account", {
+      const response = await fetch(`${API_BASE_URL}/delete-account`, {
         method: "DELETE",
         credentials: "include",
       });
