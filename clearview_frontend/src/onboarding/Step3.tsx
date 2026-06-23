@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { GetData } from "../hooks/context/generalContext";
 import CreateEnvelopeModal from "../modals/EnvelopeModal";
 import { useAuth } from "../hooks/context/userContext";
+import OnboardingHelpModal from "../components/OnboardingHelpModal";
+import { formatCurrency } from "../utils/format";
 
 export default function OnboardingStep3() {
   const { getEnvelopes, envelopeData, fetchDashboardData } = useAuth();
@@ -14,6 +16,7 @@ export default function OnboardingStep3() {
 
   const navigate = useNavigate();
   const [finishing, setFinishing] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
 
   const handleFinish = async () => {
     setFinishing(true);
@@ -52,7 +55,7 @@ export default function OnboardingStep3() {
             ClearView
           </div>
 
-          <button className="btn d-flex align-items-center gap-1 text-secondary border-0 p-0 shadow-none small fw-medium">
+          <button className="btn d-flex align-items-center gap-1 text-secondary border-0 p-0 shadow-none small fw-medium" onClick={() => setShowHelp(true)}>
             <HelpCircle size={18} />
           </button>
         </header>
@@ -161,7 +164,7 @@ export default function OnboardingStep3() {
                 <div className="text-muted" style={{ fontSize: "0.7rem" }}>Envelopes</div>
               </div>
               <div className="bg-light rounded-3 px-3 py-2 text-center">
-                <div className="fw-bold text-dark">KES {totalBudget.toLocaleString()}</div>
+                <div className="fw-bold text-dark">{formatCurrency(totalBudget)}</div>
                 <div className="text-muted" style={{ fontSize: "0.7rem" }}>Total Budget</div>
               </div>
             </div>
@@ -235,7 +238,7 @@ export default function OnboardingStep3() {
                         className="text-muted"
                         style={{ fontSize: "0.78rem" }}
                       >
-                        KES {envelope.monthly_limit.toLocaleString()} limit
+                        {formatCurrency(envelope.monthly_limit)} limit
                       </span>
                     </div>
 
@@ -275,7 +278,7 @@ export default function OnboardingStep3() {
                         className="fw-bold"
                         style={{ color: statusColor.text, fontSize: "0.95rem" }}
                       >
-                        KES {remainingBudget.toLocaleString()}
+                        {formatCurrency(remainingBudget)}
                       </span>
                     </div>
                   </div>
@@ -378,6 +381,7 @@ export default function OnboardingStep3() {
             </button>
           </div>
         </footer>
+        {showHelp && <OnboardingHelpModal step={3} onClose={() => setShowHelp(false)} />}
       </div>
     </>
   );

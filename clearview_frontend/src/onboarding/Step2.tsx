@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/context/userContext";
+import OnboardingHelpModal from "../components/OnboardingHelpModal";
+import { formatCurrency } from "../utils/format";
 
 interface IncomeEntry {
   source: string;
@@ -27,8 +29,7 @@ export default function OnboardingStep2() {
     month: "long",
     year: "numeric",
   });
-  const semesterLabel =
-    now.getMonth() < 6 ? "Semester 1" : "Semester 2";
+  const semesterLabel = now.getMonth() < 6 ? "Semester 1" : "Semester 2";
   const defaultLabel = `${semesterLabel} – ${currentMonth}`;
   const defaultStart = new Date(now.getFullYear(), now.getMonth(), 1)
     .toISOString()
@@ -53,6 +54,7 @@ export default function OnboardingStep2() {
   ]);
 
   const [saving, setSaving] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
 
   const totalIncome = useMemo(
     () => incomes.reduce((sum, inc) => sum + parseFloat(inc.amount || "0"), 0),
@@ -110,18 +112,34 @@ export default function OnboardingStep2() {
   };
 
   const setupDefaultEnvelopes = async (totalLimit: number) => {
-    const food = (totalLimit * 0.3).toFixed(2);
-    const transport = (totalLimit * 0.15).toFixed(2);
-    const housing = (totalLimit * 0.25).toFixed(2);
-    const academics = (totalLimit * 0.2).toFixed(2);
-    const entertainment = (totalLimit * 0.1).toFixed(2);
+    const allocated = totalLimit * 0.7;
+    const food = (allocated * 0.3).toFixed(2);
+    const transport = (allocated * 0.15).toFixed(2);
+    const housing = (allocated * 0.25).toFixed(2);
+    const academics = (allocated * 0.2).toFixed(2);
+    const entertainment = (allocated * 0.1).toFixed(2);
 
     const envelopes = [
-      { name: "Food and Dining", limit: food, spend: 0.0, icon: "UtensilsCrossed" },
+      {
+        name: "Food and Dining",
+        limit: food,
+        spend: 0.0,
+        icon: "UtensilsCrossed",
+      },
       { name: "Transport", limit: transport, spend: 0.0, icon: "Bus" },
-      { name: "Housing and Utilities", limit: housing, spend: 0.0, icon: "Home" },
+      {
+        name: "Housing and Utilities",
+        limit: housing,
+        spend: 0.0,
+        icon: "Home",
+      },
       { name: "Academic Supplies", limit: academics, spend: 0.0, icon: "Book" },
-      { name: "Entertainment", limit: entertainment, spend: 0.0, icon: "Gamepad2" },
+      {
+        name: "Entertainment",
+        limit: entertainment,
+        spend: 0.0,
+        icon: "Gamepad2",
+      },
     ];
 
     await Promise.all(envelopes.map((env) => registerEnvelope(env)));
@@ -171,19 +189,28 @@ export default function OnboardingStep2() {
         >
           ClearView
         </div>
-        <button className="btn d-flex align-items-center gap-1 text-secondary border-0 p-0 shadow-none small fw-medium">
+        <button className="btn d-flex align-items-center gap-1 text-secondary border-0 p-0 shadow-none small fw-medium" onClick={() => setShowHelp(true)}>
           <HelpCircle size={18} />
           Support
         </button>
       </header>
 
-      <main className="flex-grow-1 container py-5" style={{ maxWidth: "800px" }}>
+      <main
+        className="flex-grow-1 container py-5"
+        style={{ maxWidth: "800px" }}
+      >
         <div className="mb-5">
-          <div className="d-flex justify-content-between align-items-center mb-2 text-uppercase fw-bold text-muted" style={{ fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+          <div
+            className="d-flex justify-content-between align-items-center mb-2 text-uppercase fw-bold text-muted"
+            style={{ fontSize: "0.75rem", letterSpacing: "0.05em" }}
+          >
             <span>Step 2 of 3: Your Income as a Student</span>
             <span>66%</span>
           </div>
-          <div className="progress" style={{ height: "6px", backgroundColor: "#e9ecef" }}>
+          <div
+            className="progress"
+            style={{ height: "6px", backgroundColor: "#e9ecef" }}
+          >
             <div
               className="progress-bar"
               role="progressbar"
@@ -215,7 +242,10 @@ export default function OnboardingStep2() {
         <form onSubmit={handleNext}>
           <div className="card border-1 mb-4 bg-white p-4 rounded-3 shadow-sm">
             <div className="d-flex align-items-center justify-content-between mb-3">
-              <span className="text-uppercase fw-bold text-muted" style={{ fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+              <span
+                className="text-uppercase fw-bold text-muted"
+                style={{ fontSize: "0.75rem", letterSpacing: "0.05em" }}
+              >
                 Academic Period
               </span>
               <div className="d-flex gap-2">
@@ -304,7 +334,10 @@ export default function OnboardingStep2() {
                 </button>
               )}
 
-              <span className="text-uppercase fw-bold text-muted mb-3 d-block" style={{ fontSize: "0.75rem", letterSpacing: "0.05em" }}>
+              <span
+                className="text-uppercase fw-bold text-muted mb-3 d-block"
+                style={{ fontSize: "0.75rem", letterSpacing: "0.05em" }}
+              >
                 Income Source {idx + 1}
               </span>
 
@@ -335,9 +368,13 @@ export default function OnboardingStep2() {
                       handleIncomeChange(idx, "category", e.target.value)
                     }
                   >
-                    <option value="Parent/Guardian Allowance">Parent/Guardian Allowance</option>
+                    <option value="Parent/Guardian Allowance">
+                      Parent/Guardian Allowance
+                    </option>
                     <option value="Part-time Job">Part-time Job</option>
-                    <option value="Scholarship/Bursary">Scholarship / Bursary</option>
+                    <option value="Scholarship/Bursary">
+                      Scholarship / Bursary
+                    </option>
                     <option value="Student Loan">Student Loan</option>
                     <option value="Freelance">Freelance</option>
                     <option value="Side Hustle">Side Hustle</option>
@@ -416,7 +453,7 @@ export default function OnboardingStep2() {
                   TOTAL ESTIMATED INCOME
                 </div>
                 <div className="fs-4 fw-bold" style={{ color: "#053225" }}>
-                  KES {totalIncome.toFixed(2)}
+                  {formatCurrency(totalIncome)}
                 </div>
               </div>
             </div>
@@ -456,14 +493,13 @@ export default function OnboardingStep2() {
                 opacity: saving || totalIncome <= 0 ? 0.6 : 1,
               }}
             >
-              <span>
-                {saving ? "Saving…" : "Next: Set Up Envelopes"}
-              </span>
+              <span>{saving ? "Saving…" : "Next: Set Up Envelopes"}</span>
               <ArrowRight size={16} />
             </button>
           </div>
         </div>
       </footer>
+      {showHelp && <OnboardingHelpModal step={2} onClose={() => setShowHelp(false)} />}
     </div>
   );
 }

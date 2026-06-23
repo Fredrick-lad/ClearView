@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { HelpCircle, ArrowRight, Target, PiggyBank, Calendar, CreditCard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import OnboardingHelpModal from "../components/OnboardingHelpModal";
 
 const goals = [
   {
@@ -32,6 +33,7 @@ const goals = [
 export default function OnboardingWelcome() {
   const navigate = useNavigate();
   const [selectedGoal, setSelectedGoal] = useState<string | null>(null);
+  const [showHelp, setShowHelp] = useState(false);
 
   const handleGetStarted = () => {
     if (selectedGoal) {
@@ -58,7 +60,7 @@ export default function OnboardingWelcome() {
         >
           ClearView
         </div>
-        <button className="btn d-flex align-items-center gap-1 text-secondary border-0 p-0 shadow-none" style={{ fontSize: "0.9rem", fontWeight: 500 }}>
+        <button className="btn d-flex align-items-center gap-1 text-secondary border-0 p-0 shadow-none" style={{ fontSize: "0.9rem", fontWeight: 500 }} onClick={() => setShowHelp(true)}>
           <HelpCircle size={18} className="text-secondary" />
           Help
         </button>
@@ -151,6 +153,7 @@ export default function OnboardingWelcome() {
           <ArrowRight size={16} strokeWidth={2.5} />
         </button>
       </main>
+      {showHelp && <OnboardingHelpModal step={1} onClose={() => setShowHelp(false)} />}
     </div>
   );
 }
