@@ -9,6 +9,7 @@ import {
   LogOut,
   Settings,
   User,
+  MessageSquare,
 } from "lucide-react";
 
 interface SidebarProps {
@@ -67,11 +68,16 @@ export default function Sidebar({
       id: "settings",
       label: "Settings",
     },
-    // {
-    //   icon: <Headset className="text-brand" />,
-    //   id: "helpCenter",
-    //   label: "Help Center",
-    // },
+    {
+      icon: <Headset className="text-brand" />,
+      id: "helpCenter",
+      label: "Help Center",
+    },
+    {
+      icon: <MessageSquare className="text-brand" />,
+      id: "contactSupport",
+      label: "Contact Support",
+    },
     {
       icon: <LogOut className="text-brand" />,
       id: "logout",
@@ -83,9 +89,8 @@ export default function Sidebar({
     <aside
       style={{
         width: 220,
-        borderRight: "1px solid #e5e7eb",
-        // height: "100vh",
-        // position: "relative",
+        borderRight: "1px solid var(--cv-sidebar-border)",
+        backgroundColor: "var(--cv-sidebar-bg)",
       }}
       className="d-flex justify-content-between flex-column h-100 p-2 z-2"
     >
@@ -104,16 +109,16 @@ export default function Sidebar({
           <div key={it.id} style={{ marginBottom: 8 }}>
             <button
               onClick={() => setScreen(it.id)}
-              style={{
-                width: "100%",
-                textAlign: "left",
-                padding: "8px 10px",
-                border: "none",
-                background: screen === it.id ? "#E1F5EE" : "transparent",
-                cursor: "pointer",
-                borderLeft: screen === it.id ? "3px solid #1D9E75" : "none",
-                paddingLeft: screen === it.id ? "8px" : "none",
-              }}
+                style={{
+                  width: "100%",
+                  textAlign: "left",
+                  padding: "8px 10px",
+                  border: "none",
+                  background: screen === it.id ? "var(--cv-nav-active-bg)" : "transparent",
+                  cursor: "pointer",
+                  borderLeft: screen === it.id ? "3px solid var(--cv-nav-active-border)" : "none",
+                  paddingLeft: screen === it.id ? "8px" : "none",
+                }}
             >
               <div className="d-flex gap-2">
                 {it.icon}
@@ -134,10 +139,10 @@ export default function Sidebar({
                 textAlign: "left",
                 padding: "8px 10px",
                 border: "none",
-                background: screen === supp.id ? "#E1F5EE" : "transparent",
+                background: screen === supp.id ? "var(--cv-nav-active-bg)" : "transparent",
                 cursor: "pointer",
 
-                borderLeft: screen === supp.id ? "3px solid #1D9E75" : "none",
+                borderLeft: screen === supp.id ? "3px solid var(--cv-nav-active-border)" : "none",
                 paddingLeft: screen === supp.id ? "8px" : "none",
               }}
             >

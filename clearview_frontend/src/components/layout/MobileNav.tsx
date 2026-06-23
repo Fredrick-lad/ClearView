@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { Icon } from "../ui/iconMap";
 import type { ScreenKey } from "../../types";
-import { Settings, User, Bell } from "lucide-react";
+import { Settings, User, Bell, HelpCircle } from "lucide-react";
 import { GetData } from "../../hooks/context/generalContext";
 
 function MobileNav() {
@@ -40,7 +40,6 @@ function MobileNav() {
       className="d-flex flex-row justify-content-around align-items-center w-100 bg-white border-top shadow-sm"
       style={{
         padding: "6px 0 constant(safe-area-inset-bottom)",
-        padding: "6px 0 env(safe-area-inset-bottom)",
         minHeight: "60px",
       }}
     >
@@ -54,8 +53,10 @@ function MobileNav() {
             style={{
               padding: "4px 8px",
               cursor: "pointer",
-              color: isActive ? "#1D9E75" : "#6c757d",
-              borderBottom: isActive ? "3px solid #1D9E75" : "3px solid transparent",
+              color: isActive ? "var(--cv-nav-active-text)" : "var(--cv-nav-inactive-text)",
+              borderBottom: isActive
+                ? "3px solid var(--cv-nav-active-border)"
+                : "3px solid transparent",
               transition: "color 0.15s, border-color 0.15s",
               minWidth: "56px",
             }}
@@ -83,13 +84,19 @@ function MobileNav() {
         style={{
           padding: "4px 8px",
           cursor: "pointer",
-          color: screen === "Profile" ? "#1D9E75" : "#6c757d",
-          borderBottom: screen === "Profile" ? "3px solid #1D9E75" : "3px solid transparent",
+          color: screen === "Profile" ? "var(--cv-nav-active-text)" : "var(--cv-nav-inactive-text)",
+          borderBottom:
+            screen === "Profile"
+              ? "3px solid var(--cv-nav-active-border)"
+              : "3px solid transparent",
           transition: "color 0.15s, border-color 0.15s",
           minWidth: "56px",
         }}
       >
-        <User size={18} className={screen === "Profile" ? "text-success" : "text-secondary"} />
+        <User
+          size={18}
+          className={screen === "Profile" ? "text-success" : "text-secondary"}
+        />
         <span
           style={{
             fontSize: "10px",
@@ -100,6 +107,41 @@ function MobileNav() {
           }}
         >
           Profile
+        </span>
+      </button>
+
+      {/* Help */}
+      <button
+        onClick={() => setScreen("helpCenter")}
+        className="d-flex flex-column align-items-center justify-content-center gap-1 border-0 bg-transparent"
+        style={{
+          padding: "4px 8px",
+          cursor: "pointer",
+          color: screen === "helpCenter" ? "var(--cv-nav-active-text)" : "var(--cv-nav-inactive-text)",
+          borderBottom:
+            screen === "helpCenter"
+              ? "3px solid var(--cv-nav-active-border)"
+              : "3px solid transparent",
+          transition: "color 0.15s, border-color 0.15s",
+          minWidth: "56px",
+        }}
+      >
+        <HelpCircle
+          size={18}
+          className={
+            screen === "helpCenter" ? "text-success" : "text-secondary"
+          }
+        />
+        <span
+          style={{
+            fontSize: "10px",
+            fontWeight: screen === "helpCenter" ? 700 : 500,
+            lineHeight: 1.1,
+            letterSpacing: "0.02em",
+            whiteSpace: "nowrap",
+          }}
+        >
+          Help
         </span>
       </button>
     </nav>
