@@ -19,26 +19,23 @@ $ui-border:           #E0E0E0; // Light layout borders
 $muted-slate:         #4A4A50; // Darker slate for stronger structural lines
 
 // Typography Setup
-// Playfair Display works beautifully for grand headers, but a clean Sans-Serif 
-// like Plus Jakarta Sans keeps your data rows, numbers, and inputs sharp.
 $font-family-serif:      'Playfair Display', Georgia, serif;
 $font-family-sans-serif: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-$font-family-base:       $font-family-sans-serif; // Defaults layout to clean text
+$font-family-base:       $font-family-sans-serif;
 
 // Heading Customization
-$headings-font-family:   $font-family-serif; // Keeps the editorial vibe for big greetings
+$headings-font-family:   $font-family-serif;
 
 // ==========================================================================
 // Bootstrap Theme Map Overrides
 // ==========================================================================
-// Overriding Bootstrap defaults to look completely native
 $primary:       $brand;
 $secondary:     $ui-text-dim;
 $body-bg:       $ui-bg;
 $body-color:    $ui-text;
 $border-color:  $ui-border;
 
-// Custom utility mappings so you can use classes like text-brand-active directly
+// Custom utility mappings
 $custom-colors: (
   "brand":        $brand,
   "brand-active": $brand-active,
@@ -52,7 +49,158 @@ $custom-colors: (
 
 @import 'bootstrap/scss/variables';
 
-// Merge our custom map into Bootstrap's existing theme map
 $theme-colors: map-merge($theme-colors, $custom-colors);
 
 @import 'bootstrap/scss/bootstrap';
+
+// ==========================================================================
+// ClearView CSS Custom Properties (for inline style dark mode support)
+// ==========================================================================
+
+:root {
+  --cv-primary-dark: #0a3d34;
+  --cv-primary-light: #e2f2ee;
+  --cv-insight-bg: #013328;
+  --cv-card-dark-bg: #013328;
+  --cv-main-bg: #f8fafc;
+  --cv-button-bg: #004d40;
+  --cv-deep-green: #0A4433;
+  --cv-mint-bg: #EBF5F1;
+  --cv-light-green-accent: #CCECE0;
+  --cv-danger-light: #FDE8E8;
+  --cv-danger-text: #C81E1E;
+  --cv-dark-bg: #26292B;
+  --cv-card-bg: #FFFFFF;
+  --cv-body-bg: #F9F8F4;
+  --cv-text-primary: #18181A;
+  --cv-text-dim: #8A8A94;
+  --cv-border: #E0E0E0;
+  --cv-brand-light: #E1F5EE;
+  --cv-envelope-card-bg: #daf5ee;
+  --cv-unread-bg: #EDF9F4;
+  --cv-older-card-bg: #F8F9FA;
+  --cv-accent-green: #34d399;
+  --cv-light-gray: #f8fafc;
+  --cv-sidebar-bg: #FFFFFF;
+  --cv-sidebar-border: #e5e7eb;
+  --cv-nav-active-bg: #E1F5EE;
+  --cv-nav-active-border: #1D9E75;
+  --cv-nav-active-text: #1D9E75;
+  --cv-nav-inactive-text: #6c757d;
+}
+
+[data-bs-theme="dark"] {
+  --cv-primary-dark: #6ECFB0;
+  --cv-primary-light: #1a3d32;
+  --cv-insight-bg: #0F2D24;
+  --cv-card-dark-bg: #1A2C26;
+  --cv-main-bg: #1A1C1E;
+  --cv-button-bg: #1D9E75;
+  --cv-deep-green: #6ECFB0;
+  --cv-mint-bg: #1a2e26;
+  --cv-light-green-accent: #1a4a3a;
+  --cv-danger-light: #3d1a1a;
+  --cv-danger-text: #ff6b6b;
+  --cv-dark-bg: #1E2022;
+  --cv-card-bg: #1E2022;
+  --cv-body-bg: #161819;
+  --cv-text-primary: #E8E8EA;
+  --cv-text-dim: #9A9AA4;
+  --cv-border: #2E3032;
+
+  // Bootstrap variable overrides for deeper integration
+  --bs-body-bg: #161819;
+  --bs-body-color: #E8E8EA;
+  --bs-tertiary-bg: #1E2022;
+  --cv-brand-light: #1a3d32;
+  --cv-envelope-card-bg: #1a3d32;
+  --cv-unread-bg: #1a3d32;
+  --cv-older-card-bg: #2A2C2E;
+  --cv-accent-green: #6ECFB0;
+  --cv-light-gray: #1A1C1E;
+  --cv-sidebar-bg: #1E2022;
+  --cv-sidebar-border: #2E3032;
+  --cv-nav-active-bg: #1a3d32;
+  --cv-nav-active-border: #34d399;
+  --cv-nav-active-text: #34d399;
+  --cv-nav-inactive-text: #9A9AA4;
+}
+
+// ==========================================================================
+// Dark Mode Overrides for Inline Styles
+// ==========================================================================
+
+[data-bs-theme="dark"] {
+  // Override bg-ui-bg (used on page wrappers)
+  .bg-ui-bg {
+    background-color: var(--cv-body-bg) !important;
+  }
+
+  // Ensure white-background cards adapt
+  .bg-white,
+  [style*="background-color: #fff"],
+  [style*="background-color: rgb(255, 255, 255)"],
+  [style*="background-color: white"] {
+    background-color: var(--cv-card-bg) !important;
+  }
+
+  // Override hardcoded border colors
+  [style*="border-color: rgba(0,0,0,0.12)"] {
+    border-color: rgba(255,255,255,0.12) !important;
+  }
+
+  // Form controls in dark mode
+  .form-select,
+  .form-control {
+    background-color: #2A2C2E;
+    color: #E8E8EA;
+    border-color: #3A3C3E;
+
+    &:focus {
+      background-color: #2A2C2E;
+      color: #E8E8EA;
+    }
+  }
+
+  // Override btn-white or white-bordered buttons
+  .btn-white,
+  [class*="btn"].bg-white {
+    background-color: var(--cv-card-bg) !important;
+    border-color: var(--cv-border) !important;
+    color: var(--cv-text-primary) !important;
+  }
+
+  // Override bg-light in dark mode
+  .bg-light {
+    background-color: #2A2C2E !important;
+  }
+
+  // Ensure text colors adapt
+  .text-dark {
+    color: var(--cv-text-primary) !important;
+  }
+
+  // Fix modals with bg-white
+  [style*="backdrop-filter"] + [style*="background-color"],
+  [class*="modal"] .bg-white {
+    background-color: var(--cv-card-bg) !important;
+    color: var(--cv-text-primary);
+  }
+
+  // Override inline bg-light
+  [style*="background-color: #f8f9fa"] {
+    background-color: #2A2C2E !important;
+  }
+
+  // Card backgrounds
+  .card {
+    background-color: var(--cv-card-bg);
+    color: var(--cv-text-primary);
+  }
+
+  // Shadow elements need transparent backgrounds
+  .shadow-sm,
+  .shadow {
+    background-color: inherit;
+  }
+}
