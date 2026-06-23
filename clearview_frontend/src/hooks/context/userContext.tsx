@@ -32,8 +32,22 @@ interface UserContextType {
   incomeSource: any;
   envelopeData: any;
   setEnvelopeData: any;
+  periodData: any;
+  setPeriodData: any;
   getEnvelopes: any;
   expenses: any;
+  fetchDashboardData: () => Promise<void>;
+  updateProfile: (data: {
+    firstName: string;
+    lastName: string;
+    email: string;
+  }) => Promise<boolean>;
+  updateExpense: (id: number, data: any) => Promise<boolean>;
+  changePassword: (
+    currentPassword: string,
+    newPassword: string,
+  ) => Promise<{ success: boolean; message: string }>;
+  deleteAccount: () => Promise<boolean>;
 
   logoutUser: () => void;
 }
@@ -59,25 +73,33 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const navigate = useNavigate();
 
+  const fetchDashboardData = async () => {
+    try {
+      const response = await fetch(`http://localhost:4000/me`, {
+        method: "GET",
+        credentials: "include",
+      });
+      if (!response.ok) {
+        setError("Failed to load dashboard");
+        return;
+      }
+      const data = await response.json();
+
+      setUserData(data.user);
+      setEnvelopeData(data.envelope);
+      setIncomeSource(data.incomesource);
+      setPeriodData(data.period);
+      setExpenses(data.expenses);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     const checkUser = async () => {
       try {
         setIsLoading(true);
-        const fetchDashboardDetails = await fetch(`http://localhost:4000/me`, {
-          method: "GET",
-          credentials: "include",
-        });
-        if (!fetchDashboardDetails.ok) {
-          setError("Failed to load dashboard");
-          return;
-        }
-        const data = await fetchDashboardDetails.json();
-
-        setUserData(data.user);
-        setEnvelopeData(data.envelope);
-        setIncomeSource(data.incomesource);
-        setPeriodData(data.period);
-        setExpenses(data.expenses);
+        await fetchDashboardData();
       } catch (error) {
         console.error(error);
       } finally {
@@ -289,7 +311,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       user_id,
     };
     try {
-      await fetch("http://localhost:4000/addincome", {
+      const response = await fetch("http://localhost:4000/addincome", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -297,6 +319,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         },
         body: JSON.stringify(payload),
       });
+      if (response.ok) {
+        await fetchDashboardData();
+      }
     } catch (error) {
       console.log(error);
     }
@@ -304,18 +329,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const addExpense = async (expenseData: any) => {
     try {
-      const user_id = userData?.id;
-      const envelope_id = envelopeData.id;
-      const period_id = periodData.id;
-
       const payload = {
+        user_id: userData?.id,
         ...expenseData,
-        user_id,
-        envelope_id,
-        period_id,
       };
 
-      await fetch("http://localhost:4000/addexpense", {
+      const response = await fetch("http://localhost:4000/addexpense", {
         method: "POST",
         credentials: "include",
         headers: {
@@ -323,8 +342,96 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         },
         body: JSON.stringify(payload),
       });
+
+      if (response.ok) {
+        await fetchDashboardData();
+        return true;
+      }
+      return false;
     } catch (error) {
       console.log(error);
+      return false;
+    }
+  };
+
+  const updateExpense = async (id: number, expenseData: any) => {
+    try {
+      const response = await fetch(`http://localhost:4000/editexpense/${id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(expenseData),
+      });
+
+      if (response.ok) {
+        await fetchDashboardData();
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  };
+
+  const updateProfile = async (data: {
+    firstName: string;
+    lastName: string;
+    email: string;
+  }) => {
+    try {
+      const response = await fetch("http://localhost:4000/update-profile", {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (response.ok) {
+        await fetchDashboardData();
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  };
+
+  const changePassword = async (
+    currentPassword: string,
+    newPassword: string,
+  ) => {
+    try {
+      const response = await fetch("http://localhost:4000/change-password", {
+        method: "PUT",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+      const data = await response.json();
+      return { success: response.ok, message: data.message || "" };
+    } catch (error) {
+      console.error(error);
+      return { success: false, message: "Network error" };
+    }
+  };
+
+  const deleteAccount = async () => {
+    try {
+      const response = await fetch("http://localhost:4000/delete-account", {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (response.ok) {
+        setUserData(null);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error(error);
+      return false;
     }
   };
 
@@ -349,8 +456,15 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         incomeSource,
         envelopeData,
         setEnvelopeData,
+        periodData,
+        setPeriodData,
         getEnvelopes,
         expenses,
+        fetchDashboardData,
+        updateProfile,
+        updateExpense,
+        changePassword,
+        deleteAccount,
         logoutUser,
       }}
     >
