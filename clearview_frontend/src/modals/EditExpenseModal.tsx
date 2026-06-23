@@ -1,29 +1,36 @@
 import React, { useState } from "react";
 import { useAuth } from "../hooks/context/userContext";
+import { GetData } from "../hooks/context/generalContext";
 
-interface AddExpenseModalProps {
+interface EditExpenseModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export default function AddExpenseModal({
+export default function EditExpenseModal({
   isOpen,
   onClose,
-}: AddExpenseModalProps) {
-  const { periodData, envelopeData, addExpense } = useAuth();
+}: EditExpenseModalProps) {
+  const { envelopeData, updateExpense } = useAuth();
+  const { selectedExpense } = GetData();
 
-  const [expenseName, setExpenseName] = useState("");
-  const [amount, setAmount] = useState("");
-  const [date, setDate] = useState("");
-  const [envelopeId, setEnvelopeId] = useState("");
-  const [notes, setNotes] = useState("");
+  const [expenseName, setExpenseName] = useState(selectedExpense?.expense_name || "");
+  const [amount, setAmount] = useState(selectedExpense?.amount?.toString() || "");
+  const [date, setDate] = useState(() => {
+    if (selectedExpense?.expense_date) {
+      const d = new Date(selectedExpense.expense_date);
+      return isNaN(d.getTime()) ? selectedExpense.expense_date : d.toISOString().split("T")[0];
+    }
+    return "";
+  });
+  const [envelopeId, setEnvelopeId] = useState(selectedExpense?.envelope_id?.toString() || "");
+  const [notes, setNotes] = useState(selectedExpense?.description || "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  if (!isOpen) return null;
+  if (!isOpen || !selectedExpense) return null;
 
   const envelopes: any[] = Array.isArray(envelopeData) ? envelopeData : [];
-  const period_id = Array.isArray(periodData) ? periodData[0].id : "";
 
   const brandSerif = { fontFamily: "Georgia, serif" };
   const colors = {
@@ -37,24 +44,18 @@ export default function AddExpenseModal({
     setSaving(true);
 
     try {
-      const ok = await addExpense({
+      const ok = await updateExpense(selectedExpense.id, {
         expense_name: expenseName,
         amount: parseFloat(amount),
         expense_date: date,
         envelope_id: parseInt(envelopeId),
         description: notes,
-        period_id: period_id,
       });
 
       if (ok) {
-        setExpenseName("");
-        setAmount("");
-        setDate("");
-        setEnvelopeId("");
-        setNotes("");
         onClose();
       } else {
-        setError("Failed to add expense. Please try again.");
+        setError("Failed to update expense. Please try again.");
       }
     } catch {
       setError("Network error. Please try again.");
@@ -78,7 +79,7 @@ export default function AddExpenseModal({
       >
         <div className="d-flex align-items-center justify-content-between px-4 pt-4 pb-3 border-bottom border-light-subtle">
           <h3 className="h5 mb-0 fw-bold text-dark" style={brandSerif}>
-            Add New Expense
+            Edit Expense
           </h3>
           <button
             onClick={onClose}
@@ -93,20 +94,14 @@ export default function AddExpenseModal({
               stroke="currentColor"
               style={{ width: "20px", height: "20px" }}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18 18 6M6 6l12 12"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
         <div className="p-4">
           <form onSubmit={handleFormSubmit}>
-            {error && (
-              <div className="alert alert-danger py-2 small">{error}</div>
-            )}
+            {error && <div className="alert alert-danger py-2 small">{error}</div>}
 
             <div className="mb-4">
               <label className="form-label text-dark small fw-medium mb-2">
@@ -205,7 +200,7 @@ export default function AddExpenseModal({
                 style={{ backgroundColor: colors.deepGreen }}
                 disabled={saving}
               >
-                {saving ? "Adding…" : "Add Transaction"}
+                {saving ? "Saving…" : "Save Changes"}
               </button>
             </div>
           </form>
