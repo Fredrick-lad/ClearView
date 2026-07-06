@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { createContext, useContext } from "react";
 import { type ModalKind, type ScreenKey } from "../../types";
 
@@ -29,7 +29,26 @@ interface envelopeContextType {
 export const generalContext = createContext<envelopeContextType | null>(null);
 
 function DataContext({ children }: { children: React.ReactNode }) {
-  const [screen, setScreen] = useState<ScreenKey>("Dashboard");
+  const getInitialScreen = (): ScreenKey => {
+    const params = new URLSearchParams(window.location.search);
+    const s = params.get("screen");
+    if (s && ["Dashboard","Envelopes","Expenses","Income","Reports","settings","helpCenter","contactSupport","logout","Profile","Notifications"].includes(s)) {
+      return s as ScreenKey;
+    }
+    return "Dashboard";
+  };
+
+  const [screen, setScreen] = useState<ScreenKey>(getInitialScreen);
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (screen === "Dashboard") {
+      url.searchParams.delete("screen");
+    } else {
+      url.searchParams.set("screen", screen);
+    }
+    window.history.replaceState({}, "", url.toString());
+  }, [screen]);
   const [modal, setModal] = useState<ModalKind>(null);
   const [selectedOption, setSelectedOption] = useState<
     "preset" | "scratch" | null

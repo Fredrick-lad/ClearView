@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../hooks/context/userContext";
+import { GetData } from "../hooks/context/generalContext";
 import TopBar from "../components/layout/Topbar";
 
 const brandColors = {
@@ -10,6 +11,7 @@ const brandColors = {
 
 export default function UserProfileContent() {
   const { userData, updateProfile, changePassword, deleteAccount } = useAuth();
+  const { setScreen } = GetData();
 
   const [pushNotifications, setPushNotifications] = useState(() => {
     return localStorage.getItem("pushNotifications") !== "false";
@@ -103,7 +105,7 @@ export default function UserProfileContent() {
       className="px-3 px-md-4 mx-auto bg-ui-bg pb-5"
       style={{ maxWidth: "1200px" }}
     >
-      <TopBar title="User Profile" />
+      <TopBar title="User Profile" showBack onBack={() => setScreen("Dashboard")} />
 
       <div className="row g-4 mb-4">
         <div className="col-12 col-lg-4">

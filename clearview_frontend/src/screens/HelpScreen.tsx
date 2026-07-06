@@ -79,7 +79,7 @@ export default function HelpScreen() {
       className="px-4 p-md-3 mx-auto bg-ui-bg pb-5"
       style={{ maxWidth: "1200px" }}
     >
-      <TopBar title="Help Center" />
+      <TopBar title="Help Center" showBack onBack={() => setScreen("Dashboard")} />
 
       {/* Quick Guides */}
       <div className="row g-4 mb-4">

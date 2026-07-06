@@ -3,6 +3,8 @@ import { GetData } from "../../hooks/context/generalContext";
 
 interface TopBarProps {
   title: string;
+  showBack?: boolean;
+  onBack?: () => void;
   showActionBtn?: boolean;
   actionBtnText?: string;
   onActionClick?: () => void;
@@ -16,6 +18,8 @@ interface TopBarProps {
 
 export default function TopBar({
   title,
+  showBack = false,
+  onBack,
   showActionBtn = false,
   actionBtnText = "New Envelope",
   onActionClick,
@@ -31,7 +35,23 @@ export default function TopBar({
   return (
     <div className="d-flex justify-content-between align-items-center py-2 py-md-3 z-2 sticky-top bg-ui-bg">
       {/* PAGE TITLE */}
-      <h1 className="h5 h-sm-4 fw-bold mb-0 text-dark" style={{ fontFamily: "serif" }}>
+      <h1 className="h5 h-sm-4 fw-bold mb-0 text-dark d-flex align-items-center gap-2" style={{ fontFamily: "serif" }}>
+        {showBack && (
+          <button
+            type="button"
+            onClick={onBack}
+            className="btn p-0 border-0 bg-transparent d-inline-flex align-items-center shadow-none text-decoration-none"
+            style={{
+              color: "#3A4B5C",
+              fontSize: "18px",
+              lineHeight: 1,
+              cursor: "pointer",
+            }}
+            aria-label="Go back"
+          >
+            <span style={{ fontWeight: "bold", transform: "scaleY(1.2)", display: "inline-block" }}>&lt;</span>
+          </button>
+        )}
         {title}
       </h1>
 

@@ -1,10 +1,11 @@
 import { useState, useMemo } from "react";
 import { useAuth } from "../hooks/context/userContext";
 import { GetData } from "../hooks/context/generalContext";
+import TopBar from "../components/layout/Topbar";
 
 export default function NotificationsView() {
   const { envelopeData } = useAuth();
-  const { notifications, clearNotifications } = GetData();
+  const { notifications, clearNotifications, setScreen } = GetData();
 
   const [markedReadAt, setMarkedReadAt] = useState(() => {
     return localStorage.getItem("notificationsReadAt") || "";
@@ -275,6 +276,7 @@ export default function NotificationsView() {
         className="container-fluid py-4 text-dark"
         style={{ maxWidth: "1000px" }}
       >
+        <TopBar title="Notifications" showBack onBack={() => setScreen("Dashboard")} />
         <div className="text-center py-5">
           <p className="text-muted mb-0">
             No notifications yet. Start adding income, expenses, and envelopes
@@ -290,6 +292,7 @@ export default function NotificationsView() {
       className="container-fluid py-4 text-dark"
       style={{ maxWidth: "1000px" }}
     >
+      <TopBar title="Notifications" showBack onBack={() => setScreen("Dashboard")} />
       <div className="d-flex justify-content-between align-items-center mb-4 pt-2">
         <p className="mb-0 text-secondary" style={{ fontSize: "15px" }}>
           You have{" "}
