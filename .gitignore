@@ -18,5 +18,4 @@ build/
 *.swp
 *~
 
-# Vercel
-.vercel
+

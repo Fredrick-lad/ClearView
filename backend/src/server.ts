@@ -17,10 +17,9 @@ app.use(express.json());
 
 app.use(routes);
 
-if (!process.env.VERCEL) {
-  app.listen(4000, () => {
-    console.log("Server up and Running");
-  });
-}
+const PORT = parseInt(process.env.PORT || "4000");
+app.listen(PORT, () => {
+  console.log(`Server up and Running on port ${PORT}`);
+});
 
 export default app;
