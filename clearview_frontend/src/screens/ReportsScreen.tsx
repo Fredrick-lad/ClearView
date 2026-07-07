@@ -63,6 +63,7 @@ function groupBy<T>(
 
 export default function ReportsScreen() {
   const { incomeSource, envelopeData, expenses } = useAuth();
+  const { goBack } = GetData();
 
   const incomeList: any[] = Array.isArray(incomeSource) ? incomeSource : [];
   const envelopes: any[] = Array.isArray(envelopeData) ? envelopeData : [];
@@ -290,7 +291,7 @@ export default function ReportsScreen() {
         className="px-3 px-md-4 py-3 mx-auto bg-ui-bg min-vh-100"
         style={{ maxWidth: "1200px" }}
       >
-        <TopBar title="Financial Reports" />
+        <TopBar title="Financial Reports" showBack onBack={goBack} />
 
         {/* Period selector */}
         <div
@@ -874,4 +875,18 @@ function IconSwitcher({
       {paths[type] || null}
     </svg>
   );
+}
+
+function GetData(): { goBack: any; } {
+  // Simple helper to provide navigation handlers used by this screen.
+  // Use browser history back by default; in app shell this will navigate
+  // to the previous view. Kept minimal to match the expected return shape.
+  const goBack = () => {
+    try {
+      window.history.back();
+    } catch (e) {
+      // noop
+    }
+  };
+  return { goBack };
 }

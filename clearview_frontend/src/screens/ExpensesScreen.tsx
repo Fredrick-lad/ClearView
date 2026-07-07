@@ -28,7 +28,7 @@ function formatDate(dateStr: string): string {
 
 export default function ExpensesScreen() {
   const { expenses, envelopeData } = useAuth();
-  const { setModal, setSelectedExpense } = GetData();
+  const { setModal, setSelectedExpense, goBack } = GetData();
 
   const expenseList: any[] = Array.isArray(expenses) ? expenses : [];
   const envelopes: any[] = Array.isArray(envelopeData) ? envelopeData : [];
@@ -95,7 +95,7 @@ export default function ExpensesScreen() {
         className="px-3 px-md-4 mx-auto bg-ui-bg pb-5"
         style={{ maxWidth: "1300px" }}
       >
-        <TopBar title="Expenses" showExpenseBtn />
+        <TopBar title="Expenses" showBack onBack={goBack} showExpenseBtn />
         <div className="row g-2 g-md-4 mb-3 mb-md-5">
           <div className="col-12 col-lg-4">
             <div

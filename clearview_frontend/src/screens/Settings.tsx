@@ -6,7 +6,7 @@ import TopBar from "../components/layout/Topbar";
 
 export default function SettingsContent() {
   const { userData, updateProfile, changePassword, deleteAccount, expenses, envelopeData, incomeSource } = useAuth();
-  const { setScreen } = GetData();
+  const { goBack } = GetData();
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -182,7 +182,7 @@ export default function SettingsContent() {
 
   return (
     <div className="px-4 p-md-3 mx-auto bg-ui-bg pb-5" style={{ maxWidth: "1200px" }}>
-      <TopBar title="Settings" showBack onBack={() => setScreen("Dashboard")} />
+      <TopBar title="Settings" showBack onBack={goBack} />
 
       <div className="row g-4">
         <div className="col-12 col-lg-7 d-flex flex-column gap-4">

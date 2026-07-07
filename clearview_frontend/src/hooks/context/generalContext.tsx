@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { createContext, useContext } from "react";
 import { type ModalKind, type ScreenKey } from "../../types";
 
@@ -13,6 +13,7 @@ export interface NotificationItem {
 interface envelopeContextType {
   screen: ScreenKey;
   setScreen: any;
+  goBack: () => void;
   modal: ModalKind;
   setModal: any;
   selectedOption: any;
@@ -35,10 +36,47 @@ function DataContext({ children }: { children: React.ReactNode }) {
     if (s && ["Dashboard","Envelopes","Expenses","Income","Reports","settings","helpCenter","contactSupport","logout","Profile","Notifications"].includes(s)) {
       return s as ScreenKey;
     }
+    const saved = localStorage.getItem("cv_lastScreen");
+    if (saved && ["Dashboard","Envelopes","Expenses","Income","Reports","settings","helpCenter","contactSupport","logout","Profile","Notifications"].includes(saved)) {
+      return saved as ScreenKey;
+    }
     return "Dashboard";
   };
 
-  const [screen, setScreen] = useState<ScreenKey>(getInitialScreen);
+  const [screen, setScreenState] = useState<ScreenKey>(getInitialScreen);
+  const [screenHistory, setScreenHistory] = useState<ScreenKey[]>(() => {
+    try {
+      const saved = localStorage.getItem("cv_screenHistory");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const screenRef = useRef(screen);
+  screenRef.current = screen;
+
+  const setScreen = useCallback((newScreen: ScreenKey) => {
+    if (newScreen === screenRef.current) return;
+    const prev = screenRef.current;
+    setScreenHistory(prevHistory => {
+      const next = [...prevHistory, prev];
+      localStorage.setItem("cv_screenHistory", JSON.stringify(next));
+      return next;
+    });
+    setScreenState(newScreen);
+  }, []);
+
+  const goBack = useCallback(() => {
+    setScreenHistory(prevHistory => {
+      if (prevHistory.length === 0) return prevHistory;
+      const next = prevHistory.slice(0, -1);
+      const prev = prevHistory[prevHistory.length - 1];
+      setScreenState(prev);
+      localStorage.setItem("cv_screenHistory", JSON.stringify(next));
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
     const url = new URL(window.location.href);
@@ -48,6 +86,7 @@ function DataContext({ children }: { children: React.ReactNode }) {
       url.searchParams.set("screen", screen);
     }
     window.history.replaceState({}, "", url.toString());
+    localStorage.setItem("cv_lastScreen", screen);
   }, [screen]);
   const [modal, setModal] = useState<ModalKind>(null);
   const [selectedOption, setSelectedOption] = useState<
@@ -89,6 +128,7 @@ function DataContext({ children }: { children: React.ReactNode }) {
         setSelectedOption,
         screen,
         setScreen,
+        goBack,
         setModal,
         modal,
         selectedEnvelope,

@@ -7,7 +7,7 @@ import { GetData } from "../hooks/context/generalContext";
 export default function LogoutScreen() {
   const { logoutUser } = useAuth();
   const navigate = useNavigate();
-  const { setScreen } = GetData();
+  const { goBack } = GetData();
 
   const handleLogout = () => {
     logoutUser();
@@ -19,7 +19,7 @@ export default function LogoutScreen() {
       className="px-4 p-md-3 mx-auto bg-ui-bg"
       style={{ maxWidth: "600px" }}
     >
-      <TopBar title="Logout" />
+      <TopBar title="Logout" showBack onBack={goBack} />
 
       <div
         className="card bg-white border-0 shadow-sm p-5 text-center"
@@ -50,7 +50,7 @@ export default function LogoutScreen() {
           <button
             className="btn btn-outline-secondary d-inline-flex align-items-center gap-2 px-4 py-2 shadow-none"
             style={{ borderRadius: "8px", fontSize: "14px" }}
-            onClick={() => setScreen("Dashboard")}
+            onClick={goBack}
           >
             <ArrowLeft size={16} />
             Stay logged in

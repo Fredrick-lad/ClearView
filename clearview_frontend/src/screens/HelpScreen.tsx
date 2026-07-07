@@ -72,14 +72,14 @@ const guides = [
 
 export default function HelpScreen() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const { setScreen } = GetData();
+  const { goBack, setScreen } = GetData();
 
   return (
     <div
       className="px-4 p-md-3 mx-auto bg-ui-bg pb-5"
       style={{ maxWidth: "1200px" }}
     >
-      <TopBar title="Help Center" showBack onBack={() => setScreen("Dashboard")} />
+      <TopBar title="Help Center" showBack onBack={goBack} />
 
       {/* Quick Guides */}
       <div className="row g-4 mb-4">

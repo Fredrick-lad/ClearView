@@ -8,7 +8,7 @@ const brandColors = {
 };
 
 export default function ContactSupport() {
-  const { setScreen } = GetData();
+  const { goBack } = GetData();
   const [sent, setSent] = useState(false);
   const [form, setForm] = useState({ subject: "", message: "" });
 
@@ -22,7 +22,7 @@ export default function ContactSupport() {
       className="px-4 p-md-3 mx-auto bg-ui-bg pb-5"
       style={{ maxWidth: "800px" }}
     >
-      <TopBar title="Contact Support" showBack onBack={() => setScreen("Dashboard")} />
+      <TopBar title="Contact Support" showBack onBack={goBack} />
 
       <div className="row g-4 mb-4">
         <div className="col-12 col-md-5">

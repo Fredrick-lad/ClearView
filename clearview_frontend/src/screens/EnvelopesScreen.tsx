@@ -6,7 +6,7 @@ import ProgBar from "../hooks/ProgBar";
 import { formatCurrency } from "../utils/format";
 
 export default function MyEnvelopes() {
-  const { setModal, setSelectedEnvelope } = GetData();
+  const { setModal, setSelectedEnvelope, goBack } = GetData();
   const { envelopeData } = useAuth();
 
   const envelopes: any[] = Array.isArray(envelopeData) ? envelopeData : [];
@@ -65,7 +65,7 @@ export default function MyEnvelopes() {
       className="px-3 px-md-4 mx-auto bg-ui-bg pb-5"
       style={{ maxWidth: "1300px" }}
     >
-      <TopBar title="My Envelopes" showActionBtn />
+      <TopBar title="My Envelopes" showBack onBack={goBack} showActionBtn />
 
       {/* --- SUMMARY CARDS --- */}
       <div className="row g-4 mb-5">

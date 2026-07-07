@@ -1,4 +1,5 @@
 import React from "react";
+import { ArrowLeft } from "lucide-react";
 import { GetData } from "../../hooks/context/generalContext";
 
 interface TopBarProps {
@@ -40,16 +41,27 @@ export default function TopBar({
           <button
             type="button"
             onClick={onBack}
-            className="btn p-0 border-0 bg-transparent d-inline-flex align-items-center shadow-none text-decoration-none"
+            className="btn d-inline-flex align-items-center justify-content-center border-0"
             style={{
-              color: "#3A4B5C",
-              fontSize: "18px",
-              lineHeight: 1,
+              width: "32px",
+              height: "32px",
+              borderRadius: "8px",
+              backgroundColor: "var(--cv-nav-active-bg, #e8f4f0)",
+              color: "var(--cv-primary-dark, #0a3d34)",
               cursor: "pointer",
+              transition: "background-color 0.15s, transform 0.15s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "var(--cv-primary-dark, #38796d)";
+              e.currentTarget.style.color = "#fff";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "var(--cv-nav-active-bg, #e8f4f0)";
+              e.currentTarget.style.color = "var(--cv-primary-dark, #0a3d34)";
             }}
             aria-label="Go back"
           >
-            <span style={{ fontWeight: "bold", transform: "scaleY(1.2)", display: "inline-block" }}>&lt;</span>
+            <ArrowLeft size={16} strokeWidth={2.5} />
           </button>
         )}
         {title}
