@@ -107,6 +107,11 @@ export default function ClearViewLanding() {
               Outcomes
             </a>
           </li>
+          <li>
+            <Link to="/help" style={styles.navLinkItem}>
+              Help
+            </Link>
+          </li>
         </ul>
         <Link to="/register" style={styles.navCta}>
           Start Budgeting

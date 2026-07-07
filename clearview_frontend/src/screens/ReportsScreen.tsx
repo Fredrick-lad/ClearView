@@ -18,6 +18,8 @@ import TopBar from "../components/layout/Topbar";
 import { useAuth } from "../hooks/context/userContext";
 import { iconMap } from "../components/ui/iconMap";
 import { formatCurrency } from "../utils/format";
+import { GetData } from "../hooks/context/generalContext";
+
 
 function formatDate(dateStr: string): string {
   if (!dateStr) return "—";
@@ -877,16 +879,3 @@ function IconSwitcher({
   );
 }
 
-function GetData(): { goBack: any; } {
-  // Simple helper to provide navigation handlers used by this screen.
-  // Use browser history back by default; in app shell this will navigate
-  // to the previous view. Kept minimal to match the expected return shape.
-  const goBack = () => {
-    try {
-      window.history.back();
-    } catch (e) {
-      // noop
-    }
-  };
-  return { goBack };
-}

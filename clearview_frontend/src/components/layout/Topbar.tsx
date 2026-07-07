@@ -143,8 +143,19 @@ export default function TopBar({
           </button>
         )}
 
-        {/* Settings gear (mobile only — MobileNav already has Profile) */}
-        <div className="d-lg-none ms-1 d-flex align-items-center">
+        {/* Help (mobile & desktop) */}
+        <button
+          className="btn p-1 text-dark border-0 d-flex align-items-center justify-content-center opacity-75 hover-opacity-100"
+          onClick={() => setScreen("helpCenter")}
+        >
+          <TopBarIconSwitcher
+            type="help-circle"
+            style={{ width: "20px", height: "20px" }}
+          />
+        </button>
+
+        {/* Settings gear */}
+        <div className="ms-1 d-flex align-items-center">
           <button
             className="btn p-1 text-dark border-0 d-flex align-items-center justify-content-center opacity-75 hover-opacity-100"
             onClick={() => setScreen("settings")}
@@ -156,8 +167,8 @@ export default function TopBar({
           </button>
         </div>
 
-        {/* User profile (desktop only) */}
-        <div className="d-none d-lg-flex ms-1 align-items-center">
+        {/* User profile */}
+        <div className="ms-1 d-flex align-items-center">
           {avatarUrl ? (
             <img
               src={avatarUrl}

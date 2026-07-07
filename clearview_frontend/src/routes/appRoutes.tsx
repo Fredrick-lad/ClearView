@@ -4,6 +4,8 @@ import NotFound from "../components/NotFound";
 import { Login, Register, Forgotpassword } from "../onboarding/onboading";
 import LandingPage from "../components/landingpage";
 import MainScreen from "../screens/MainScreen";
+import PublicHelpScreen from "../screens/PublicHelpScreen";
+import PublicContactScreen from "../screens/PublicContactScreen";
 import ProtectedRoute from "../components/protectedRoute";
 import { UserProvider } from "../hooks/context/userContext";
 import OnboardingWelcome from "../onboarding/Step1";
@@ -52,6 +54,14 @@ const routes = createBrowserRouter([
             <Register />
           </UserProvider>
         ),
+      },
+      {
+        path: "/help",
+        element: <PublicHelpScreen />,
+      },
+      {
+        path: "/contact",
+        element: <PublicContactScreen />,
       },
       {
         path: "*",

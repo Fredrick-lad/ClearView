@@ -125,6 +125,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     setIsLoading(true);
     setUserData(null);
     setError("");
+    localStorage.removeItem("cv_screenHistory");
+    localStorage.removeItem("cv_lastScreen");
     setIsLoading(false);
   };
 

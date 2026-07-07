@@ -1,7 +1,7 @@
 import { type ReactNode } from "react";
 import { Icon } from "../ui/iconMap";
 import type { ScreenKey } from "../../types";
-import { User, HelpCircle } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { GetData } from "../../hooks/context/generalContext";
 
 function MobileNav() {
@@ -79,77 +79,41 @@ function MobileNav() {
         );
       })}
 
-      {/* Profile */}
+      {/* Logout */}
       <button
-        onClick={() => setScreen("Profile")}
+        onClick={() => setScreen("logout")}
         className="d-flex flex-column align-items-center justify-content-center gap-1 border-0 bg-transparent"
         style={{
           padding: "4px 8px",
           cursor: "pointer",
           color:
-            screen === "Profile"
+            screen === "logout"
               ? "var(--cv-nav-active-text)"
               : "var(--cv-nav-inactive-text)",
           borderBottom:
-            screen === "Profile"
+            screen === "logout"
               ? "3px solid var(--cv-nav-active-border)"
               : "3px solid transparent",
           transition: "color 0.15s, border-color 0.15s",
           minWidth: "56px",
         }}
       >
-        <User
-          size={18}
-          className={screen === "Profile" ? "text-success" : "text-secondary"}
-        />
-        <span
-          style={{
-            fontSize: "10px",
-            fontWeight: screen === "Profile" ? 700 : 500,
-            lineHeight: 1.1,
-            letterSpacing: "0.02em",
-            whiteSpace: "nowrap",
-          }}
-        >
-          Profile
-        </span>
-      </button>
-
-      {/* Help */}
-      <button
-        onClick={() => setScreen("helpCenter")}
-        className="d-flex flex-column align-items-center justify-content-center gap-1 border-0 bg-transparent"
-        style={{
-          padding: "4px 8px",
-          cursor: "pointer",
-          color:
-            screen === "helpCenter"
-              ? "var(--cv-nav-active-text)"
-              : "var(--cv-nav-inactive-text)",
-          borderBottom:
-            screen === "helpCenter"
-              ? "3px solid var(--cv-nav-active-border)"
-              : "3px solid transparent",
-          transition: "color 0.15s, border-color 0.15s",
-          minWidth: "56px",
-        }}
-      >
-        <HelpCircle
+        <LogOut
           size={18}
           className={
-            screen === "helpCenter" ? "text-success" : "text-secondary"
+            screen === "logout" ? "text-success" : "text-secondary"
           }
         />
         <span
           style={{
             fontSize: "10px",
-            fontWeight: screen === "helpCenter" ? 700 : 500,
+            fontWeight: screen === "logout" ? 700 : 500,
             lineHeight: 1.1,
             letterSpacing: "0.02em",
             whiteSpace: "nowrap",
           }}
         >
-          Help
+          Logout
         </span>
       </button>
     </nav>
