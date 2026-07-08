@@ -1,11 +1,27 @@
 function LoadingScreen() {
+  const colors = {
+    deepGreen: "#0A4433",
+  };
+
   return (
     <>
-      {/* <div className="d-flex justify-content-center align-items-center vh-100"> */}
-      <div className="position-absolute top-0 bg-dark opacity-10 vh-100 vw-100 d-flex justify-content-center  align-items-center vh-100">
+      <div
+        className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center"
+        style={{
+          backgroundColor: "rgba(212, 222, 218, 0.5)",
+          backdropFilter: "blur(4px)",
+          WebkitBackdropFilter: "blur(4px)", // Ensure Safari support
+          zIndex: 9999, // Kept higher than modal (1050) to overlay correctly if needed
+        }}
+      >
         <div
-          className="spinner-border text-white"
-          style={{ width: "4rem", height: "4rem" }}
+          className="spinner-border"
+          style={{
+            width: "3.5rem",
+            height: "3.5rem",
+            borderWidth: "0.4em",
+            color: colors.deepGreen, // Uses your modal's deep green brand color
+          }}
           role="status"
         >
           <span className="visually-hidden">Loading.....</span>
@@ -14,4 +30,5 @@ function LoadingScreen() {
     </>
   );
 }
+
 export default LoadingScreen;
