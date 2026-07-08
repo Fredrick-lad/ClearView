@@ -57,7 +57,7 @@ export const UserContext = createContext<UserContextType | null>(null);
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [userData, setUserData] = useState<initialdata | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [email, setEmail] = useState<string>(" ");
+  const [, setEmail] = useState<string>(" ");
   const [emailError, setEmailError] = useState<string>(" ");
   const [newEnvelope, setNewEnvelope] = useState<Envelope | null>(null);
   const [incomeSource, setIncomeSource] = useState<
