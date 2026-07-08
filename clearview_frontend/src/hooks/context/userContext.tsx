@@ -151,7 +151,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      console.log("Issues logging in");
+      console.log(error  + "Issues logging in");
       return false;
     }
   };
