@@ -34,7 +34,14 @@ export default function TopBar({
   const { setModal, setScreen } = GetData();
 
   return (
-    <div className="d-flex justify-content-between align-items-center py-2 py-md-3 z-2 sticky-top bg-ui-bg">
+
+<div className="z-2 sticky-top bg-ui-bg">
+      {/* Mobile brand bar */}
+      <div className="d-lg-none text-center py-1" style={{ backgroundColor: "var(--cv-nav-active-bg, #e8f4f0)", cursor: "pointer" }} onClick={() => setScreen("Dashboard")}>
+        <span style={{ fontFamily: "Georgia, serif", fontSize: "13px", fontWeight: 700, color: "var(--cv-primary-dark, #0a3d34)", letterSpacing: "0.03em" }}>ClearView</span>
+      </div>
+
+      <div className="d-flex justify-content-between align-items-center py-2 py-md-3">
       {/* PAGE TITLE */}
       <h1 className="h5 h-sm-4 fw-bold mb-0 text-dark d-flex align-items-center gap-2" style={{ fontFamily: "serif" }}>
         {showBack && (
@@ -188,6 +195,7 @@ export default function TopBar({
             </button>
           )}
         </div>
+      </div>
       </div>
     </div>
   );
