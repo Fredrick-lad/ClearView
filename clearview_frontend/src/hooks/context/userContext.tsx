@@ -143,14 +143,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         setUserData(user);
         setIsLoading(false);
         return true;
-      } else if (!response.ok){
+      } 
+      else {
         setIsLoading(false);
         setError(data.message || "Login failed");
-        throw new Error("Login failed");
-
-      } else {
-        setIsLoading(false);
-        setError("Login failed");
         return false;
       }
     } catch (error) {
