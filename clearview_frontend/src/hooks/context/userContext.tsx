@@ -137,7 +137,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         body: JSON.stringify(loginFormData),
       });
       const data = await response.json();
-       if (response.ok) {
+      if (response.ok) {
         const { user } = await response.json();
         setIsSignedin(true);
         setUserData(user);
@@ -155,7 +155,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      setError("Issues logging in");
+      console.log("Issues logging in");
       return false;
     }
   };
@@ -206,7 +206,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const lastname =
       nameparts.length > 1 ? nameparts[nameparts.length - 1] : firstname;
     if (!firstname || !formdata.email || !formdata.password) {
-      setError("Please fill in all profile fields.");
+      alert("Please fill in all profile fields.");
       return false;
     }
     const payload = {
@@ -232,7 +232,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         navigate("/onboardingStep1");
         return true;
       } else {
-        setError("Registration failed");
+        alert("Registration failed");
         return false;
       }
     } catch (err) {
