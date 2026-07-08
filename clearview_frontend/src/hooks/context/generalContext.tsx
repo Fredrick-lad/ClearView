@@ -44,7 +44,7 @@ function DataContext({ children }: { children: React.ReactNode }) {
   };
 
   const [screen, setScreenState] = useState<ScreenKey>(getInitialScreen);
-  const [screenHistory, setScreenHistory] = useState<ScreenKey[]>(() => {
+  const [, setScreenHistory] = useState<ScreenKey[]>(() => {
     try {
       const saved = localStorage.getItem("cv_screenHistory");
       return saved ? JSON.parse(saved) : [];
