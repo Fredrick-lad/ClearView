@@ -76,7 +76,7 @@ export default function HelpScreen() {
 
   return (
     <div
-      className="px-4 p-md-3 mx-auto bg-ui-bg pb-5"
+      className="px-2 px-sm-3 px-md-4 mx-auto bg-ui-bg pb-5"
       style={{ maxWidth: "1200px" }}
     >
       <TopBar title="Help Center" showBack onBack={goBack} />

@@ -19,7 +19,7 @@ export default function ContactSupport() {
 
   return (
     <div
-      className="px-4 p-md-3 mx-auto bg-ui-bg pb-5"
+      className="px-2 px-sm-3 px-md-4 mx-auto bg-ui-bg pb-5"
       style={{ maxWidth: "800px" }}
     >
       <TopBar title="Contact Support" showBack onBack={goBack} />

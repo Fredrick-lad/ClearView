@@ -290,7 +290,7 @@ export default function ReportsScreen() {
   return (
     <>
       <div
-        className="px-3 px-md-4 py-3 mx-auto bg-ui-bg min-vh-100"
+        className="px-2 px-sm-3 px-md-4 py-3 mx-auto bg-ui-bg min-vh-100"
         style={{ maxWidth: "1200px" }}
       >
         <TopBar title="Financial Reports" showBack onBack={goBack} />
@@ -328,7 +328,7 @@ export default function ReportsScreen() {
                 >
                   {card.title}
                 </span>
-                <p className="h5 h4-md fw-bold my-1 my-md-2 text-dark">
+                <p className="h5 fw-bold my-1 my-md-2 text-dark">
                   {card.value}
                 </p>
                 <span
@@ -350,7 +350,7 @@ export default function ReportsScreen() {
               >
                 Savings Rate
               </span>
-              <p className="h5 h4-md fw-bold my-1 my-md-2 text-dark">
+              <p className="h5 fw-bold my-1 my-md-2 text-dark">
                 {savingsRate}%
               </p>
               <div className="progress mt-1 mt-md-2" style={{ height: "6px" }}>

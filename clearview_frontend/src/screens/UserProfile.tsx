@@ -102,7 +102,7 @@ export default function UserProfileContent() {
 
   return (
     <div
-      className="px-3 px-md-4 mx-auto bg-ui-bg pb-5"
+      className="px-2 px-sm-3 px-md-4 mx-auto bg-ui-bg pb-5"
       style={{ maxWidth: "1200px" }}
     >
       <TopBar title="User Profile" showBack onBack={goBack} />

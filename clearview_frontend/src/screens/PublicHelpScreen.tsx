@@ -74,7 +74,7 @@ export default function PublicHelpScreen() {
   return (
     <div className="min-vh-100 bg-ui-bg">
       <div
-        className="d-flex align-items-center px-3 px-md-4 py-3 border-bottom bg-white sticky-top"
+        className="d-flex align-items-center px-2 px-sm-3 px-md-4 py-3 border-bottom bg-white sticky-top"
         style={{ zIndex: 1020 }}
       >
         <button
@@ -107,7 +107,7 @@ export default function PublicHelpScreen() {
         </h1>
       </div>
 
-      <div className="px-3 px-md-4 mx-auto py-4" style={{ maxWidth: "1200px" }}>
+      <div className="px-2 px-sm-3 px-md-4 mx-auto py-4" style={{ maxWidth: "1200px" }}>
         <div className="row g-4 mb-4">
           {guides.map((g, i) => {
             const Icon = g.icon;

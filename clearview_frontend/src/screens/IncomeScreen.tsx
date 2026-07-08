@@ -47,7 +47,7 @@ export default function IncomeOverview() {
 
   return (
     <div
-      className="px-3 px-md-4 mx-auto bg-ui-bg pb-5"
+      className="px-2 px-sm-3 px-md-4 mx-auto bg-ui-bg pb-5"
       style={{ maxWidth: "1200px" }}
     >
       <TopBar title="Income Overview" showBack onBack={goBack} showIncomeBtn />
@@ -185,9 +185,9 @@ export default function IncomeOverview() {
             Transaction History
           </h3>
 
-          <div className="d-flex gap-2">
+          <div className="d-flex flex-column flex-sm-row gap-2 w-100 w-sm-auto">
             <div
-              className="input-group input-group-sm"
+              className="input-group input-group-sm w-100 w-sm-auto"
               style={{ maxWidth: "240px" }}
             >
               <span className="input-group-text bg-white text-muted border-end-0">
@@ -200,7 +200,7 @@ export default function IncomeOverview() {
                 style={{ fontSize: "13px" }}
               />
             </div>
-            <button className="btn btn-outline-secondary btn-sm fw-semibold d-flex align-items-center gap-1">
+            <button className="btn btn-outline-secondary btn-sm fw-semibold d-flex align-items-center gap-1 text-nowrap">
               <IconSwitcher type="filter" style={{ width: "14px" }} /> Filter
             </button>
           </div>

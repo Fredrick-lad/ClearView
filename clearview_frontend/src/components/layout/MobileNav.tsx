@@ -37,9 +37,9 @@ function MobileNav() {
 
   return (
     <nav
-      className="d-flex flex-row justify-content-around align-items-center w-100 bg-white border-top shadow-sm"
+      className="d-flex flex-row justify-content-around align-items-center w-100 bg-white border-top shadow-sm overflow-auto"
       style={{
-        padding: "6px 0 constant(safe-area-inset-bottom)",
+        padding: "6px 0 env(safe-area-inset-bottom, 0px)",
         minHeight: "60px",
       }}
     >
@@ -51,7 +51,7 @@ function MobileNav() {
             onClick={() => setScreen(it.id)}
             className="d-flex flex-column align-items-center justify-content-center gap-1 border-0 bg-transparent"
             style={{
-              padding: "4px 8px",
+              padding: "4px 6px",
               cursor: "pointer",
               color: isActive
                 ? "var(--cv-nav-active-text)"
@@ -60,7 +60,7 @@ function MobileNav() {
                 ? "3px solid var(--cv-nav-active-border)"
                 : "3px solid transparent",
               transition: "color 0.15s, border-color 0.15s",
-              minWidth: "56px",
+              minWidth: "48px",
             }}
           >
             {it.icon}
@@ -84,7 +84,7 @@ function MobileNav() {
         onClick={() => setScreen("logout")}
         className="d-flex flex-column align-items-center justify-content-center gap-1 border-0 bg-transparent"
         style={{
-          padding: "4px 8px",
+          padding: "4px 6px",
           cursor: "pointer",
           color:
             screen === "logout"
@@ -95,7 +95,7 @@ function MobileNav() {
               ? "3px solid var(--cv-nav-active-border)"
               : "3px solid transparent",
           transition: "color 0.15s, border-color 0.15s",
-          minWidth: "56px",
+          minWidth: "48px",
         }}
       >
         <LogOut

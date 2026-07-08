@@ -43,7 +43,7 @@ export default function TopBar({
 
       <div className="d-flex justify-content-between align-items-center py-2 py-md-3">
       {/* PAGE TITLE */}
-      <h1 className="h5 h-sm-4 fw-bold mb-0 text-dark d-flex align-items-center gap-2" style={{ fontFamily: "serif" }}>
+      <h1 className="h5 fw-bold mb-0 text-dark d-flex align-items-center gap-2" style={{ fontFamily: "serif" }}>
         {showBack && (
           <button
             type="button"

@@ -16,7 +16,7 @@ export default function LogoutScreen() {
 
   return (
     <div
-      className="px-4 p-md-3 mx-auto bg-ui-bg"
+      className="px-2 px-sm-3 px-md-4 mx-auto bg-ui-bg"
       style={{ maxWidth: "600px" }}
     >
       <TopBar title="Logout" showBack onBack={goBack} />

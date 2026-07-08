@@ -92,7 +92,7 @@ export default function ExpensesScreen() {
   return (
     <>
       <div
-        className="px-3 px-md-4 mx-auto bg-ui-bg pb-5"
+        className="px-2 px-sm-3 px-md-4 mx-auto bg-ui-bg pb-5"
         style={{ maxWidth: "1300px" }}
       >
         <TopBar title="Expenses" showBack onBack={goBack} showExpenseBtn />
@@ -105,7 +105,7 @@ export default function ExpensesScreen() {
               <span className="text-uppercase text-muted fw-bold small tracking-wider">
                 Total Expenses This Semester
               </span>
-              <p className="h3 h2-md fw-bold my-2 my-md-3">
+              <p className="h3 fw-bold my-2 my-md-3">
                 {formatCurrency(totalExpenses)}
               </p>
               <p className="text-danger small fw-bold mb-0 d-flex align-items-center gap-1">
@@ -183,8 +183,8 @@ export default function ExpensesScreen() {
           className="card border-0 shadow-sm mb-5"
           style={{ borderRadius: "12px" }}
         >
-          <div className="p-3 p-md-4 d-flex justify-content-between align-items-center">
-            <div className="input-group" style={{ maxWidth: "400px" }}>
+          <div className="p-3 p-md-4 d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
+            <div className="input-group w-100 w-md-auto" style={{ maxWidth: "400px" }}>
               <span className="input-group-text bg-white border-end-0 text-muted">
                 <IconSwitcher type="search" style={{ width: "18px" }} />
               </span>
@@ -194,11 +194,11 @@ export default function ExpensesScreen() {
                 placeholder="Search transactions..."
               />
             </div>
-            <div className="d-flex gap-2">
-              <button className="btn btn-outline-secondary btn-sm fw-bold px-3 d-flex align-items-center gap-2">
+            <div className="d-flex gap-2 flex-shrink-0">
+              <button className="btn btn-outline-secondary btn-sm fw-bold px-3 d-flex align-items-center gap-2 text-nowrap">
                 <IconSwitcher type="filter" style={{ width: "16px" }} /> Filter
               </button>
-              <button className="btn btn-outline-secondary btn-sm fw-bold px-3 d-flex align-items-center gap-2">
+              <button className="btn btn-outline-secondary btn-sm fw-bold px-3 d-flex align-items-center gap-2 text-nowrap">
                 <IconSwitcher type="export" style={{ width: "16px" }} /> Export
               </button>
             </div>

@@ -113,7 +113,7 @@ export default function DashboardScreen(_: Props) {
   return (
     <>
       <div
-        className="px-3 px-md-4 mx-auto bg-ui-bg pb-5"
+        className="px-2 px-sm-3 px-md-4 mx-auto bg-ui-bg pb-5"
         style={{ maxWidth: "1300px" }}
       >
         <TopBar title="Dashboard" showIncomeBtn showActionBtn showExpenseBtn />
@@ -121,7 +121,7 @@ export default function DashboardScreen(_: Props) {
         {/* User Welcome */}
         <div className="mb-3 mb-md-4">
           <h3
-            className="h4 h2-md fw-bold mb-1"
+            className="h4 fw-bold mb-1"
             style={{ fontFamily: "serif", color: brandColors.primaryDark }}
           >
             Hello, {userData?.firstName ?? userData?.username ?? "there"}
@@ -136,28 +136,28 @@ export default function DashboardScreen(_: Props) {
           {summaryCards.map((card, index) => (
             <div className="col-12 col-sm-6 col-lg-3" key={index}>
               <div
-                className="card h-100 p-3 p-md-4 bg-white border-light shadow-sm d-flex flex-column justify-content-between"
+                className="card h-100 p-2 p-sm-3 p-md-4 bg-white border-light shadow-sm d-flex flex-column justify-content-between"
                 style={{ borderRadius: "12px" }}
               >
                 <div>
                   <span
                     className="text-uppercase text-muted fw-bold tracking-wide"
-                    style={{ fontSize: "11px", letterSpacing: "0.02rem" }}
+                    style={{ fontSize: "10px", letterSpacing: "0.02rem" }}
                   >
                     {card.title}
                   </span>
-                  <p className={`h3 fw-bold mt-2 mb-0 ${card.textColor}`}>
+                  <p className={`h5 fw-bold mt-1 mt-sm-2 mb-0 ${card.textColor}`}>
                     {card.value}
                   </p>
                 </div>
-                <div className="mt-3">
+                <div className="mt-2 mt-sm-3">
                   {card.subtext && (
                     <p className="text-muted small fw-medium mb-0">
                       {card.subtext}
                     </p>
                   )}
                   {card.hasProgressBar && (
-                    <div className="mt-2">
+                    <div className="mt-1 mt-sm-2">
                       <ProgBar pct={card.progressPct ?? 0} />
                     </div>
                   )}
@@ -172,18 +172,18 @@ export default function DashboardScreen(_: Props) {
           {/* Active Envelopes */}
           <div className="col-12">
             <div
-              className="card h-100 p-3 p-md-4 bg-white border-light shadow-sm"
+              className="card h-100 p-2 p-sm-3 p-md-4 bg-white border-light shadow-sm"
               style={{ borderRadius: "12px" }}
             >
-              <div className="d-flex align-items-center justify-content-between mb-3 mb-md-4">
+              <div className="d-flex align-items-center justify-content-between mb-2 mb-sm-3 mb-md-4">
                 <h4
-                  className="h6 fw-bold mb-0"
+                  className="h6 fw-bold mb-0 text-truncate"
                   style={{ color: brandColors.primaryDark }}
-                >
+               >
 My Semester Envelopes
                 </h4>
                 <button
-                  className="btn btn-link p-0 text-muted small fw-bold text-decoration-none"
+                  className="btn btn-link p-0 text-muted small fw-bold text-decoration-none text-nowrap flex-shrink-0 ms-2"
                   onClick={() => setScreen("Envelopes")}
                 >
                   View All
@@ -221,7 +221,7 @@ My Semester Envelopes
                     return (
                       <div className="col-12 col-sm-6 col-lg-3" key={idx}>
                         <div
-                          className="card h-100 p-3 border-0 d-flex flex-column justify-content-between"
+                          className="card h-100 p-2 p-sm-3 border-0 d-flex flex-column justify-content-between"
                           style={{
                             borderTop: `4px solid ${topColor}`,
                             backgroundColor: "var(--cv-main-bg)",
@@ -230,10 +230,10 @@ My Semester Envelopes
                           {/* Icon + actions */}
                           <div className="d-flex justify-content-between align-items-start">
                             <div
-                              className="p-2 bg-white rounded-3 border shadow-sm d-flex align-items-center justify-content-center"
+                              className="p-1 p-sm-2 bg-white rounded-3 border shadow-sm d-flex align-items-center justify-content-center"
                               style={{ color: brandColors.primaryDark }}
                             >
-                              <Icon size={18} />
+                              <Icon size={16} />
                             </div>
                             <div className="d-flex gap-1 text-secondary">
                               <button
@@ -245,7 +245,7 @@ My Semester Envelopes
                                 title="Edit"
                               >
                                 <svg
-                                  style={{ width: 14, height: 14 }}
+                                  style={{ width: 12, height: 12 }}
                                   fill="none"
                                   viewBox="0 0 24 24"
                                   stroke="currentColor"
@@ -267,7 +267,7 @@ My Semester Envelopes
                                 title="Delete"
                               >
                                 <svg
-                                  style={{ width: 14, height: 14 }}
+                                  style={{ width: 12, height: 12 }}
                                   fill="none"
                                   viewBox="0 0 24 24"
                                   stroke="currentColor"
@@ -284,8 +284,8 @@ My Semester Envelopes
                           </div>
 
                           {/* Name + spend */}
-                          <div className="mt-3">
-                            <h5 className="h6 fw-bold text-dark text-truncate mb-1">
+                          <div className="mt-2 mt-sm-3">
+                            <h5 className="h6 fw-bold text-dark text-truncate mb-0 mb-sm-1">
                               {envelope.name}
                             </h5>
                             <p className="text-muted small fw-medium mb-0">
@@ -297,7 +297,7 @@ My Semester Envelopes
                           </div>
 
                           {/* Progress bar */}
-                          <div className="mt-3">
+                          <div className="mt-2 mt-sm-3">
                             <ProgBar pct={pct} />
                             <div className="text-end mt-1">
                               <span
@@ -323,7 +323,7 @@ My Semester Envelopes
           className="card bg-white border-light shadow-sm overflow-hidden mb-5 mb-lg-0"
           style={{ borderRadius: "12px" }}
         >
-          <div className="p-3 p-md-4 d-flex align-items-center justify-content-between border-bottom">
+          <div className="p-2 p-sm-3 p-md-4 d-flex align-items-center justify-content-between border-bottom">
             <h4
               className="h6 fw-bold mb-0"
               style={{ color: brandColors.primaryDark }}
@@ -348,18 +348,18 @@ My Semester Envelopes
               <table className="table table-hover align-middle mb-0">
                 <thead
                   className="table-light text-uppercase text-muted fw-bold"
-                  style={{ fontSize: "10px", letterSpacing: "0.05rem" }}
+                  style={{ fontSize: "9px", letterSpacing: "0.05rem" }}
                 >
                   <tr>
-                    <th className="py-2 py-md-3 px-3 px-md-4">Envelope</th>
-                    <th className="py-2 py-md-3 px-3 px-md-4">Description</th>
-                    <th className="py-2 py-md-3 px-3 px-md-4">Date</th>
-                    <th className="py-2 py-md-3 px-3 px-md-4 text-end">Amount</th>
+                    <th className="py-2 py-md-3 px-2 px-md-4">Envelope</th>
+                    <th className="py-2 py-md-3 px-2 px-md-4">Description</th>
+                    <th className="py-2 py-md-3 px-2 px-md-4">Date</th>
+                    <th className="py-2 py-md-3 px-2 px-md-4 text-end">Amount</th>
                   </tr>
                 </thead>
                 <tbody
                   className="text-secondary fw-medium"
-                  style={{ fontSize: "13px" }}
+                  style={{ fontSize: "12px" }}
                 >
                   {recentExpenses.map((exp: any, idx: number) => {
                     // Match envelope name by id if possible
@@ -371,18 +371,18 @@ My Semester Envelopes
 
                     return (
                       <tr key={idx}>
-                        <td className="py-2 py-md-3 px-3 px-md-4">
-                          <span className="badge bg-light text-muted border px-2 px-md-3 py-1 py-md-2 rounded-pill fw-bold" style={{ fontSize: "11px" }}>
+                        <td className="py-2 py-md-3 px-2 px-md-4">
+                          <span className="badge bg-light text-muted border px-2 px-md-3 py-1 py-md-2 rounded-pill fw-bold text-truncate d-inline-block" style={{ fontSize: "10px", maxWidth: "90px" }}>
                             {envName}
                           </span>
                         </td>
-                        <td className="py-2 py-md-3 px-3 px-md-4 fw-bold text-dark text-truncate" style={{ maxWidth: "120px" }}>
+                        <td className="py-2 py-md-3 px-2 px-md-4 fw-bold text-dark text-truncate" style={{ maxWidth: "80px", minWidth: 0 }}>
                           {exp.description || "—"}
                         </td>
-                        <td className="py-2 py-md-3 px-3 px-md-4 text-muted fw-normal text-nowrap">
+                        <td className="py-2 py-md-3 px-2 px-md-4 text-muted fw-normal text-nowrap" style={{ fontSize: "11px" }}>
                           {formatDate(exp.expense_date)}
                         </td>
-                        <td className="py-2 py-md-3 px-3 px-md-4 text-end fw-bold text-danger text-nowrap">
+                        <td className="py-2 py-md-3 px-2 px-md-4 text-end fw-bold text-danger text-nowrap" style={{ fontSize: "11px" }}>
                           {formatCurrency(exp.amount)}
                         </td>
                       </tr>
