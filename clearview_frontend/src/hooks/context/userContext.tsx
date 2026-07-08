@@ -57,7 +57,7 @@ export const UserContext = createContext<UserContextType | null>(null);
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [userData, setUserData] = useState<initialdata | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [, setEmail] = useState<string>(" ");
+  const [ _ , setEmail] = useState<string>(" ");
   const [emailError, setEmailError] = useState<string>(" ");
   const [newEnvelope, setNewEnvelope] = useState<Envelope | null>(null);
   const [incomeSource, setIncomeSource] = useState<
@@ -142,8 +142,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         setError(data.message || "Login failed");
         throw new Error("Login failed");
 
-      }
-      if (response.ok) {
+      } else if (response.ok) {
         const { user } = await response.json();
         setIsSignedin(true);
         setUserData(user);
