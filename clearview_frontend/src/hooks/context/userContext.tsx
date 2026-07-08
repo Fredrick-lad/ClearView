@@ -137,17 +137,17 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         body: JSON.stringify(loginFormData),
       });
       const data = await response.json();
-      if (!response.ok){
-        setIsLoading(false);
-        setError(data.message || "Login failed");
-        throw new Error("Login failed");
-
-      } else if (response.ok) {
+       if (response.ok) {
         const { user } = await response.json();
         setIsSignedin(true);
         setUserData(user);
         setIsLoading(false);
         return true;
+      } else if (!response.ok){
+        setIsLoading(false);
+        setError(data.message || "Login failed");
+        throw new Error("Login failed");
+
       } else {
         setIsLoading(false);
         setError("Login failed");
