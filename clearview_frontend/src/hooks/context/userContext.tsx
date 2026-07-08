@@ -70,7 +70,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [error, setError] = useState("");
 
   const [isSignedin, setIsSignedin] = useState(false);
-  console.log(email);
   const navigate = useNavigate();
 
   const fetchDashboardData = async () => {
@@ -80,7 +79,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         credentials: "include",
       });
       if (!response.ok) {
-        setError("Failed to load dashboard");
         return;
       }
       const data = await response.json();
@@ -109,15 +107,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
     checkUser();
   }, [isSignedin]);
-  useEffect(() => {
-    console.log("incomeSource updated:", incomeSource);
-  }, [incomeSource]);
-  useEffect(() => {
-    console.log("envelopeData updated:", envelopeData);
-  }, [envelopeData]);
-  useEffect(() => {
-    console.log("PeriodeData updated:", periodData);
-  }, [periodData]);
+  
 
   if (isLoading) return <LoadingScreen />;
 
@@ -146,21 +136,27 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         credentials: "include",
         body: JSON.stringify(loginFormData),
       });
+      const data = await response.json();
+      if (!response.ok){
+        setIsLoading(false);
+        setError(data.message || "Login failed");
+        throw new Error("Login failed");
+
+      }
       if (response.ok) {
         const { user } = await response.json();
         setIsSignedin(true);
         setUserData(user);
-        console.log(user.id);
         setIsLoading(false);
         return true;
       } else {
         setIsLoading(false);
-        setError("An error occurred during login");
+        setError("Login failed");
         return false;
       }
     } catch (error) {
       setIsLoading(false);
-      console.log("Issues logging in");
+      setError("Issues logging in");
       return false;
     }
   };
@@ -211,7 +207,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const lastname =
       nameparts.length > 1 ? nameparts[nameparts.length - 1] : firstname;
     if (!firstname || !formdata.email || !formdata.password) {
-      alert("Please fill in all profile fields.");
+      setError("Please fill in all profile fields.");
       return false;
     }
     const payload = {
@@ -234,11 +230,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         const { user } = await response.json();
         setUserData(user);
         setIsLoading(false);
-        console.log(userData?.id);
         navigate("/onboardingStep1");
         return true;
       } else {
-        alert("Registration failed");
+        setError("Registration failed");
         return false;
       }
     } catch (err) {
@@ -278,7 +273,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       credentials: "include",
     });
     const data = await response.json();
-    console.log(data);
     setEnvelopeData(data.envelope);
     return data.envelope;
   };
