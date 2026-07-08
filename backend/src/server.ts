@@ -18,7 +18,7 @@ app.use(express.json());
 app.use(routes);
 
 const PORT = parseInt(process.env.PORT || "4000");
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server up and Running on port ${PORT}`);
 });
 
