@@ -1,7 +1,6 @@
 import { type ReactNode } from "react";
 import { Icon } from "../ui/iconMap";
 import type { ScreenKey } from "../../types";
-import { LogOut } from "lucide-react";
 import { GetData } from "../../hooks/context/generalContext";
 
 function MobileNav() {
@@ -79,7 +78,7 @@ function MobileNav() {
         );
       })}
 
-      {/* Logout */}
+      {/* Logout
       <button
         onClick={() => setScreen("logout")}
         className="d-flex flex-column align-items-center justify-content-center gap-1 border-0 bg-transparent"
@@ -115,7 +114,7 @@ function MobileNav() {
         >
           Logout
         </span>
-      </button>
+      </button> */}
     </nav>
   );
 }

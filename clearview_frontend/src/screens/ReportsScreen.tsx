@@ -290,7 +290,8 @@ export default function ReportsScreen() {
   return (
     <>
       <div
-        className="px-2 px-sm-3 px-md-4 py-3 mx-auto bg-ui-bg min-vh-100"
+        className="px-2 px-sm-3 px-md-4  mx-auto bg-ui-bg pb-3"
+
         style={{ maxWidth: "1200px" }}
       >
         <TopBar title="Financial Reports" showBack onBack={goBack} />

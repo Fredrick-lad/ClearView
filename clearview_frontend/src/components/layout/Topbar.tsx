@@ -1,6 +1,7 @@
-import React from "react";
-import { ArrowLeft } from "lucide-react";
+import React, { useState } from "react";
+import { ArrowLeft, Menu, X } from "lucide-react";
 import { GetData } from "../../hooks/context/generalContext";
+import { LogOut } from "lucide-react";
 
 interface TopBarProps {
   title: string;
@@ -31,172 +32,255 @@ export default function TopBar({
   showHelpIcon = false,
   avatarUrl,
 }: TopBarProps) {
-  const { setModal, setScreen } = GetData();
+  const { setModal, screen, setScreen } = GetData();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => setIsMenuOpen((prev) => !prev);
+
+  const handleAction = (callback?: () => void, modalType?: string) => {
+    if (callback) {
+      callback();
+    } else if (modalType) {
+      setModal(modalType);
+    }
+    setIsMenuOpen(false);
+  };
+
+  const handleNavigation = (screenName: string) => {
+    setScreen(screenName);
+    setIsMenuOpen(false);
+  };
 
   return (
-
-<div className="z-2 sticky-top bg-ui-bg">
-      {/* Mobile brand bar */}
-      <div className="d-lg-none text-center py-1" style={{ backgroundColor: "var(--cv-nav-active-bg, #e8f4f0)", cursor: "pointer" }} onClick={() => setScreen("Dashboard")}>
-        <span style={{ fontFamily: "Georgia, serif", fontSize: "13px", fontWeight: 700, color: "var(--cv-primary-dark, #0a3d34)", letterSpacing: "0.03em" }}>ClearView</span>
-      </div>
-
-      <div className="d-flex justify-content-between align-items-center py-2 py-md-3">
-      {/* PAGE TITLE */}
-      <h1 className="h5 fw-bold mb-0 text-dark d-flex align-items-center gap-2" style={{ fontFamily: "serif" }}>
-        {showBack && (
-          <button
-            type="button"
-            onClick={onBack}
-            className="btn d-inline-flex align-items-center justify-content-center border-0"
-            style={{
-              width: "32px",
-              height: "32px",
-              borderRadius: "8px",
-              backgroundColor: "var(--cv-nav-active-bg, #e8f4f0)",
-              color: "var(--cv-primary-dark, #0a3d34)",
-              cursor: "pointer",
-              transition: "background-color 0.15s, transform 0.15s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "var(--cv-primary-dark, #38796d)";
-              e.currentTarget.style.color = "#fff";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "var(--cv-nav-active-bg, #e8f4f0)";
-              e.currentTarget.style.color = "var(--cv-primary-dark, #0a3d34)";
-            }}
-            aria-label="Go back"
-          >
-            <ArrowLeft size={16} strokeWidth={2.5} />
-          </button>
-        )}
-        {title}
-      </h1>
-
-      {/* UTILITIES & ACTIONS - action buttons hidden on mobile/tablet (handled by FAB), bell + profile always visible */}
-      <div className="d-flex align-items-center gap-2 flex-wrap">
-        <div className="d-none d-lg-flex align-items-center gap-2">
-          {showIncomeBtn && (
-            <button
-              type="button"
-              className="btn fw-bold btn-sm bg-transparent"
-              style={{
-                color: "var(--cv-insight-bg)",
-                border: "1px solid var(--cv-insight-bg)",
-                borderRadius: "4px",
-                fontSize: "13px",
-              }}
-              onClick={onIncomeClick ? onIncomeClick : () => setModal("inc")}
-            >
-              <span className="me-1">↓</span> Add Income
-            </button>
-          )}
-
-          {showExpenseBtn && (
-            <button
-              type="button"
-              className="btn text-white px-3 py-2 fw-bold btn-sm border-0"
-              style={{
-                backgroundColor: "var(--cv-insight-bg)",
-                borderRadius: "4px",
-                fontSize: "13px",
-              }}
-              onClick={onExpenseClick ? onExpenseClick : () => setModal("exp")}
-            >
-              <span className="me-1">+</span> Add Expense
-            </button>
-          )}
-
-          {showActionBtn && (
-            <button
-              type="button"
-              className="btn text-white px-3 py-2 fw-bold btn-sm border-0"
-              style={{
-                backgroundColor: "var(--cv-insight-bg)",
-                borderRadius: "4px",
-                fontSize: "13px",
-              }}
-              onClick={onActionClick ? onActionClick : () => setModal("env")}
-            >
-              {actionBtnText}
-            </button>
-          )}
-
-          {(showActionBtn || showExpenseBtn || showIncomeBtn) && (
-            <div
-              className="vr mx-1 text-secondary opacity-25"
-              style={{ height: "auto" }}
-            ></div>
-          )}
-        </div>
-
-        <button
-          className="btn p-1 text-dark border-0 d-flex align-items-center justify-content-center opacity-75 hover-opacity-100"
-          onClick={() => setScreen("Notifications")}
+    <div className="z-2 sticky-top bg-ui-bg">
+      <div className="d-flex justify-content-between align-items-center py-2 py-md-3 shadow-sm px-3">
+        {/* PAGE TITLE + OPTIONAL BACK BUTTON */}
+        <h1
+          className="h5 fw-bold mb-0 text-dark d-flex align-items-center gap-2"
+          style={{ fontFamily: "serif" }}
         >
-          <TopBarIconSwitcher
-            type="bell"
-            style={{ width: "20px", height: "20px" }}
-          />
-        </button>
-
-        {showHelpIcon && (
-          <button className="btn p-1 text-dark border-0 d-flex align-items-center justify-content-center opacity-75 hover-opacity-100">
-            <TopBarIconSwitcher
-              type="help-circle"
-              style={{ width: "20px", height: "20px" }}
-            />
-          </button>
-        )}
-
-        {/* Help (mobile & desktop) */}
-        <button
-          className="btn p-1 text-dark border-0 d-flex align-items-center justify-content-center opacity-75 hover-opacity-100"
-          onClick={() => setScreen("helpCenter")}
-        >
-          <TopBarIconSwitcher
-            type="help-circle"
-            style={{ width: "20px", height: "20px" }}
-          />
-        </button>
-
-        {/* Settings gear */}
-        <div className="ms-1 d-flex align-items-center">
-          <button
-            className="btn p-1 text-dark border-0 d-flex align-items-center justify-content-center opacity-75 hover-opacity-100"
-            onClick={() => setScreen("settings")}
-          >
-            <TopBarIconSwitcher
-              type="settings"
-              style={{ width: "22px", height: "22px" }}
-            />
-          </button>
-        </div>
-
-        {/* User profile */}
-        <div className="ms-1 d-flex align-items-center">
-          {avatarUrl ? (
-            <img
-              src={avatarUrl}
-              alt="User Account Thumbnail"
-              className="rounded-1 border border-secondary border-opacity-20 shadow-sm"
-              style={{ width: "32px", height: "32px", objectFit: "cover" }}
-            />
-          ) : (
+          {showBack && (
             <button
-              className="btn p-1 text-dark border-0 d-flex align-items-center justify-content-center opacity-75 hover-opacity-100"
-              onClick={() => setScreen("Profile")}
+              type="button"
+              onClick={onBack}
+              className="btn d-inline-flex align-items-center justify-content-center border-0 p-0"
+              style={{
+                width: "32px",
+                height: "32px",
+                borderRadius: "8px",
+                backgroundColor: "var(--cv-nav-active-bg, #e8f4f0)",
+                color: "var(--cv-primary-dark, #0a3d34)",
+                cursor: "pointer",
+                transition: "background-color 0.15s, transform 0.15s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor =
+                  "var(--cv-primary-dark, #38796d)";
+                e.currentTarget.style.color = "#fff";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor =
+                  "var(--cv-nav-active-bg, #e8f4f0)";
+                e.currentTarget.style.color = "var(--cv-primary-dark, #0a3d34)";
+              }}
+              aria-label="Go back"
             >
-              <TopBarIconSwitcher
-                type="user-outline"
-                style={{ width: "22px", height: "22px" }}
-              />
+              <ArrowLeft size={16} strokeWidth={2.5} />
             </button>
           )}
+          {title}
+        </h1>
+
+        {/* HAMBURGER BUTTON */}
+        <button
+          type="button"
+          className="btn p-2 text-dark border-0 d-flex align-items-center justify-content-center opacity-75 hover-opacity-100"
+          onClick={toggleMenu}
+          aria-label="Open menu"
+        >
+          <Menu size={24} />
+        </button>
+      </div>
+
+      {/* OFFCANVAS HAMBURGER MENU DRAWER */}
+      {isMenuOpen && (
+        <div
+          className="offcanvas offcanvas-end show"
+          tabIndex={-1}
+          style={{ visibility: "visible" }}
+        >
+          <div className="offcanvas-header border-bottom d-flex justify-content-between align-items-center">
+            <h5 className="offcanvas-title fw-bold mb-0">Menu</h5>
+            <button
+              type="button"
+              className="btn p-1 border-0"
+              onClick={toggleMenu}
+              aria-label="Close menu"
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          <div className="offcanvas-body d-flex flex-column gap-3">
+            {/* Quick Action Buttons */}
+            {(showIncomeBtn || showExpenseBtn || showActionBtn) && (
+              <div className="d-flex flex-column gap-2 pb-3 border-bottom">
+                <span className="text-muted small fw-bold uppercase">
+                  Quick Actions
+                </span>
+
+                {showIncomeBtn && (
+                  <button
+                    type="button"
+                    className="btn fw-bold btn-sm text-start bg-transparent"
+                    style={{
+                      color: "var(--cv-insight-bg)",
+                      border: "1px solid var(--cv-insight-bg)",
+                      borderRadius: "4px",
+                    }}
+                    onClick={() => handleAction(onIncomeClick, "inc")}
+                  >
+                    <span className="me-2">↓</span> Add Income
+                  </button>
+                )}
+
+                {showExpenseBtn && (
+                  <button
+                    type="button"
+                    className="btn text-white fw-bold btn-sm border-0 text-start"
+                    style={{
+                      backgroundColor: "var(--cv-insight-bg)",
+                      borderRadius: "4px",
+                    }}
+                    onClick={() => handleAction(onExpenseClick, "exp")}
+                  >
+                    <span className="me-2">+</span> Add Expense
+                  </button>
+                )}
+
+                {showActionBtn && (
+                  <button
+                    type="button"
+                    className="btn text-white fw-bold btn-sm border-0 text-start"
+                    style={{
+                      backgroundColor: "var(--cv-insight-bg)",
+                      borderRadius: "4px",
+                    }}
+                    onClick={() => handleAction(onActionClick, "env")}
+                  >
+                    {actionBtnText}
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Navigation Options */}
+            <div className="d-flex flex-column gap-1">
+              <button
+                className="btn text-start p-2 d-flex align-items-center gap-3 hover-bg-light rounded"
+                onClick={() => handleNavigation("Notifications")}
+              >
+                <TopBarIconSwitcher
+                  type="bell"
+                  style={{ width: "20px", height: "20px" }}
+                />
+                <span>Notifications</span>
+              </button>
+
+              {(showHelpIcon || true) && (
+                <button
+                  className="btn text-start p-2 d-flex align-items-center gap-3 hover-bg-light rounded"
+                  onClick={() => handleNavigation("helpCenter")}
+                >
+                  <TopBarIconSwitcher
+                    type="help-circle"
+                    style={{ width: "20px", height: "20px" }}
+                  />
+                  <span>Help Center</span>
+                </button>
+              )}
+
+              <button
+                className="btn text-start p-2 d-flex align-items-center gap-3 hover-bg-light rounded"
+                onClick={() => handleNavigation("settings")}
+              >
+                <TopBarIconSwitcher
+                  type="settings"
+                  style={{ width: "20px", height: "20px" }}
+                />
+                <span>Settings</span>
+              </button>
+
+              <button
+                className="btn text-start p-2 d-flex align-items-center gap-3 hover-bg-light rounded"
+                onClick={() => handleNavigation("Profile")}
+              >
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt="User Profile"
+                    className="rounded-circle"
+                    style={{
+                      width: "22px",
+                      height: "22px",
+                      objectFit: "cover",
+                    }}
+                  />
+                ) : (
+                  <TopBarIconSwitcher
+                    type="user-outline"
+                    style={{ width: "20px", height: "20px" }}
+                  />
+                )}
+                <span>Profile</span>
+              </button>
+              <button
+                onClick={() => setScreen("logout")}
+                className="btn text-white d-inline-flex align-items-center justify-content-center gap-2 px-4 py-2 border-0 shadow-none"
+                style={{
+                  backgroundColor:"#dc2626",
+                  padding: "6px 12px",
+                  cursor: "pointer",
+                  color:
+                    screen === "logout"
+                      ? "var(--cv-nav-active-text)"
+                      : "var(--cv-nav-inactive-text)",
+                  borderBottom:
+                    screen === "logout"
+                      ? "3px solid var(--cv-nav-active-border)"
+                      : "3px solid transparent",
+                  transition: "color 0.15s, border-color 0.15s",
+                }}
+              >
+                <LogOut
+                  size={18}
+                  color="#fff"
+                  className={
+                    screen === "logout" ? "text-success" : "text-secondary"
+                  }
+                />
+                <span
+                  style={{
+                    fontSize: "13px",
+                    fontWeight: screen === "logout" ? 700 : 500,
+                    lineHeight: 1.1,
+                    letterSpacing: "0.02em",
+                    whiteSpace: "nowrap",
+                    color:"#ffffff"
+                  }}
+                >
+                  Logout
+                </span>
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-      </div>
+      )}
+
+      {/* BACKDROP FOR CLOSING MENU */}
+      {isMenuOpen && (
+        <div className="offcanvas-backdrop fade show" onClick={toggleMenu} />
+      )}
     </div>
   );
 }

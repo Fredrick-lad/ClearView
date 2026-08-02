@@ -59,12 +59,6 @@ export default function ClearViewLanding() {
           opacity: 1; 
           transform: translateY(0); 
         }
-
-        @keyframes pulse {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.5; transform: scale(0.7); }
-        }
-
         @keyframes floatUp {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
@@ -122,9 +116,6 @@ export default function ClearViewLanding() {
       <section style={{ padding: 0 }}>
         <div className="responsive-hero" style={styles.hero}>
           <div style={styles.heroContent}>
-            <div style={styles.heroBadge}>
-              <span style={styles.pulseDot}></span>Built for university students
-            </div>
             <h1 style={styles.heroTitle}>
               Make your <em>semester money</em> last.
             </h1>
