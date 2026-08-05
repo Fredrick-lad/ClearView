@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { ArrowLeft, Menu, X } from "lucide-react";
+import { ArrowLeft, Menu, X, LogOut } from "lucide-react";
 import { GetData } from "../../hooks/context/generalContext";
-import { LogOut } from "lucide-react";
 
 interface TopBarProps {
   title: string;
@@ -91,10 +90,121 @@ export default function TopBar({
           {title}
         </h1>
 
-        {/* HAMBURGER BUTTON */}
+        {/* DESKTOP CONTENT (Visible on Large screens ≥ 992px) */}
+        <div className="d-none d-lg-flex align-items-center gap-3">
+          {/* Quick Action Buttons */}
+          <div className="d-flex align-items-center gap-2 pe-3 border-end">
+            {showIncomeBtn && (
+              <button
+                type="button"
+                className="btn fw-bold btn-sm bg-transparent"
+                style={{
+                  color: "var(--cv-insight-bg)",
+                  border: "1px solid var(--cv-insight-bg)",
+                  borderRadius: "4px",
+                }}
+                onClick={() => handleAction(onIncomeClick, "inc")}
+              >
+                <span className="me-1">↓</span> Add Income
+              </button>
+            )}
+
+            {showExpenseBtn && (
+              <button
+                type="button"
+                className="btn text-white fw-bold btn-sm border-0"
+                style={{
+                  backgroundColor: "var(--cv-insight-bg)",
+                  borderRadius: "4px",
+                }}
+                onClick={() => handleAction(onExpenseClick, "exp")}
+              >
+                <span className="me-1">+</span> Add Expense
+              </button>
+            )}
+
+            {showActionBtn && (
+              <button
+                type="button"
+                className="btn text-white fw-bold btn-sm border-0"
+                style={{
+                  backgroundColor: "var(--cv-insight-bg)",
+                  borderRadius: "4px",
+                }}
+                onClick={() => handleAction(onActionClick, "env")}
+              >
+                {actionBtnText}
+              </button>
+            )}
+          </div>
+
+          {/* Navigation Items */}
+          <div className="d-flex align-items-center gap-1">
+            <button
+              className="btn btn-sm p-2 text-dark hover-bg-light rounded"
+              onClick={() => handleNavigation("Notifications")}
+              title="Notifications"
+            >
+              <TopBarIconSwitcher
+                type="bell"
+                style={{ width: "20px", height: "20px" }}
+              />
+            </button>
+
+            {(showHelpIcon || true) && (
+              <button
+                className="btn btn-sm p-2 text-dark hover-bg-light rounded"
+                onClick={() => handleNavigation("helpCenter")}
+                title="Help Center"
+              >
+                <TopBarIconSwitcher
+                  type="help-circle"
+                  style={{ width: "20px", height: "20px" }}
+                />
+              </button>
+            )}
+
+            <button
+              className="btn btn-sm p-2 text-dark hover-bg-light rounded"
+              onClick={() => handleNavigation("settings")}
+              title="Settings"
+            >
+              <TopBarIconSwitcher
+                type="settings"
+                style={{ width: "20px", height: "20px" }}
+              />
+            </button>
+
+            <button
+              className="btn btn-sm p-1 text-dark hover-bg-light rounded-circle ms-1"
+              onClick={() => handleNavigation("Profile")}
+              title="Profile"
+            >
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt="User Profile"
+                  className="rounded-circle"
+                  style={{
+                    width: "24px",
+                    height: "24px",
+                    objectFit: "cover",
+                  }}
+                />
+              ) : (
+                <TopBarIconSwitcher
+                  type="user-outline"
+                  style={{ width: "22px", height: "22px" }}
+                />
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* HAMBURGER BUTTON (Hidden on Desktop, Visible on Tablet/Mobile) */}
         <button
           type="button"
-          className="btn p-2 text-dark border-0 d-flex align-items-center justify-content-center opacity-75 hover-opacity-100"
+          className="btn p-2 text-dark border-0 d-flex d-lg-none align-items-center justify-content-center opacity-75 hover-opacity-100"
           onClick={toggleMenu}
           aria-label="Open menu"
         >
@@ -102,10 +212,10 @@ export default function TopBar({
         </button>
       </div>
 
-      {/* OFFCANVAS HAMBURGER MENU DRAWER */}
+      {/* OFFCANVAS HAMBURGER MENU DRAWER (Mobile/Tablet Only) */}
       {isMenuOpen && (
         <div
-          className="offcanvas offcanvas-end show"
+          className="offcanvas offcanvas-end show d-lg-none"
           tabIndex={-1}
           style={{ visibility: "visible" }}
         >
@@ -238,7 +348,7 @@ export default function TopBar({
                 onClick={() => setScreen("logout")}
                 className="btn text-white d-inline-flex align-items-center justify-content-center gap-2 px-4 py-2 border-0 shadow-none"
                 style={{
-                  backgroundColor:"#dc2626",
+                  backgroundColor: "#dc2626",
                   padding: "6px 12px",
                   cursor: "pointer",
                   color:
@@ -266,7 +376,7 @@ export default function TopBar({
                     lineHeight: 1.1,
                     letterSpacing: "0.02em",
                     whiteSpace: "nowrap",
-                    color:"#ffffff"
+                    color: "#ffffff",
                   }}
                 >
                   Logout
@@ -277,9 +387,12 @@ export default function TopBar({
         </div>
       )}
 
-      {/* BACKDROP FOR CLOSING MENU */}
+      {/* BACKDROP FOR CLOSING MENU (Mobile/Tablet Only) */}
       {isMenuOpen && (
-        <div className="offcanvas-backdrop fade show" onClick={toggleMenu} />
+        <div
+          className="offcanvas-backdrop fade show d-lg-none"
+          onClick={toggleMenu}
+        />
       )}
     </div>
   );
