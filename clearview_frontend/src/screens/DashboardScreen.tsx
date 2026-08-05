@@ -55,10 +55,7 @@ export default function DashboardScreen(_: Props) {
     : 0;
 
   const unallocated = totalIncome - totalBudgeted;
-  const savingsPct =
-    totalIncome > 0
-      ? Math.round(((totalIncome - totalSpent) / totalIncome) * 100)
-      : 0;
+
 
   // --- Summary cards ---
   const summaryCards = [
