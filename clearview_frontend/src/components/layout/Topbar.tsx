@@ -52,7 +52,7 @@ export default function TopBar({
   };
 
   return (
-    <div className="z-2 sticky-top bg-ui-bg">
+    <div className="z-2 sticky-top bg-ui-bg mb-4">
       <div className="d-flex justify-content-between align-items-center py-2 py-md-3 shadow-sm px-3">
         {/* PAGE TITLE + OPTIONAL BACK BUTTON */}
         <h1

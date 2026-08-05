@@ -86,10 +86,7 @@ export default function DashboardScreen(_: Props) {
     {
       title: "Unallocated",
       value: formatCurrency(unallocated),
-      hasProgressBar: true,
-      progressPct: savingsPct,
-      subtext: `${savingsPct}% saved`,
-      textColor: unallocated < 0 ? "text-danger" : "text-dark",
+      
     },
   ];
 
@@ -156,11 +153,7 @@ export default function DashboardScreen(_: Props) {
                       {card.subtext}
                     </p>
                   )}
-                  {card.hasProgressBar && (
-                    <div className="mt-1 mt-sm-2">
-                      <ProgBar pct={card.progressPct ?? 0} />
-                    </div>
-                  )}
+                  
                 </div>
               </div>
             </div>
