@@ -8,8 +8,10 @@ The application provides a modern user interface connected to a backend API and 
 ## 🚀 Live Demo
 
 🔗 https://clear-view-one.vercel.app/
+```bash
 username: demo@gmail.com
 password:demo
+```
 
 ## 📌 Project Overview
 
