@@ -172,7 +172,11 @@ Navigate to frontend:
 ```bash
 cd clearview_frontend
 ```
-Navigate to util folder and uncomment the local development code line  and comment out the render link line
+Navigate to util folder and uncomment the local development code line  and comment the onrender link line
+```bash
+// const API_BASE_URL = "https://clearview-backend-k466.onrender.com"
+const API_BASE_URL = "http://localhost:4000" // for local development
+```
 
 Install dependencies:
 
