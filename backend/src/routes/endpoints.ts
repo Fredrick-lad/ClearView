@@ -7,6 +7,15 @@ import TokenAuthenticator from "../middleware/tokenauthenticator.js";
 import { RowDataPacket } from "mysql2";
 import strict from "node:assert/strict";
 
+routes.get("/health", async (req: Request, res: Response) => {
+  try {
+    return res.sendStatus(200);
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(500);
+  }
+});
+
 routes.get("/", TokenAuthenticator,  async (req: Request, res: Response) => {
   try {
     const [data] = await pool.query("SELECT * FROM Users");
