@@ -214,25 +214,6 @@ The database design focuses on:
 
 ---
 
-# 📸 Screenshots
-
-Add screenshots here:
-
-```
-screenshots/
-│
-├── dashboard.png
-├── login.png
-├── expenses.png
-└── database.png
-```
-
-Example:
-
-![Dashboard](./screenshots/dashboard.png)
-
----
-
 # 👨‍💻 Developer
 
 **Fredrick Mwangangi**
