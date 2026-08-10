@@ -1,258 +1,322 @@
-# ClearView - Personal Finance Management Platform
+# ClearView — Personal Finance Management Platform
 
+> A full-stack, envelope-based budgeting app that helps students and young professionals take control of their money — one envelope at a time.
 
-ClearView is a full-stack personal finance management platform designed to help users track expenses, manage budgets, and gain better control over their financial activities.
+ClearView lets users record income, split it into smart spending **envelopes**, track every expense, and watch their semester budget in real time. Built as a modern full-stack application with a React + TypeScript frontend, an Express + TypeScript API, and a MySQL database, it demonstrates end-to-end product development: onboarding, state management, REST APIs, authentication, notifications, email delivery, and responsive UI.
 
-The application provides a modern user interface connected to a backend API and database system, demonstrating full-stack development practices including frontend development, backend engineering, API design, and database management.
+---
 
 ## 🚀 Live Demo
 
-🔗 https://clear-view-one.vercel.app/
-```bash
-username: demo@gmail.com
-password:demo
+🔗 **Frontend:** https://clear-view-one.vercel.app/
+🔗 **Backend API:** https://clearview-backend-k466.onrender.com/
+
+```text
+email:    demo@gmail.com
+password: demo
 ```
 
-## 📌 Project Overview
-
-Managing personal finances can be challenging, especially for students and young professionals. ClearView provides a simple platform where users can record expenses, organize transactions, and monitor their financial progress.
-
-The project focuses on:
-
-- User-friendly financial tracking
-- Efficient data management
-- Scalable backend architecture
-- Responsive user experience
+> Tip: while logged in, open Settings → toggle **Email Reports** on to try the email notification feature.
 
 ---
 
-# ✨ Features
+## ✨ Features
 
-## User Features
+### Budgeting
+- **Envelope system** — set monthly limits per category (Food, Transport, Academics…)
+- **70/30 rule** — 70% of income auto-allocated into envelopes, 30% kept as an unallocated safety buffer
+- **Budget alerts** — automatic notifications (and optional emails) when an envelope reaches 90% of its limit
+- **Envelope editor** — rename, change limits, swap icons, or delete envelopes (funds are freed back)
 
-- User account management
-- Expense tracking
-- Budget monitoring
-- Financial overview dashboard
-- Transaction management
+### Tracking & Insights
+- **Dashboard** — at-a-glance overview of total income, budgeted, spent, and unallocated funds
+- **Expenses** — log, edit, and remove expenses against envelopes in real time
+- **Income** — record allowance, scholarship, part-time jobs, or M-Pesa remittances
+- **Reports** — visual breakdowns with bar charts and pie charts, plus a spending leaderboard
 
-## System Features
+### Notifications & Email
+- **In-app notifications** — activity feed (expenses, income, envelopes, edits, alerts) with a **bell icon that shows an unread badge and changes state** when there are new notifications
+- **Email notifications** — same events delivered to your inbox via **Nodemailer (SMTP)**, gated by the *Email Reports* toggle
+- **Password reset** — "Forgot password?" flow emails a secure one-time reset link (JWT, 1-hour expiry)
 
-- REST API architecture
-- Database-driven application
-- Frontend and backend separation
-- Responsive user interface
-- Structured project organization
+### Onboarding & UX
+- **3-step onboarding wizard** — set a savings goal, add income, and get auto-created envelopes
+- **Dark / light mode** (system-aware) plus appearance and formatting preferences
+- **Responsive** — desktop sidebar, mobile bottom navigation, and a floating action button (FAB)
+- **Help Center & Contact Support** pages (public and in-app)
 
 ---
 
-# 🏗️ System Architecture
+## 🛠️ Tech Stack
+
+### Frontend — `clearview_frontend/`
+| Technology | Purpose |
+|---|---|
+| React 19 | UI framework |
+| TypeScript | Type-safe development |
+| Vite | Build tool & dev server |
+| Bootstrap 5 + custom SCSS | Styling, themes, layout |
+| React Router v7 | Routing & protected routes |
+| Recharts | Budget/expense visualizations |
+| Lucide React | Icon system |
+
+### Backend — `backend/`
+| Technology | Purpose |
+|---|---|
+| Node.js + Express 5 | REST API |
+| TypeScript (tsx) | Type-safe server code |
+| MySQL (mysql2) | Relational database |
+| bcrypt | Password hashing |
+| jsonwebtoken | Auth + reset tokens (httpOnly cookies) |
+| Nodemailer | SMTP email delivery |
+
+### Deployment
+- **Frontend:** Vercel
+- **Backend:** Render
+- **Database:** MySQL (local or cloud-hosted, e.g. Clever Cloud)
+
+---
+
+## 🏗️ System Architecture
 
 ```
-             Client Application
-                    |
-                    |
-              React Frontend
-                    |
-                    |
-              REST API Layer
-                    |
-                    |
-          Node.js / Express Backend
-                    |
-                    |
-                MySQL Database
+        ┌──────────────────────┐
+        │  React + TypeScript   │   Vercel
+        │  (Vite / Bootstrap)   │
+        └──────────┬───────────┘
+                   │  HTTPS + credentials
+                   ▼
+        ┌──────────────────────┐
+        │   Express REST API    │   Render
+        │  (JWT httpOnly auth)  │
+        └──────────┬───────────┘
+                   │
+        ┌──────────┴───────────┐
+        │      MySQL DB         │
+        │ Users · Envelopes ·   │
+        │ Expenses · Income ·   │
+        │ BudgetPeriods ·       │
+        │ IncomeAllocation      │
+        └──────────────────────┘
+
+        ┌──────────────────────┐
+        │  Nodemailer (SMTP)    │   password reset + notifications
+        └──────────────────────┘
 ```
 
----
-
-# 🛠️ Technologies Used
-
-## Frontend
-
-- React.js
-- TypeScript
-- CSS / Bootstrap
-- Vercel Deployment
-
-## Backend
-
-- Node.js
-- Express.js
-- REST API
-- JavaScript
-
-## Database
-
-- MySQL
-- Relational Database Design
-
-## Development Tools
-
-- Git
-- GitHub
-- Vercel
+**Auth flow:** the server issues a JWT stored in an httpOnly cookie; protected routes are guarded by a `TokenAuthenticator` middleware.
 
 ---
 
-# 📂 Project Structure
+## 📂 Project Structure
 
 ```
 ClearView/
-
-│
 ├── backend/
-│   ├── controllers/
-│   ├── routes/
-│   ├── models/
-│   ├── middleware/
-│   └── server.js
+│   ├── src/
+│   │   ├── middleware/          # JWT auth middleware
+│   │   ├── routes/endpoints.ts  # All REST API endpoints
+│   │   ├── util/                # JWT tokens, mailer (Nodemailer)
+│   │   ├── database.ts          # MySQL connection pool
+│   │   └── server.ts            # Express app entry point
+│   ├── .env                     # DB + SMTP + JWT config (git-ignored)
+│   └── package.json
 │
 ├── clearview_frontend/
 │   ├── src/
-│   ├── components/
-│   ├── pages/
-│   └── assets/
+│   │   ├── components/          # Layout (Sidebar/Topbar/MobileNav), charts, UI
+│   │   ├── screens/             # Dashboard, Envelopes, Expenses, Income,
+│   │   │                        # Reports, Notifications, Settings, Profile…
+│   │   ├── modals/              # Add/Edit/Delete modals
+│   │   ├── hooks/context/       # Auth + global (screen/notification) contexts
+│   │   ├── onboarding/          # Auth pages + 3-step onboarding wizard
+│   │   ├── routes/              # React Router configuration
+│   │   ├── utils/               # API client, email helpers, formatters
+│   │   └── types/               # Shared TypeScript types
+│   ├── index.html
+│   └── package.json
 │
+├── screenshots/                 # Presentation screenshots
 └── README.md
 ```
 
 ---
 
-# ⚙️ Local deveoplment guide
+## ⚙️ Local Setup
 
-## Clone Repository
+### Prerequisites
+- Node.js ≥ 20
+- MySQL server running locally
+- (Optional) an SMTP account (Gmail app password, Zoho, etc.)
 
-```bash
-git clone https://github.com/Fredrick-lad/ClearView.git
-```
-
-Move into project:
-
-```bash
-cd ClearView
-```
-
----
-
-# Backend Setup
-
-Navigate to backend:
+### 1. Backend
 
 ```bash
 cd backend
-```
-
-Install dependencies:
-
-```bash
 npm install
 ```
 
-Create environment variables:
-
-```
-DB_HOST=
-DB_USER=
-DB_PASSWORD=
-DB_NAME=
-PORT=
-```
-
-Start backend server:
+Create a `.env` file (see [Environment Variables](#environment-variables)):
 
 ```bash
-npm start
+cp .env.example .env   # if provided, or create from the table below
 ```
 
----
+Start the API:
 
-# Frontend Setup
+```bash
+npm run dev        # development (tsx watch)
+npm run build      # type-check + compile to dist/
+npm start          # production
+```
 
-Navigate to frontend:
+The server runs at `http://localhost:4000`.
+
+### 2. Frontend
 
 ```bash
 cd clearview_frontend
-```
-Navigate to util folder and uncomment the local development code line  and comment the onrender link line
-```bash
-// const API_BASE_URL = "https://clearview-backend-k466.onrender.com"
-const API_BASE_URL = "http://localhost:4000" // for local development
-```
-
-Install dependencies:
-
-```bash
 npm install
 ```
 
-Run development server:
+Point the app at your local API in `src/utils/api.ts`:
+
+```ts
+// const API_BASE_URL = "https://clearview-backend-k466.onrender.com"
+const API_BASE_URL = "http://localhost:4000" // local development
+```
+
+Run the dev server:
 
 ```bash
 npm run dev
 ```
 
----
-
-# 🗄️ Database Design
-
-ClearView uses a relational database structure designed for efficient data management.
-
-Main entities include:
-
-- Users
-- Expenses
-- Transactions
-- Categories
-- Budgets
-
-The database design focuses on:
-
-- Data consistency
-- Reduced redundancy
-- Efficient queries
+Open **http://localhost:5173**.
 
 ---
 
-# 👨‍💻 Developer
+## 🔐 Environment Variables
+
+### Backend (`.env`)
+```env
+# Database
+DB_HOST=localhost
+DB_USER=your_db_user
+DB_PASS=your_db_password
+DB_NAME=Clearview
+DB_PORT=3306
+
+# CORS
+ALLOWED_ORIGINS=http://localhost:5173
+
+# Auth
+JWT_SECRET=your-long-random-secret
+FRONTEND_URL=http://localhost:5173
+
+# SMTP (Nodemailer) — email notifications + password reset
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-email@gmail.com
+SMTP_PASS=your-app-password
+SMTP_FROM=ClearView <your-email@gmail.com>
+```
+
+> For Gmail, create an [App Password](https://support.google.com/accounts/answer/185833) — your normal password won't work for SMTP.
+
+### Frontend
+Update `clearview_frontend/src/utils/api.ts` with your backend URL.
+
+---
+
+## 🗄️ Database Schema
+
+Core tables used by the API:
+
+| Table | Purpose | Key columns |
+|---|---|---|
+| `Users` | Accounts | `id`, `firstName`, `lastName`, `email`, `password_hash` |
+| `Envelopes` | Spending categories | `id`, `user_id`, `name`, `monthly_limit`, `current_spend`, `icon_name` |
+| `Expenses` | Transaction log | `id`, `user_id`, `envelope_id`, `period_id`, `amount`, `description`, `expense_date` |
+| `Income` | Income sources | `id`, `user_id`, `period_id`, `source`, `total_amount` |
+| `BudgetPeriods` | Semesters/periods | `id`, `user_id`, `label`, `start_date`, `end_date` |
+| `IncomeAllocation` | Allocation record | `income_id`, `envelope_id`, `allocated_amount` |
+
+---
+
+## 📡 API Endpoints
+
+| Method | Endpoint | Auth | Description |
+|---|---|---|---|
+| `GET` | `/health` | — | Health check |
+| `POST` | `/register` | — | Create account |
+| `POST` | `/login` | — | Log in (sets httpOnly JWT cookie) |
+| `POST` | `/checkemail` | — | Check email availability |
+| `POST` | `/forgot-password` | — | Send password reset email |
+| `POST` | `/reset-password` | — | Set new password from reset token |
+| `GET` | `/me` | ✅ | Fetch user, envelopes, income, expenses, periods |
+| `GET` | `/getenvelopes` | ✅ | List envelopes |
+| `POST` | `/addenvelope` | ✅ | Create envelope |
+| `PUT` | `/editenvelope/:id` | ✅ | Update envelope |
+| `DELETE` | `/deleteenvelope/:id` | ✅ | Delete envelope |
+| `POST` | `/addperiod` | ✅ | Create budget period |
+| `POST` | `/addincome` | ✅ | Add income source |
+| `POST` | `/addexpense` | ✅ | Add expense (updates envelope spend) |
+| `PUT` | `/editexpense/:id` | ✅ | Edit expense (recalculates spend) |
+| `POST` | `/send-notification-email` | ✅ | Send a notification email |
+| `PUT` | `/update-profile` | ✅ | Update profile |
+| `PUT` | `/change-password` | ✅ | Change password |
+| `DELETE` | `/delete-account` | ✅ | Delete account + related data |
+| `POST` | `/logout` | ✅ | Clear session |
+
+---
+
+## 📧 Email Service
+
+ClearView ships a complete **Nodemailer** integration:
+
+- **Notification emails** — when an event creates an in-app notification (new expense, income, envelope, edit, or budget alert ≥ 90%), an email is sent to the account address *if* the **Email Reports** toggle is enabled (Settings / Profile).
+- **Budget alert deduplication** — each alert threshold is emailed only once (tracked locally).
+- **Password reset** — `/forgot-password` emails a link to `/reset-password?token=…`. The token is a JWT valid for **1 hour**; `/reset-password` verifies it and updates the password.
+
+All SMTP credentials are configured via environment variables (see above).
+
+---
+
+## ✅ Skills Demonstrated
+
+- Full-stack application development (React + Node/Express + MySQL)
+- REST API design & integration
+- Secure authentication with hashed passwords and JWT httpOnly cookies
+- State management with React Context
+- Responsive, themeable UI (dark/light, mobile navigation)
+- Third-party service integration (Nodemailer/SMTP)
+- Environment-based configuration & deployment (Vercel + Render)
+
+---
+
+## 🚧 Future Improvements
+
+- Advanced financial analytics & forecasting
+- Recurring transactions
+- Multi-currency & exchange-rate support
+- Automated test suite (unit + integration)
+- Budget sharing / groups
+- Native mobile app (React Native)
+
+---
+
+## 👨‍💻 Developer
 
 **Fredrick Mwangangi**
 
-Business Information Technology Student  
-Kabarak University
+Business Information Technology Student · Kabarak University
 
-Interested in:
-
-- Backend Engineering
-- Database Systems
-- Full-Stack Development
-- Software Architecture
+Interested in: Backend Engineering · Database Systems · Full-Stack Development · Software Architecture
 
 ---
 
-# 📚 Skills Demonstrated
-
-This project demonstrates:
-
-✅ Backend API Development  
-✅ Database Design  
-✅ RESTful Services  
-✅ Frontend Development  
-✅ System Architecture  
-✅ Git Version Control  
-
----
-
-# Future Improvements
-
-- Add advanced financial analytics
-- Implement role-based access control
-- Add automated  testing
-- Improve reporting features
-- Add mobile application support
-
----
-
-# License
+## 📄 License
 
 This project is for educational and portfolio purposes.
