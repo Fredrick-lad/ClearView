@@ -3,6 +3,12 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+const isSmtpConfigured = () =>
+  Boolean(process.env.SMTP_USER) &&
+  !process.env.SMTP_USER.includes("your-email") &&
+  Boolean(process.env.SMTP_PASS) &&
+  !process.env.SMTP_PASS.includes("your-app-password");
+
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || "smtp.gmail.com",
   port: parseInt(process.env.SMTP_PORT || "587", 10),
@@ -11,6 +17,9 @@ const transporter = nodemailer.createTransport({
     user: process.env.SMTP_USER || "",
     pass: process.env.SMTP_PASS || "",
   },
+  connectionTimeout: 15000,
+  greetingTimeout: 15000,
+  socketTimeout: 20000,
 });
 
 const fromAddress =
@@ -54,6 +63,14 @@ export async function sendNotificationEmail(
     };
   })();
   const content = wrapEmail(title, bodyHtml, bodyText);
+
+  if (!isSmtpConfigured()) {
+    console.log(
+      `[ClearView] SMTP not configured — no email sent. Would have emailed ${to}:\n${content.text}`,
+    );
+    return;
+  }
+
   await transporter.sendMail({
     from: fromAddress,
     to,
@@ -81,6 +98,14 @@ export async function sendPasswordResetEmail(to: string, resetUrl: string) {
     `,
     `Reset your ClearView password\n\n${resetUrl}`,
   );
+
+  if (!isSmtpConfigured()) {
+    console.log(
+      `[ClearView] SMTP not configured — no email sent. Would have emailed ${to}:\n${content.text}`,
+    );
+    return;
+  }
+
   await transporter.sendMail({
     from: fromAddress,
     to,
