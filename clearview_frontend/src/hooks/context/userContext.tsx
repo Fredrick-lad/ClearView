@@ -136,16 +136,16 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         credentials: "include",
         body: JSON.stringify(loginFormData),
       });
-      const { user } = await response.json();
+      const data = await response.json();
       if (response.ok) {
         setIsSignedin(true);
-        setUserData(user);
+        setUserData(data.user);
         setIsLoading(false);
         return true;
       } 
       else {
         setIsLoading(false);
-        setError(user.message || "Login failed");
+        setError(data.message || "Login failed");
         return false;
       }
     } catch (error) {

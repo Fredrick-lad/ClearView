@@ -34,7 +34,7 @@ routes.post("/login", async (req: Request, res: Response) => {
 
     const { email, password} = req.body;
 
-    if (!password && !email) {
+    if (!password || !email) {
       return res.status(400).json({ message: "Email and password required" });
     }
 
