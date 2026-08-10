@@ -17,7 +17,7 @@ export default function UserProfileContent() {
     return localStorage.getItem("pushNotifications") !== "false";
   });
   const [emailReports, setEmailReports] = useState(() => {
-    return localStorage.getItem("emailReports") === "true";
+    return localStorage.getItem("cv_emailReports") === "true";
   });
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export default function UserProfileContent() {
   }, [pushNotifications]);
 
   useEffect(() => {
-    localStorage.setItem("emailReports", String(emailReports));
+    localStorage.setItem("cv_emailReports", String(emailReports));
   }, [emailReports]);
 
   const [editing, setEditing] = useState(false);

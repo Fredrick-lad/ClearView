@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState, type FormEvent } from "react";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import LoadingScreen from "../components/loadingscreen";
 import { useAuth } from "../hooks/context/userContext";
 import { Eye, EyeOff, Mail, Lock, User, ArrowLeft } from "lucide-react";
+import { forgotPassword, resetPassword } from "../utils/email";
 
 const brand = {
   primary: "#0F6E56",
@@ -289,7 +290,224 @@ function Login() {
 }
 
 function Forgotpassword() {
-  return <></>;
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setMessage("");
+    setLoading(true);
+    const res = await forgotPassword(email);
+    setLoading(false);
+    if (res.ok) {
+      setMessage(res.message || "If that email is registered, a reset link has been sent.");
+    } else {
+      setError(res.message || "Something went wrong. Please try again.");
+    }
+  };
+
+  return (
+    <>
+      {loading ? <LoadingScreen /> : (
+        <div style={{ minHeight: "100vh", background: "#f8faf9", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}>
+          <style>{`@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap');`}</style>
+          <div
+            style={{
+              background: "#FFFFFF",
+              border: "0.5px solid rgba(24,24,26,0.10)",
+              borderRadius: "20px",
+              padding: "2.25rem",
+              boxShadow: "0 2px 40px rgba(24,24,26,0.06)",
+              maxWidth: "420px",
+              width: "100%",
+              animation: "floatUp 0.6s ease both",
+            }}
+          >
+            <form onSubmit={handleSubmit}>
+              <Link to="/login" style={{ color: brand.primary, fontSize: "13px", fontWeight: 500, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "4px", marginBottom: "1.5rem" }}>
+                <ArrowLeft size={14} /> Back to login
+              </Link>
+
+              <div style={{ marginBottom: "1.5rem" }}>
+                <h1 style={{ ...brand.serif, fontSize: "1.6rem", fontWeight: 700, color: brand.dark, marginBottom: "0.3rem" }}>
+                  Forgot password?
+                </h1>
+                <p style={{ fontSize: "14px", color: "#8A8A94", margin: 0, lineHeight: 1.5 }}>
+                  Enter your email and we'll send you a link to reset your password.
+                </p>
+              </div>
+
+              <div className="mb-3">
+                <label style={{ fontSize: "12px", fontWeight: 600, color: "#4A4A50", marginBottom: "4px", display: "block", letterSpacing: "0.03em" }}>Email</label>
+                <div style={{ position: "relative" }}>
+                  <Mail size={16} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#8A8A94", pointerEvents: "none" }} />
+                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@kabarak.ac.ke" required
+                    style={{ width: "100%", padding: "10px 12px 10px 38px", border: "1px solid #e2e8f0", borderRadius: "10px", fontSize: "14px", outline: "none", background: "#fafafa", boxSizing: "border-box" }}
+                    onFocus={(e) => e.target.style.borderColor = brand.primary}
+                    onBlur={(e) => e.target.style.borderColor = "#e2e8f0"}
+                  />
+                </div>
+              </div>
+
+              {message && (
+                <p style={{ fontSize: "13px", color: brand.primary, textAlign: "center", background: brand.lightBg, padding: "10px", borderRadius: "8px", marginBottom: "1rem", fontWeight: 500, lineHeight: 1.5 }}>
+                  {message}
+                </p>
+              )}
+              {error && (
+                <p style={{ fontSize: "13px", color: "#dc3545", textAlign: "center", background: "#fef2f2", padding: "8px", borderRadius: "8px", marginBottom: "1rem", fontWeight: 500 }}>
+                  {error}
+                </p>
+              )}
+
+              <button type="submit"
+                style={{ width: "100%", padding: "12px", background: brand.primary, color: "#fff", border: "none", borderRadius: "10px", fontSize: "15px", fontWeight: 600, cursor: "pointer", transition: "opacity 0.2s" }}
+                onMouseEnter={(e) => e.currentTarget.style.opacity = "0.9"}
+                onMouseLeave={(e) => e.currentTarget.style.opacity = "1"}
+              >
+                Send reset link
+              </button>
+
+              <p style={{ fontSize: "13px", color: "#8A8A94", textAlign: "center", marginTop: "1.25rem", marginBottom: 0 }}>
+                Remembered it?{" "}
+                <Link to="/login" style={{ color: brand.primary, fontWeight: 600, textDecoration: "none" }}>
+                  Log in
+                </Link>
+              </p>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }
 
-export { Login, Register, Forgotpassword };
+function ResetPassword() {
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token") || "";
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [message, setMessage] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setMessage("");
+    if (password !== confirmPassword) {
+      setMessage("Passwords don't match");
+      return;
+    }
+    setLoading(true);
+    const res = await resetPassword(token, password);
+    setLoading(false);
+    if (res.ok) {
+      setSuccess(true);
+      setMessage(res.message || "Password reset successfully.");
+    } else {
+      setMessage(res.message || "Something went wrong. Please try again.");
+    }
+  };
+
+  return (
+    <>
+      {loading ? <LoadingScreen /> : (
+        <div style={{ minHeight: "100vh", background: "#f8faf9", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }}>
+          <style>{`@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap');`}</style>
+          <div
+            style={{
+              background: "#FFFFFF",
+              border: "0.5px solid rgba(24,24,26,0.10)",
+              borderRadius: "20px",
+              padding: "2.25rem",
+              boxShadow: "0 2px 40px rgba(24,24,26,0.06)",
+              maxWidth: "420px",
+              width: "100%",
+              animation: "floatUp 0.6s ease both",
+            }}
+          >
+            <form onSubmit={handleSubmit}>
+              <Link to="/login" style={{ color: brand.primary, fontSize: "13px", fontWeight: 500, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "4px", marginBottom: "1.5rem" }}>
+                <ArrowLeft size={14} /> Back to login
+              </Link>
+
+              <div style={{ marginBottom: "1.5rem" }}>
+                <h1 style={{ ...brand.serif, fontSize: "1.6rem", fontWeight: 700, color: brand.dark, marginBottom: "0.3rem" }}>
+                  Set a new password
+                </h1>
+                <p style={{ fontSize: "14px", color: "#8A8A94", margin: 0, lineHeight: 1.5 }}>
+                  Choose a strong password for your account.
+                </p>
+              </div>
+
+              {!token && (
+                <p style={{ fontSize: "13px", color: "#dc3545", textAlign: "center", background: "#fef2f2", padding: "8px", borderRadius: "8px", marginBottom: "1rem", fontWeight: 500 }}>
+                  This reset link is invalid or missing. Please request a new one.
+                </p>
+              )}
+
+              <div className="mb-3">
+                <label style={{ fontSize: "12px", fontWeight: 600, color: "#4A4A50", marginBottom: "4px", display: "block", letterSpacing: "0.03em" }}>New Password</label>
+                <div style={{ position: "relative" }}>
+                  <Lock size={16} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#8A8A94", pointerEvents: "none" }} />
+                  <input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="At least 6 characters" required
+                    style={{ width: "100%", padding: "10px 38px 10px 38px", border: "1px solid #e2e8f0", borderRadius: "10px", fontSize: "14px", outline: "none", background: "#fafafa", boxSizing: "border-box" }}
+                    onFocus={(e) => e.target.style.borderColor = brand.primary}
+                    onBlur={(e) => e.target.style.borderColor = "#e2e8f0"}
+                  />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", border: "none", background: "none", padding: 0, cursor: "pointer", color: "#8A8A94", lineHeight: 0 }}>
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="mb-3">
+                <label style={{ fontSize: "12px", fontWeight: 600, color: "#4A4A50", marginBottom: "4px", display: "block", letterSpacing: "0.03em" }}>Confirm Password</label>
+                <div style={{ position: "relative" }}>
+                  <Lock size={16} style={{ position: "absolute", left: "12px", top: "50%", transform: "translateY(-50%)", color: "#8A8A94", pointerEvents: "none" }} />
+                  <input type={showConfirm ? "text" : "password"} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Repeat your password" required
+                    style={{ width: "100%", padding: "10px 38px 10px 38px", border: "1px solid #e2e8f0", borderRadius: "10px", fontSize: "14px", outline: "none", background: "#fafafa", boxSizing: "border-box" }}
+                    onFocus={(e) => e.target.style.borderColor = brand.primary}
+                    onBlur={(e) => e.target.style.borderColor = "#e2e8f0"}
+                  />
+                  <button type="button" onClick={() => setShowConfirm(!showConfirm)} style={{ position: "absolute", right: "12px", top: "50%", transform: "translateY(-50%)", border: "none", background: "none", padding: 0, cursor: "pointer", color: "#8A8A94", lineHeight: 0 }}>
+                    {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+              </div>
+
+              {message && (
+                <p style={{ fontSize: "13px", color: success ? brand.primary : "#dc3545", textAlign: "center", background: success ? brand.lightBg : "#fef2f2", padding: "10px", borderRadius: "8px", marginBottom: "1rem", fontWeight: 500, lineHeight: 1.5 }}>
+                  {message}
+                </p>
+              )}
+
+              {success ? (
+                <Link to="/login"
+                  style={{ display: "block", width: "100%", padding: "12px", background: brand.primary, color: "#fff", textAlign: "center", textDecoration: "none", borderRadius: "10px", fontSize: "15px", fontWeight: 600, boxSizing: "border-box" }}
+                >
+                  Go to login
+                </Link>
+              ) : (
+                <button type="submit" disabled={!token}
+                  style={{ width: "100%", padding: "12px", background: token ? brand.primary : "#cbd5d1", color: "#fff", border: "none", borderRadius: "10px", fontSize: "15px", fontWeight: 600, cursor: token ? "pointer" : "not-allowed", transition: "opacity 0.2s" }}
+                  onMouseEnter={(e) => { if (token) e.currentTarget.style.opacity = "0.9"; }}
+                  onMouseLeave={(e) => { if (token) e.currentTarget.style.opacity = "1"; }}
+                >
+                  Reset password
+                </button>
+              )}
+            </form>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+export { Login, Register, Forgotpassword, ResetPassword };

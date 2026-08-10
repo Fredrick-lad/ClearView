@@ -3,9 +3,11 @@ import pool from "../database.js";
 import bcrypt from "bcrypt";
 const routes = Router();
 import generateToken from "../util/tokengenerator.js";
+import jwt from "jsonwebtoken";
 import TokenAuthenticator from "../middleware/tokenauthenticator.js";
 import { RowDataPacket } from "mysql2";
 import strict from "node:assert/strict";
+import { sendNotificationEmail, sendPasswordResetEmail } from "../util/mailer.js";
 
 routes.get("/health", async (req: Request, res: Response) => {
   try {
@@ -429,6 +431,116 @@ routes.delete("/delete-account", TokenAuthenticator, async (req: Request, res: R
   }
 });
 
+routes.post("/send-notification-email", TokenAuthenticator, async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const { title, description } = req.body;
+
+    if (!title || !description) {
+      return res.status(400).json({ message: "Title and description are required" });
+    }
+
+    const [rows]: any = await pool.query(
+      "SELECT email FROM Users WHERE id = ?",
+      [user.userid],
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    await sendNotificationEmail(rows[0].email, { title, description });
+
+    return res.status(200).json({ message: "Notification email sent" });
+  } catch (error) {
+    console.error("Notification email error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+routes.post("/forgot-password", async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const [rows]: any = await pool.query(
+      "SELECT id, email FROM Users WHERE email = ?",
+      [email],
+    );
+
+    if (rows.length === 0) {
+      return res.status(200).json({ message: "If that email is registered, a reset link has been sent." });
+    }
+
+    const user = rows[0];
+    const secret = process.env.JWT_SECRET || "";
+    const resetToken = jwt.sign(
+      { userid: user.id, email: user.email, purpose: "password-reset" },
+      secret,
+      { expiresIn: "1h" },
+    );
+
+    const frontendUrl = process.env.FRONTEND_URL || "https://clear-view-one.vercel.app";
+    const resetUrl = `${frontendUrl}/reset-password?token=${resetToken}`;
+
+    await sendPasswordResetEmail(user.email, resetUrl);
+
+    return res.status(200).json({ message: "If that email is registered, a reset link has been sent." });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+routes.post("/reset-password", async (req: Request, res: Response) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+      return res.status(400).json({ message: "Token and new password are required" });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: "New password must be at least 6 characters" });
+    }
+
+    const secret = process.env.JWT_SECRET || "";
+    let payload: any;
+    try {
+      payload = jwt.verify(token, secret);
+    } catch (error) {
+      return res.status(400).json({ message: "Reset link is invalid or has expired" });
+    }
+
+    if (payload.purpose !== "password-reset") {
+      return res.status(400).json({ message: "Reset link is invalid or has expired" });
+    }
+
+    const [rows]: any = await pool.query(
+      "SELECT id FROM Users WHERE id = ?",
+      [payload.userid],
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const password_hash = await bcrypt.hash(newPassword, salt);
+
+    await pool.query(
+      "UPDATE Users SET password_hash = ? WHERE id = ?",
+      [password_hash, payload.userid],
+    );
+
+    return res.status(200).json({ message: "Password reset successfully" });
+  } catch (error) {
+    console.error("Reset password error:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 export default routes;
-
-

@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
 import NotFound from "../components/NotFound";
-import { Login, Register, Forgotpassword } from "../onboarding/onboading";
+import { Login, Register, Forgotpassword, ResetPassword } from "../onboarding/onboading";
 import LandingPage from "../components/landingpage";
 import MainScreen from "../screens/MainScreen";
 import PublicHelpScreen from "../screens/PublicHelpScreen";
@@ -46,6 +46,10 @@ const routes = createBrowserRouter([
       {
         path: "/forgotpassword",
         element: <Forgotpassword />,
+      },
+      {
+        path: "/reset-password",
+        element: <ResetPassword />,
       },
       {
         path: "/register",

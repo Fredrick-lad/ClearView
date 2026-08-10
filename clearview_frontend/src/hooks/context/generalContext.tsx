@@ -1,6 +1,8 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { createContext, useContext } from "react";
 import { type ModalKind, type ScreenKey } from "../../types";
+import { useAuth } from "./userContext";
+import { emailReportsEnabled, sendNotificationEmail } from "../../utils/email";
 
 export interface NotificationItem {
   id: string;
@@ -32,6 +34,7 @@ interface envelopeContextType {
 export const generalContext = createContext<envelopeContextType | null>(null);
 
 function DataContext({ children }: { children: React.ReactNode }) {
+  const { userData } = useAuth();
   const getInitialScreen = (): ScreenKey => {
     const params = new URLSearchParams(window.location.search);
     const s = params.get("screen");
@@ -93,8 +96,7 @@ function DataContext({ children }: { children: React.ReactNode }) {
   const [modal, setModal] = useState<ModalKind>(null);
   const [selectedOption, setSelectedOption] = useState<
     "preset" | "scratch" | null
-  >(null);
-  const [selectedEnvelope, setSelectedEnvelope] = useState<any>(null);
+  >(null);  const [selectedEnvelope, setSelectedEnvelope] = useState<any>(null);
   const [selectedExpense, setSelectedExpense] = useState<any>(null);
   const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
     try {
@@ -116,7 +118,13 @@ function DataContext({ children }: { children: React.ReactNode }) {
       localStorage.setItem("cv_notifications", JSON.stringify(next));
       return next;
     });
-  }, []);
+    if (emailReportsEnabled() && userData?.email) {
+      void sendNotificationEmail({
+        title: item.title,
+        description: item.description,
+      });
+    }
+  }, [userData]);
 
   const clearNotifications = useCallback(() => {
     setNotifications([]);

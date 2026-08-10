@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, ArrowDown, DollarSign, Wallet } from "lucide-react";
 import { GetData } from "../hooks/context/generalContext";
+import { useAuth } from "../hooks/context/userContext";
+import { emailReportsEnabled, sendNotificationEmail } from "../utils/email";
 import Sidebar from "../components/layout/Sidebar";
 import DashboardScreen from "./DashboardScreen";
 import EnvelopesScreen from "./EnvelopesScreen";
@@ -24,7 +26,50 @@ import EnvelopeSuccessModal from "../modals/EnvelopeSucces";
 
 function MainScreen() {
   const { screen, setScreen, modal, setModal } = GetData();
+  const { userData, envelopeData } = useAuth();
   const [fabOpen, setFabOpen] = useState(false);
+
+  useEffect(() => {
+    if (!emailReportsEnabled() || !userData?.email) return;
+
+    const envelopes: Array<{
+      id?: number;
+      name?: string;
+      current_spend?: string | number;
+      monthly_limit?: string | number;
+    }> = Array.isArray(envelopeData) ? envelopeData : [];
+
+    let sent: string[];
+    try {
+      sent = JSON.parse(
+        localStorage.getItem("cv_emailedBudgetAlerts") || "[]",
+      );
+    } catch {
+      sent = [];
+    }
+
+    const nextSent = new Set(sent);
+    for (const env of envelopes) {
+      const spent = parseFloat(String(env.current_spend)) || 0;
+      const limit = parseFloat(String(env.monthly_limit)) || 0;
+      if (limit > 0 && spent / limit >= 0.9) {
+        const key = `budget-${env.id}-${Math.floor((spent / limit) * 10)}`;
+        if (!nextSent.has(key)) {
+          nextSent.add(key);
+          void sendNotificationEmail({
+            title: `Budget Alert: ${env.name}`,
+            description: `You\u2019ve used ${Math.round((spent / limit) * 100)}% of your monthly ${env.name} budget.`,
+          });
+        }
+      }
+    }
+    if (nextSent.size !== sent.length) {
+      localStorage.setItem(
+        "cv_emailedBudgetAlerts",
+        JSON.stringify([...nextSent]),
+      );
+    }
+  }, [envelopeData, userData?.email]);
 
   const handleFabAction = (action: () => void) => {
     setFabOpen(false);
