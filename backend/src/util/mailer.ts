@@ -1,34 +1,16 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const isSmtpConfigured = () => {
-  const user = process.env.SMTP_USER || "";
-  const pass = process.env.SMTP_PASS || "";
-  return (
-    Boolean(user) &&
-    !user.includes("your-email") &&
-    Boolean(pass) &&
-    !pass.includes("your-app-password")
-  );
-};
+const apiKey = process.env.RESEND_API_KEY || "";
+const isResendConfigured = () =>
+  Boolean(apiKey) && !apiKey.startsWith("re_your-");
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || "smtp.gmail.com",
-  port: parseInt(process.env.SMTP_PORT || "587", 10),
-  secure: process.env.SMTP_SECURE === "true",
-  auth: {
-    user: process.env.SMTP_USER || "",
-    pass: process.env.SMTP_PASS || "",
-  },
-  connectionTimeout: 15000,
-  greetingTimeout: 15000,
-  socketTimeout: 20000,
-});
+const resend = new Resend(apiKey);
 
 const fromAddress =
-  process.env.SMTP_FROM || `ClearView <${process.env.SMTP_USER || "no-reply@clearview.app"}>`;
+  process.env.EMAIL_FROM || "onboarding@resend.dev";
 
 const brandColor = "#0F6E56";
 
@@ -54,41 +36,46 @@ function wrapEmail(title: string, bodyHtml: string, bodyText: string) {
   };
 }
 
+async function sendEmail(
+  to: string,
+  subject: string,
+  html: string,
+  text: string,
+) {
+  if (!isResendConfigured()) {
+    console.log(
+      `[ClearView] Resend not configured — no email sent. Would have emailed ${to}:\n${text}`,
+    );
+    return;
+  }
+  const { data, error } = await resend.emails.send({
+    from: fromAddress,
+    to,
+    subject,
+    html,
+    text,
+  });
+  if (error) {
+    throw new Error(error.message);
+  }
+  return data;
+}
+
 export async function sendNotificationEmail(
   to: string,
   info: { title: string; description: string },
 ) {
-  const { title, bodyHtml, bodyText } = (() => {
-    const subject = `ClearView: ${info.title}`;
-    const body = `<p style="margin:0 0 8px; color:#3f3f46; font-size:14px; line-height:1.6;">${info.description}</p>`;
-    return {
-      title: subject,
-      bodyHtml: body,
-      bodyText: `ClearView: ${info.title}\n\n${info.description}`,
-    };
-  })();
-  const content = wrapEmail(title, bodyHtml, bodyText);
-
-  if (!isSmtpConfigured()) {
-    console.log(
-      `[ClearView] SMTP not configured — no email sent. Would have emailed ${to}:\n${content.text}`,
-    );
-    return;
-  }
-
-  await transporter.sendMail({
-    from: fromAddress,
-    to,
-    subject: title,
-    html: content.html,
-    text: content.text,
-  });
+  const subject = `ClearView: ${info.title}`;
+  const bodyHtml = `<p style="margin:0 0 8px; color:#3f3f46; font-size:14px; line-height:1.6;">${info.description}</p>`;
+  const bodyText = `ClearView: ${info.title}\n\n${info.description}`;
+  const content = wrapEmail(subject, bodyHtml, bodyText);
+  await sendEmail(to, subject, content.html, content.text);
 }
 
 export async function sendPasswordResetEmail(to: string, resetUrl: string) {
-  const title = "Reset your ClearView password";
+  const subject = "Reset your ClearView password";
   const content = wrapEmail(
-    title,
+    subject,
     `
       <p style="margin:0 0 16px; color:#3f3f46; font-size:14px; line-height:1.6;">
         We received a request to reset your password. If this wasn't you, you can safely ignore this email.
@@ -103,19 +90,5 @@ export async function sendPasswordResetEmail(to: string, resetUrl: string) {
     `,
     `Reset your ClearView password\n\n${resetUrl}`,
   );
-
-  if (!isSmtpConfigured()) {
-    console.log(
-      `[ClearView] SMTP not configured — no email sent. Would have emailed ${to}:\n${content.text}`,
-    );
-    return;
-  }
-
-  await transporter.sendMail({
-    from: fromAddress,
-    to,
-    subject: title,
-    html: content.html,
-    text: content.text,
-  });
+  await sendEmail(to, subject, content.html, content.text);
 }

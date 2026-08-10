@@ -36,7 +36,7 @@ password: demo
 
 ### Notifications & Email
 - **In-app notifications** — activity feed (expenses, income, envelopes, edits, alerts) with a **bell icon that shows an unread badge and changes state** when there are new notifications
-- **Email notifications** — same events delivered to your inbox via **Nodemailer (SMTP)**, gated by the *Email Reports* toggle
+- **Email notifications** — same events delivered to your inbox via the **Resend API**, gated by the *Email Reports* toggle
 - **Password reset** — "Forgot password?" flow emails a secure one-time reset link (JWT, 1-hour expiry)
 
 ### Onboarding & UX
@@ -68,7 +68,7 @@ password: demo
 | MySQL (mysql2) | Relational database |
 | bcrypt | Password hashing |
 | jsonwebtoken | Auth + reset tokens (httpOnly cookies) |
-| Nodemailer | SMTP email delivery |
+| Resend | Email delivery (HTTPS API — no SMTP ports needed) |
 
 ### Deployment
 - **Frontend:** Vercel
@@ -100,7 +100,7 @@ password: demo
         └──────────────────────┘
 
         ┌──────────────────────┐
-        │  Nodemailer (SMTP)    │   password reset + notifications
+        │   Resend (HTTPS API)  │   email notifications + password reset
         └──────────────────────┘
 ```
 
@@ -116,10 +116,10 @@ ClearView/
 │   ├── src/
 │   │   ├── middleware/          # JWT auth middleware
 │   │   ├── routes/endpoints.ts  # All REST API endpoints
-│   │   ├── util/                # JWT tokens, mailer (Nodemailer)
+│   │   ├── util/                # JWT tokens, mailer (Resend)
 │   │   ├── database.ts          # MySQL connection pool
 │   │   └── server.ts            # Express app entry point
-│   ├── .env                     # DB + SMTP + JWT config (git-ignored)
+│   ├── .env                     # DB + Resend + JWT config (git-ignored)
 │   └── package.json
 │
 ├── clearview_frontend/
@@ -147,7 +147,7 @@ ClearView/
 ### Prerequisites
 - Node.js ≥ 20
 - MySQL server running locally
-- (Optional) an SMTP account (Gmail app password, Zoho, etc.)
+- (Optional) a [Resend](https://resend.com) API key (free tier ~100 emails/day)
 
 ### 1. Backend
 
@@ -214,16 +214,13 @@ ALLOWED_ORIGINS=http://localhost:5173
 JWT_SECRET=your-long-random-secret
 FRONTEND_URL=http://localhost:5173
 
-# SMTP (Nodemailer) — email notifications + password reset
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_SECURE=false
-SMTP_USER=your-email@gmail.com
-SMTP_PASS=your-app-password
-SMTP_FROM=ClearView <your-email@gmail.com>
+# Email (Resend) — email notifications + password reset
+# Get a key at https://resend.com/api-keys (free tier ~100 emails/day)
+RESEND_API_KEY=re_your-resend-api-key
+EMAIL_FROM=ClearView <onboarding@resend.dev>
 ```
 
-> For Gmail, create an [App Password](https://support.google.com/accounts/answer/185833) — your normal password won't work for SMTP.
+> Resend free tier uses `onboarding@resend.dev` as the sender until you verify your own domain. Create your API key at [resend.com/api-keys](https://resend.com/api-keys).
 
 ### Frontend
 Update `clearview_frontend/src/utils/api.ts` with your backend URL.
@@ -274,13 +271,20 @@ Core tables used by the API:
 
 ## 📧 Email Service
 
-ClearView ships a complete **Nodemailer** integration:
+ClearView delivers email through the **Resend API** (HTTPS, no SMTP ports required — works on Render's free tier):
 
 - **Notification emails** — when an event creates an in-app notification (new expense, income, envelope, edit, or budget alert ≥ 90%), an email is sent to the account address *if* the **Email Reports** toggle is enabled (Settings / Profile).
 - **Budget alert deduplication** — each alert threshold is emailed only once (tracked locally).
 - **Password reset** — `/forgot-password` emails a link to `/reset-password?token=…`. The token is a JWT valid for **1 hour**; `/reset-password` verifies it and updates the password.
 
-All SMTP credentials are configured via environment variables (see above).
+Configure it with two environment variables (see above):
+
+```env
+RESEND_API_KEY=re_...      # from https://resend.com/api-keys
+EMAIL_FROM=ClearView <onboarding@resend.dev>
+```
+
+> The free Resend tier (~100 emails/day) uses `onboarding@resend.dev` as the sender until you verify your own domain in the Resend dashboard. If `RESEND_API_KEY` is not set, emails are skipped and the content is logged to the server console instead of failing.
 
 ---
 
@@ -291,7 +295,7 @@ All SMTP credentials are configured via environment variables (see above).
 - Secure authentication with hashed passwords and JWT httpOnly cookies
 - State management with React Context
 - Responsive, themeable UI (dark/light, mobile navigation)
-- Third-party service integration (Nodemailer/SMTP)
+- Third-party service integration (Resend email API)
 - Environment-based configuration & deployment (Vercel + Render)
 
 ---
