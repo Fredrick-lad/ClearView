@@ -3,11 +3,16 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const isSmtpConfigured = () =>
-  Boolean(process.env.SMTP_USER) &&
-  !process.env.SMTP_USER.includes("your-email") &&
-  Boolean(process.env.SMTP_PASS) &&
-  !process.env.SMTP_PASS.includes("your-app-password");
+const isSmtpConfigured = () => {
+  const user = process.env.SMTP_USER || "";
+  const pass = process.env.SMTP_PASS || "";
+  return (
+    Boolean(user) &&
+    !user.includes("your-email") &&
+    Boolean(pass) &&
+    !pass.includes("your-app-password")
+  );
+};
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || "smtp.gmail.com",
