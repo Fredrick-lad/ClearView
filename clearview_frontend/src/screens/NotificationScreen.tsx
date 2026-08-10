@@ -1,15 +1,18 @@
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { useAuth } from "../hooks/context/userContext";
 import { GetData } from "../hooks/context/generalContext";
 import TopBar from "../components/layout/Topbar";
+import { getUnreadNotificationsCount } from "../utils/notifications";
 
 export default function NotificationsView() {
   const { envelopeData } = useAuth();
-  const { notifications, clearNotifications, goBack } = GetData();
-
-  const [markedReadAt, setMarkedReadAt] = useState(() => {
-    return localStorage.getItem("notificationsReadAt") || "";
-  });
+  const {
+    notifications,
+    clearNotifications,
+    goBack,
+    notificationsReadAt,
+    markNotificationsRead,
+  } = GetData();
 
   const styles = {
     serifText: { fontFamily: "Georgia, serif" },
@@ -84,17 +87,17 @@ export default function NotificationsView() {
   );
   const olderItems = allItems.filter((n) => n.date < yesterday);
 
-  const readTimestamp = markedReadAt
-    ? new Date(parseInt(markedReadAt)).getTime()
+  const readTimestamp = notificationsReadAt
+    ? new Date(parseInt(notificationsReadAt)).getTime()
     : 0;
-  const unreadCount = allItems.filter(
-    (n) => n.date.getTime() > readTimestamp,
-  ).length;
+  const unreadCount = getUnreadNotificationsCount(
+    notifications,
+    envelopeData,
+    readTimestamp,
+  );
 
   const handleMarkAllRead = () => {
-    const ts = Date.now().toString();
-    setMarkedReadAt(ts);
-    localStorage.setItem("notificationsReadAt", ts);
+    markNotificationsRead();
   };
 
   const timeAgo = (d: Date) => {

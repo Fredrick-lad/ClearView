@@ -25,6 +25,8 @@ interface envelopeContextType {
   notifications: NotificationItem[];
   addNotification: (n: Omit<NotificationItem, "id" | "timestamp">) => void;
   clearNotifications: () => void;
+  notificationsReadAt: string;
+  markNotificationsRead: () => void;
 }
 
 export const generalContext = createContext<envelopeContextType | null>(null);
@@ -121,6 +123,16 @@ function DataContext({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("cv_notifications");
   }, []);
 
+  const [notificationsReadAt, setNotificationsReadAt] = useState<string>(
+    () => localStorage.getItem("notificationsReadAt") || "",
+  );
+
+  const markNotificationsRead = useCallback(() => {
+    const ts = Date.now().toString();
+    setNotificationsReadAt(ts);
+    localStorage.setItem("notificationsReadAt", ts);
+  }, []);
+
   return (
     <generalContext.Provider
       value={{
@@ -138,6 +150,8 @@ function DataContext({ children }: { children: React.ReactNode }) {
         notifications,
         addNotification,
         clearNotifications,
+        notificationsReadAt,
+        markNotificationsRead,
       }}
     >
       {children}

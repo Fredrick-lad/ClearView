@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { ArrowLeft, Menu, X, LogOut } from "lucide-react";
 import { GetData } from "../../hooks/context/generalContext";
+import { useAuth } from "../../hooks/context/userContext";
+import { getUnreadNotificationsCount } from "../../utils/notifications";
 
 interface TopBarProps {
   title: string;
@@ -31,10 +33,21 @@ export default function TopBar({
   showHelpIcon = false,
   avatarUrl,
 }: TopBarProps) {
-  const { setModal, screen, setScreen } = GetData();
+  const { setModal, screen, setScreen, notifications, notificationsReadAt } =
+    GetData();
+  const { envelopeData } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
+
+  const unreadCount = getUnreadNotificationsCount(
+    notifications,
+    envelopeData,
+    notificationsReadAt
+      ? new Date(parseInt(notificationsReadAt)).getTime()
+      : 0,
+  );
+  const hasUnread = unreadCount > 0;
 
   const handleAction = (callback?: () => void, modalType?: string) => {
     if (callback) {
@@ -141,14 +154,33 @@ export default function TopBar({
           {/* Navigation Items */}
           <div className="d-flex align-items-center gap-1">
             <button
-              className="btn btn-sm p-2 text-dark hover-bg-light rounded"
+              className="btn btn-sm p-2 hover-bg-light rounded position-relative"
               onClick={() => handleNavigation("Notifications")}
               title="Notifications"
+              style={{
+                color: hasUnread
+                  ? "var(--cv-nav-active-text, #1D9E75)"
+                  : "var(--cv-text-primary, #18181A)",
+              }}
             >
               <TopBarIconSwitcher
                 type="bell"
+                hasUnread={hasUnread}
                 style={{ width: "20px", height: "20px" }}
               />
+              {hasUnread && (
+                <span
+                  className="position-absolute top-0 start-100 translate-middle badge rounded-pill"
+                  style={{
+                    fontSize: "9px",
+                    backgroundColor: "var(--cv-danger-text, #dc2626)",
+                    color: "#fff",
+                    minWidth: "15px",
+                  }}
+                >
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
             </button>
 
             {(showHelpIcon || true) && (
@@ -290,10 +322,26 @@ export default function TopBar({
                 className="btn text-start p-2 d-flex align-items-center gap-3 hover-bg-light rounded"
                 onClick={() => handleNavigation("Notifications")}
               >
-                <TopBarIconSwitcher
-                  type="bell"
-                  style={{ width: "20px", height: "20px" }}
-                />
+                <span className="position-relative">
+                  <TopBarIconSwitcher
+                    type="bell"
+                    hasUnread={hasUnread}
+                    style={{ width: "20px", height: "20px" }}
+                  />
+                  {hasUnread && (
+                    <span
+                      className="position-absolute top-0 start-100 translate-middle badge rounded-pill"
+                      style={{
+                        fontSize: "9px",
+                        backgroundColor: "var(--cv-danger-text, #dc2626)",
+                        color: "#fff",
+                        minWidth: "15px",
+                      }}
+                    >
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  )}
+                </span>
                 <span>Notifications</span>
               </button>
 
@@ -401,14 +449,21 @@ export default function TopBar({
 function TopBarIconSwitcher({
   type,
   style,
+  hasUnread = false,
 }: {
   type: string;
   style?: React.CSSProperties;
+  hasUnread?: boolean;
 }) {
   const getPath = () => {
     switch (type) {
       case "bell":
-        return (
+        return hasUnread ? (
+          <path
+            fill="currentColor"
+            d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
+          />
+        ) : (
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
