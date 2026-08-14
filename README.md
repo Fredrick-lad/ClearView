@@ -6,10 +6,10 @@ ClearView lets users record income, split it into smart spending **envelopes**, 
 
 ---
 
-## 🚀 Live Demo
+##  Live Demo
 
-🔗 **Frontend:** https://clear-view-one.vercel.app/
-🔗 **Backend API:** https://clearview-backend-k466.onrender.com/
+ **Frontend:** https://clear-view-one.vercel.app/
+ **Backend API:** https://clearview-backend-k466.onrender.com/
 
 ```text
 email:    demo@gmail.com
@@ -47,7 +47,7 @@ password: demo
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 ### Frontend — `clearview_frontend/`
 | Technology | Purpose |
@@ -77,7 +77,7 @@ password: demo
 
 ---
 
-## 🏗️ System Architecture
+##  System Architecture
 
 ```
         ┌──────────────────────┐
@@ -108,7 +108,7 @@ password: demo
 
 ---
 
-## 📂 Project Structure
+##  Project Structure
 
 ```
 ClearView/
@@ -227,7 +227,7 @@ Update `clearview_frontend/src/utils/api.ts` with your backend URL.
 
 ---
 
-## 🗄️ Database Schema
+##  Database Schema
 
 Core tables used by the API:
 
@@ -242,7 +242,7 @@ Core tables used by the API:
 
 ---
 
-## 📡 API Endpoints
+##  API Endpoints
 
 | Method | Endpoint | Auth | Description |
 |---|---|---|---|
@@ -269,7 +269,7 @@ Core tables used by the API:
 
 ---
 
-## 📧 Email Service
+##  Email Service
 
 ClearView delivers email through the **Resend API** (HTTPS, no SMTP ports required — works on Render's free tier):
 
@@ -288,7 +288,7 @@ EMAIL_FROM=ClearView <onboarding@resend.dev>
 
 ---
 
-## ✅ Skills Demonstrated
+##  Skills Demonstrated
 
 - Full-stack application development (React + Node/Express + MySQL)
 - REST API design & integration
@@ -311,7 +311,7 @@ EMAIL_FROM=ClearView <onboarding@resend.dev>
 
 ---
 
-## 👨‍💻 Developer
+##  Developer
 
 **Fredrick Mwangangi**
 
