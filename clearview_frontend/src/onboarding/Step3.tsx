@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { HelpCircle, ArrowLeft, Check, Plus, Loader } from "lucide-react";
+import { HelpCircle, ArrowLeft, Plus, Loader } from "lucide-react";
 
 import { iconMap } from "../components/ui/iconMap";
 
@@ -68,71 +68,27 @@ export default function OnboardingStep3() {
           className="flex-grow-1 container py-4"
           style={{ maxWidth: "960px" }}
         >
-          {/* Progress Timeline Header (Unified Style matching Step 2) */}
-          <div className="d-flex justify-content-between align-items-center mb-5 mt-2">
-            <div className="d-flex align-items-center gap-2">
-              {/* Step 1: Completed */}
-              <div
-                className="d-flex align-items-center justify-content-center rounded-circle"
-                style={{
-                  width: "32px",
-                  height: "32px",
-                  backgroundColor: "#cbece1",
-                  color: "#053225",
-                }}
-              >
-                <Check size={16} strokeWidth={3} />
-              </div>
-
-              <div
-                style={{
-                  width: "24px",
-                  height: "1px",
-                  backgroundColor: "#053225",
-                }}
-              ></div>
-
-              {/* Step 2: Completed */}
-              <div
-                className="d-flex align-items-center justify-content-center rounded-circle"
-                style={{
-                  width: "32px",
-                  height: "32px",
-                  backgroundColor: "#cbece1",
-                  color: "#053225",
-                }}
-              >
-                <Check size={16} strokeWidth={3} />
-              </div>
-
-              <div
-                style={{
-                  width: "24px",
-                  height: "1px",
-                  backgroundColor: "#053225",
-                }}
-              ></div>
-
-              {/* Step 3: Active Final Step */}
-              <div
-                className="d-flex align-items-center justify-content-center rounded-circle fw-medium"
-                style={{
-                  width: "32px",
-                  height: "32px",
-                  border: "2px solid #053225",
-                  color: "#053225",
-                  fontSize: "0.9rem",
-                }}
-              >
-                3
-              </div>
-            </div>
-
+          {/* Progress Bar Header (Unified Style matching Step 2) */}
+          <div className="mb-5">
             <div
-              className="text-muted fw-bold tracking-wider"
-              style={{ fontSize: "0.75rem", letterSpacing: "0.08em" }}
+              className="d-flex justify-content-between align-items-center mb-2 text-uppercase fw-bold text-muted"
+              style={{ fontSize: "0.75rem", letterSpacing: "0.05em" }}
             >
-              STEP 3 OF 3
+              <span>Step 3 of 3: Review Your Budget</span>
+              <span>100%</span>
+            </div>
+            <div
+              className="progress"
+              style={{ height: "6px", backgroundColor: "#e9ecef" }}
+            >
+              <div
+                className="progress-bar"
+                role="progressbar"
+                style={{ width: "100%", backgroundColor: "#053225" }}
+                aria-valuenow={100}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              />
             </div>
           </div>
 
